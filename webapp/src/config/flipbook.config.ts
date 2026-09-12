@@ -34,8 +34,23 @@ export interface FlipbookConfig {
      * flipbook.client.ts's own click handler, independent of this library flag.
      */
     useMouseEvents: boolean;
-    /** If true, page-flip may collapse to a single-page portrait layout on narrow viewports. Set false to always force the two-page spread. */
-    usePortrait: boolean;
+  };
+
+  /**
+   * Mobile ("one page on screen") vs desktop ("two-page spread") is decided
+   * live by viewport width, not a static flag — flipbook.client.ts rebuilds
+   * the PageFlip instance whenever `matchMedia` crosses mobileBreakpointPx
+   * (covers window resize AND phone/tablet orientation change).
+   */
+  responsive: {
+    /** At or below this viewport width (px), show one page at a time instead of a two-page spread. */
+    mobileBreakpointPx: number;
+    /**
+     * In mobile (single-page) mode, show Prev/Next + the page indicator in a
+     * fixed bar at the bottom of the screen (thumb-reachable) instead of the
+     * top toolbar's copy of the same controls, which gets hidden.
+     */
+    bottomNavOnMobile: boolean;
   };
 
   toolbar: {
@@ -99,7 +114,11 @@ const config: FlipbookConfig = {
     maxShadowOpacity: 0.5,
     drawShadow: true,
     useMouseEvents: false,
-    usePortrait: false,
+  },
+
+  responsive: {
+    mobileBreakpointPx: 700,
+    bottomNavOnMobile: true,
   },
 
   toolbar: {

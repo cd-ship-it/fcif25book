@@ -1,86 +1,59 @@
 import { PageFlip } from 'page-flip';
 import config from '../config/flipbook.config';
+import { readMoreLinks } from '../config/readmore.config';
 
 function init(): void {
-  const bookEl = document.getElementById('book');
-  const stage = document.getElementById('stage');
-  const loadingNote = document.getElementById('loading-note');
-  if (!bookEl || !stage) return;
-
-  const pageFlip = new PageFlip(bookEl, {
-    width: config.book.pageWidth,
-    height: config.book.pageHeight,
-    size: config.book.size,
-    minWidth: config.book.pageWidth,
-    maxWidth: config.book.pageWidth,
-    minHeight: config.book.pageHeight,
-    maxHeight: config.book.pageHeight,
-    showCover: config.book.showCover,
-    startPage: Math.max(0, config.book.startPage - 1),
-    flippingTime: config.book.flippingTime,
-    maxShadowOpacity: config.book.maxShadowOpacity,
-    drawShadow: config.book.drawShadow,
-    useMouseEvents: config.book.useMouseEvents,
-    usePortrait: config.book.usePortrait,
-  });
-
-  const pageEls = bookEl.querySelectorAll<HTMLElement>(':scope > .page');
-  pageFlip.loadFromHTML(pageEls);
-  loadingNote?.remove();
-
-  // page-flip's "fixed" size mode always lays the book out at a full
-  // spread width (2 * pageWidth) internally — even a lone cover page just
-  // occupies the right half of that box. Rather than fight that, give
-  // #book-shell that exact natural size and scale it down (never up, to
-  // keep text/background crisp) to fit whatever room #stage actually has.
   const bookShell = document.getElementById('book-shell');
-  const NATURAL_W = config.book.pageWidth * 2;
-  const NATURAL_H = config.book.pageHeight;
-  const STAGE_PADDING = 32;
+  const stage = document.getElementById('stage');
+  const app = document.getElementById('app');
+  const loadingNote = document.getElementById('loading-note');
+  const originalBookEl = document.getElementById('book');
+  if (!bookShell || !stage || !app || !originalBookEl) return;
 
-  function fitBookToStage(): void {
-    if (!bookShell || !stage) return;
-    bookShell.style.width = `${NATURAL_W}px`;
-    bookShell.style.height = `${NATURAL_H}px`;
-    const availW = stage.clientWidth - STAGE_PADDING * 2;
-    const availH = stage.clientHeight - STAGE_PADDING * 2;
-    const scale = Math.min(availW / NATURAL_W, availH / NATURAL_H, 1);
-    bookShell.style.transform = `scale(${Math.max(scale, 0.1)})`;
+  // Freeze a pristine copy of the page markup before page-flip ever touches
+  // it — loadFromHTML reparents/wraps the live nodes it's given, and
+  // PageFlip.destroy() removes the whole block element outright (there's no
+  // "reconfigure in place" API). Switching between desktop-spread and
+  // mobile-single-page means fully tearing down and recreating the
+  // instance, so we need our own clean copies to rebuild from each time.
+  const templatePages = Array.from(
+    originalBookEl.querySelectorAll<HTMLElement>(':scope > .page')
+  ).map((el) => el.cloneNode(true) as HTMLElement);
+  const total = templatePages.length;
+
+  // Mark "閱讀全文" trigger elements once, on the template — every future
+  // clone (i.e. every rebuild) then already carries the affordance styling
+  // and a11y attributes with it, with no per-rebuild re-work needed.
+  for (const link of readMoreLinks) {
+    for (const page of templatePages) {
+      const el = page.querySelector<HTMLElement>(`#${CSS.escape(link.elementId)}`);
+      if (!el) continue;
+      el.classList.add('readmore-trigger');
+      el.setAttribute('role', 'button');
+      el.setAttribute('tabindex', '0');
+      el.setAttribute('aria-haspopup', 'dialog');
+    }
   }
 
-  fitBookToStage();
-  window.addEventListener('resize', fitBookToStage);
-  document.addEventListener('fullscreenchange', () => setTimeout(fitBookToStage, 50));
-
-  const total = pageFlip.getPageCount();
-
-  // With useMouseEvents:false, page-flip attaches none of its own mouse
-  // handling (no hover-curl preview, no drag-follow). Restore the minimum
-  // expected interaction ourselves: click the left half of the book to go
-  // back, the right half to go forward — a plain flip, nothing more.
-  if (!config.book.useMouseEvents) {
-    bookEl.addEventListener('click', (e) => {
-      if ((window.getSelection()?.toString().length ?? 0) > 0) return; // don't hijack text selection
-      const rect = bookEl.getBoundingClientRect();
-      const fraction = (e.clientX - rect.left) / rect.width;
-      if (fraction < 0.5) {
-        pageFlip.flipPrev();
-      } else {
-        pageFlip.flipNext();
-      }
-    });
-    bookEl.style.cursor = 'pointer';
-  }
+  const mq = window.matchMedia(`(max-width: ${config.responsive.mobileBreakpointPx}px)`);
+  let pageFlip: PageFlip | null = null;
+  let bookEl: HTMLElement | null = null;
+  let mobileMode = false;
 
   const prevBtn = document.getElementById('btn-prev') as HTMLButtonElement | null;
   const nextBtn = document.getElementById('btn-next') as HTMLButtonElement | null;
   const indicator = document.getElementById('page-indicator');
+  const prevBtnMobile = document.getElementById('btn-prev-mobile') as HTMLButtonElement | null;
+  const nextBtnMobile = document.getElementById('btn-next-mobile') as HTMLButtonElement | null;
+  const indicatorMobile = document.getElementById('page-indicator-mobile');
 
   // Derive which 1-indexed source page(s) are on screen. With showCover
   // enabled, the first and last pages are shown alone; everything else is a
-  // left/right spread starting at the current page index.
+  // left/right spread starting at the current page index. In single-page
+  // (portrait) mode there's only ever one page shown.
   function currentPagesDisplay(): number[] {
-    const idx = pageFlip.getCurrentPageIndex(); // 0-based
+    if (!pageFlip) return [1];
+    const idx = pageFlip.getCurrentPageIndex();
     const orientation = pageFlip.getOrientation();
     const left = idx + 1;
     if (orientation !== 'landscape') return [left];
@@ -90,30 +63,159 @@ function init(): void {
   }
 
   function refreshUI(): void {
+    if (!pageFlip) return;
     const shown = currentPagesDisplay();
-    // Bug note: don't derive "last page" from getCurrentPageIndex() alone —
-    // it's the LEFT page of the current spread, which only equals total-1
-    // when the final spread happens to be a lone page (true for 10 pages,
-    // false for e.g. 93: 92 pages after the cover is even, so the last
-    // spread pairs up with no trailing single page). Deriving from the
-    // same left/right range used for the indicator is correct either way.
-    if (prevBtn) prevBtn.disabled = shown[0] <= 1;
-    if (nextBtn) nextBtn.disabled = shown[shown.length - 1] >= total;
-    if (indicator) indicator.textContent = config.labels.pageIndicator(shown, total);
+    // Don't derive "last page" from getCurrentPageIndex() alone — see the
+    // README for why (it's only ever the LEFT page of the spread).
+    const atStart = shown[0] <= 1;
+    const atEnd = shown[shown.length - 1] >= total;
+    const text = config.labels.pageIndicator(shown, total);
+    if (prevBtn) prevBtn.disabled = atStart;
+    if (nextBtn) nextBtn.disabled = atEnd;
+    if (indicator) indicator.textContent = text;
+    if (prevBtnMobile) prevBtnMobile.disabled = atStart;
+    if (nextBtnMobile) nextBtnMobile.disabled = atEnd;
+    if (indicatorMobile) indicatorMobile.textContent = text;
   }
 
-  pageFlip.on('flip', refreshUI);
-  pageFlip.on('changeOrientation', refreshUI);
-  refreshUI();
+  // Desktop: scale the whole two-page spread (never upscaled) to fit
+  // entirely within #stage — no scrolling, the whole spread is always
+  // visible at once.
+  function fitDesktop(): void {
+    if (!bookEl) return;
+    const NATURAL_W = config.book.pageWidth * 2;
+    const NATURAL_H = config.book.pageHeight;
+    const PADDING = 32;
+    bookShell!.style.width = `${NATURAL_W}px`;
+    bookShell!.style.height = `${NATURAL_H}px`;
+    const availW = stage!.clientWidth - PADDING * 2;
+    const availH = stage!.clientHeight - PADDING * 2;
+    const scale = Math.min(availW / NATURAL_W, availH / NATURAL_H, 1);
+    bookShell!.style.transformOrigin = 'center center';
+    bookShell!.style.transform = `scale(${Math.max(scale, 0.1)})`;
+  }
 
-  prevBtn?.addEventListener('click', () => pageFlip.flipPrev());
-  nextBtn?.addEventListener('click', () => pageFlip.flipNext());
+  // Mobile: scale a single page to fit the viewport WIDTH only (never
+  // upscaled). The resulting height often exceeds the visible stage area —
+  // that's expected; #stage scrolls vertically in mobile mode (see
+  // #app.mobile-mode #stage in app.css) rather than shrinking text to
+  // illegibility just to avoid a scrollbar.
+  function fitMobile(): void {
+    if (!bookEl) return;
+    const NATURAL_W = config.book.pageWidth;
+    const NATURAL_H = config.book.pageHeight;
+    const SIDE_PADDING = 8;
+    bookShell!.style.width = `${NATURAL_W}px`;
+    bookShell!.style.height = `${NATURAL_H}px`;
+    const availW = stage!.clientWidth - SIDE_PADDING * 2;
+    const scale = Math.min(availW / NATURAL_W, 1);
+    // top center (not the desktop center-center): so shrinking sits the
+    // page flush at the top of the scrollable area, not visually inset.
+    bookShell!.style.transformOrigin = 'top center';
+    bookShell!.style.transform = `scale(${Math.max(scale, 0.1)})`;
+  }
+
+  function applyFit(): void {
+    if (mobileMode) fitMobile();
+    else fitDesktop();
+  }
+
+  function attachBookClickToFlip(): void {
+    if (!bookEl || config.book.useMouseEvents) return;
+    // With useMouseEvents:false, page-flip attaches none of its own mouse
+    // handling (no hover-curl preview, no drag-follow). Restore the minimum
+    // expected interaction ourselves: click the left half of the book to go
+    // back, the right half to go forward — a plain flip, nothing more. This
+    // is re-attached on every rebuild since #book is a fresh element each time.
+    bookEl.addEventListener('click', (e) => {
+      if ((window.getSelection()?.toString().length ?? 0) > 0) return; // don't hijack text selection
+      const rect = bookEl!.getBoundingClientRect();
+      const fraction = (e.clientX - rect.left) / rect.width;
+      if (fraction < 0.5) pageFlip?.flipPrev();
+      else pageFlip?.flipNext();
+    });
+    bookEl.style.cursor = 'pointer';
+  }
+
+  function buildBook(mobile: boolean): void {
+    mobileMode = mobile;
+    app!.classList.toggle('mobile-mode', mobile);
+
+    if (pageFlip) {
+      pageFlip.destroy(); // also removes the old #book element from the DOM
+      pageFlip = null;
+    } else {
+      // First call: pageFlip.destroy() hasn't run yet to clear out the
+      // original server-rendered #book (the one templatePages was cloned
+      // from) — remove it ourselves, or we'd end up with two #book elements
+      // and duplicate ids, with getElementById silently resolving to the
+      // stale original instead of the live clone.
+      document.getElementById('book')?.remove();
+    }
+
+    bookEl = document.createElement('div');
+    bookEl.id = 'book';
+    for (const p of templatePages) bookEl.appendChild(p.cloneNode(true));
+    bookShell!.appendChild(bookEl);
+
+    const shared = {
+      showCover: config.book.showCover,
+      startPage: Math.max(0, config.book.startPage - 1),
+      flippingTime: config.book.flippingTime,
+      maxShadowOpacity: config.book.maxShadowOpacity,
+      drawShadow: config.book.drawShadow,
+      useMouseEvents: config.book.useMouseEvents,
+      width: config.book.pageWidth,
+      height: config.book.pageHeight,
+      size: config.book.size,
+      minWidth: config.book.pageWidth,
+      maxWidth: config.book.pageWidth,
+      minHeight: config.book.pageHeight,
+      maxHeight: config.book.pageHeight,
+    };
+
+    pageFlip = new PageFlip(bookEl, { ...shared, usePortrait: mobile });
+
+    const pageEls = bookEl.querySelectorAll<HTMLElement>(':scope > .page');
+    pageFlip.loadFromHTML(pageEls);
+    loadingNote?.remove();
+
+    attachBookClickToFlip();
+    pageFlip.on('flip', refreshUI);
+    pageFlip.on('changeOrientation', refreshUI);
+    refreshUI();
+    applyFit();
+  }
+
+  buildBook(mq.matches);
+
+  window.addEventListener('resize', () => {
+    if (mq.matches !== mobileMode) buildBook(mq.matches);
+    else applyFit();
+  });
+  // Some browsers fire this distinctly from (and before) `resize` on rotation.
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => {
+      if (mq.matches !== mobileMode) buildBook(mq.matches);
+      else applyFit();
+    }, 100);
+  });
+  document.addEventListener('fullscreenchange', () => setTimeout(applyFit, 50));
+
+  // --- Controls below are static (rendered once by index.astro) and call
+  // through the `pageFlip` closure variable, which buildBook keeps pointed
+  // at whichever instance is currently live. ---
+
+  prevBtn?.addEventListener('click', () => pageFlip?.flipPrev());
+  nextBtn?.addEventListener('click', () => pageFlip?.flipNext());
+  prevBtnMobile?.addEventListener('click', () => pageFlip?.flipPrev());
+  nextBtnMobile?.addEventListener('click', () => pageFlip?.flipNext());
 
   if (config.toolbar.showKeyboardNav) {
     window.addEventListener('keydown', (e) => {
       if (e.target instanceof HTMLInputElement) return;
-      if (e.key === 'ArrowLeft') pageFlip.flipPrev();
-      if (e.key === 'ArrowRight') pageFlip.flipNext();
+      if (e.key === 'ArrowLeft') pageFlip?.flipPrev();
+      if (e.key === 'ArrowRight') pageFlip?.flipNext();
     });
   }
 
@@ -123,7 +225,7 @@ function init(): void {
     form?.addEventListener('submit', (e) => {
       e.preventDefault();
       const n = parseInt(input?.value ?? '', 10);
-      if (!Number.isNaN(n) && n >= 1 && n <= total) {
+      if (pageFlip && !Number.isNaN(n) && n >= 1 && n <= total) {
         // turnToPage (not flip) — flip()/flipToPage() only steps one spread
         // at a time regardless of distance, so it's wrong for arbitrary jumps.
         pageFlip.turnToPage(n - 1);
@@ -137,7 +239,7 @@ function init(): void {
     const fsBtn = document.getElementById('btn-fullscreen');
     fsBtn?.addEventListener('click', () => {
       if (!document.fullscreenElement) {
-        stage.requestFullscreen?.().catch(() => {});
+        stage!.requestFullscreen?.().catch(() => {});
       } else {
         document.exitFullscreen?.().catch(() => {});
       }
@@ -170,7 +272,7 @@ function init(): void {
     drawer?.querySelectorAll<HTMLElement>('[data-goto]').forEach((el) => {
       el.addEventListener('click', () => {
         const n = parseInt(el.dataset.goto ?? '1', 10);
-        pageFlip.turnToPage(n - 1);
+        pageFlip?.turnToPage(n - 1);
         closeToc();
       });
     });
