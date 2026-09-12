@@ -1,0 +1,18 @@
+/* page6.css — local overrides for page 6.
+   This file is created once and is NEVER overwritten by generate.py,
+   so it's safe to hand-edit. It loads AFTER style.css and
+   page6.generated.css, so any rule here wins.
+
+   Examples:
+
+   #page6 {
+     background-image: url('assets/backgrounds/page6.png');
+   }
+
+   #p6-t3 {
+     left: 120px;
+     top: 340px;
+     font-size: 18px;
+     color: #333333;
+   }
+*/

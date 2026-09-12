@@ -1,0 +1,18 @@
+/* page35.css — local overrides for page 35.
+   This file is created once and is NEVER overwritten by generate.py,
+   so it's safe to hand-edit. It loads AFTER style.css and
+   page35.generated.css, so any rule here wins.
+
+   Examples:
+
+   #page35 {
+     background-image: url('assets/backgrounds/page35.png');
+   }
+
+   #p35-t3 {
+     left: 120px;
+     top: 340px;
+     font-size: 18px;
+     color: #333333;
+   }
+*/

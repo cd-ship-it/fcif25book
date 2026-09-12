@@ -1,0 +1,18 @@
+/* page57.css — local overrides for page 57.
+   This file is created once and is NEVER overwritten by generate.py,
+   so it's safe to hand-edit. It loads AFTER style.css and
+   page57.generated.css, so any rule here wins.
+
+   Examples:
+
+   #page57 {
+     background-image: url('assets/backgrounds/page57.png');
+   }
+
+   #p57-t3 {
+     left: 120px;
+     top: 340px;
+     font-size: 18px;
+     color: #333333;
+   }
+*/

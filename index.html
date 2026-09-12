@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>FiCF 25 — 目錄</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .grid { width: 940px; margin: 40px auto; display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; }
+  .thumb { display:block; text-decoration:none; color:#eee; text-align:center; font-size:13px; }
+  .thumb img { width: 100%; border-radius: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.4); display:block; margin-bottom:6px; }
+  .thumb .title { display:block; color:#aaa; font-size:11px; margin-top:2px; }
+  h1 { color:#fff; text-align:center; font-family: sans-serif; }
+</style>
+</head>
+<body>
+<h1 id="heading">FiCF 25 週年紀念電子書</h1>
+<div class="grid" id="grid"></div>
+<script>
+fetch('data/titles.json')
+  .then((r) => r.json())
+  .then((manifest) => {
+    document.getElementById('heading').textContent =
+      `FiCF 25 週年紀念電子書 — 全 ${manifest.total} 頁`;
+    const grid = document.getElementById('grid');
+    for (const p of manifest.pages) {
+      const a = document.createElement('a');
+      a.className = 'thumb';
+      a.href = `page${p.page}.html`;
+      a.innerHTML = `<img src="assets/backgrounds/page${p.page}.png" loading="lazy"><span>Page ${p.page}</span><span class="title">${p.title}</span>`;
+      grid.appendChild(a);
+    }
+  });
+</script>
+</body>
+</html>

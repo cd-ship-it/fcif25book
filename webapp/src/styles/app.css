@@ -1,0 +1,217 @@
+/* App shell: toolbar, stage backdrop, thumbnail drawer.
+   Colors come from CSS custom properties injected by src/config/flipbook.config.ts
+   (see the define:vars block in src/pages/index.astro). */
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--fpBg, #26232b);
+  color: var(--fpToolbarText, #f3ede0);
+  font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+  overflow: hidden;
+}
+
+#app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--fpBgGradient, none), var(--fpBg, #26232b);
+}
+
+/* ---------------- Toolbar ---------------- */
+
+.toolbar {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+  padding: 10px 20px;
+  background: var(--fpToolbarBg, rgba(20,20,24,0.9));
+  border-bottom: 1px solid var(--fpToolbarBorder, rgba(200,170,60,0.3));
+  z-index: 20;
+}
+
+.toolbar .brand {
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.05em;
+  color: var(--fpGold, #c9a227);
+  white-space: nowrap;
+}
+
+.toolbar .spacer { flex: 1 1 auto; }
+
+.toolbar .group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar button,
+.toolbar .btn {
+  appearance: none;
+  border: 1px solid var(--fpToolbarBorder, rgba(200,170,60,0.3));
+  background: rgba(255,255,255,0.04);
+  color: var(--fpToolbarText, #f3ede0);
+  border-radius: 6px;
+  padding: 7px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.toolbar button:hover,
+.toolbar .btn:hover {
+  background: var(--fpPrimary, #624393);
+  border-color: var(--fpPrimary, #624393);
+}
+
+.toolbar button:disabled {
+  opacity: 0.35;
+  cursor: default;
+  background: transparent;
+}
+
+.toolbar .page-indicator {
+  font-size: 13px;
+  color: var(--fpToolbarText, #f3ede0);
+  min-width: 160px;
+  text-align: center;
+}
+
+.toolbar .jump-form {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toolbar .jump-form input {
+  width: 56px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--fpToolbarBorder, rgba(200,170,60,0.3));
+  background: rgba(255,255,255,0.06);
+  color: var(--fpToolbarText, #f3ede0);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* ---------------- Stage ---------------- */
+
+#stage {
+  position: relative;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  min-height: 0;
+}
+
+#stage:fullscreen {
+  background: var(--fpBg, #26232b);
+}
+
+#book-shell {
+  filter: drop-shadow(var(--fpPageShadow, 0 20px 60px rgba(0,0,0,0.55)));
+  transform-origin: center center;
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+
+#book .page {
+  background-color: #ffffff;
+}
+
+.loading-note {
+  position: absolute;
+  color: var(--fpToolbarText, #f3ede0);
+  opacity: 0.7;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+/* ---------------- TOC drawer ---------------- */
+
+#toc-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 260px;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  background: var(--fpToolbarBg, rgba(20,20,24,0.96));
+  border-left: 1px solid var(--fpToolbarBorder, rgba(200,170,60,0.3));
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+#toc-drawer.open {
+  transform: translateX(0);
+}
+
+#toc-drawer h2 {
+  font-size: 16px;
+  margin: 0 0 12px;
+  color: var(--fpGold, #c9a227);
+}
+
+#toc-drawer .toc-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--fpToolbarText, #f3ede0);
+}
+
+#toc-drawer .toc-item:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+#toc-drawer .toc-item img {
+  width: 44px;
+  height: 57px;
+  object-fit: cover;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.15);
+  flex: 0 0 auto;
+  background: #fff;
+}
+
+#toc-drawer .toc-item .toc-label {
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+#toc-drawer .toc-item .toc-num {
+  display: block;
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+#toc-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 25;
+  display: none;
+}
+
+#toc-backdrop.open { display: block; }
+
+@media (max-width: 900px) {
+  .toolbar .brand { display: none; }
+  #toc-drawer { width: 80vw; }
+}

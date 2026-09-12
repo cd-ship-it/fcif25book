@@ -1,0 +1,18 @@
+/* page10.css — local overrides for page 10.
+   This file is created once and is NEVER overwritten by generate.py,
+   so it's safe to hand-edit. It loads AFTER style.css and
+   page10.generated.css, so any rule here wins.
+
+   Examples:
+
+   #page10 {
+     background-image: url('assets/backgrounds/page10.png');
+   }
+
+   #p10-t3 {
+     left: 120px;
+     top: 340px;
+     font-size: 18px;
+     color: #333333;
+   }
+*/

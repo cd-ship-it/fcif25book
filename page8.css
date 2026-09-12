@@ -1,0 +1,18 @@
+/* page8.css — local overrides for page 8.
+   This file is created once and is NEVER overwritten by generate.py,
+   so it's safe to hand-edit. It loads AFTER style.css and
+   page8.generated.css, so any rule here wins.
+
+   Examples:
+
+   #page8 {
+     background-image: url('assets/backgrounds/page8.png');
+   }
+
+   #p8-t3 {
+     left: 120px;
+     top: 340px;
+     font-size: 18px;
+     color: #333333;
+   }
+*/

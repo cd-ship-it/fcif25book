@@ -1,0 +1,18 @@
+/* page60.css — local overrides for page 60.
+   This file is created once and is NEVER overwritten by generate.py,
+   so it's safe to hand-edit. It loads AFTER style.css and
+   page60.generated.css, so any rule here wins.
+
+   Examples:
+
+   #page60 {
+     background-image: url('assets/backgrounds/page60.png');
+   }
+
+   #p60-t3 {
+     left: 120px;
+     top: 340px;
+     font-size: 18px;
+     color: #333333;
+   }
+*/

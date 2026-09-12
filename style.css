@@ -1,0 +1,67 @@
+@font-face {
+  font-family: 'TANAngleton';
+  src: url('assets/fonts/TANAngleton_3052.ttf') format('truetype');
+  font-display: swap;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #6b6b6b;
+  font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+}
+
+.pagewrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0 60px;
+}
+
+.nav {
+  width: 695px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  color: #eee;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.nav a {
+  color: #fff;
+  text-decoration: none;
+  background: #444;
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+
+.nav a:hover { background: #666; }
+
+.nav .disabled {
+  color: #999;
+  background: #333;
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+
+.page {
+  position: relative;
+  width: 695px;
+  height: 900px;
+  background-color: #ffffff;
+  background-repeat: no-repeat;
+  background-size: 695px 900px;
+  background-position: top left;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+  flex-shrink: 0;
+}
+
+.t {
+  position: absolute;
+  white-space: pre;
+  margin: 0;
+}

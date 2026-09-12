@@ -1,0 +1,18 @@
+/* page43.css — local overrides for page 43.
+   This file is created once and is NEVER overwritten by generate.py,
+   so it's safe to hand-edit. It loads AFTER style.css and
+   page43.generated.css, so any rule here wins.
+
+   Examples:
+
+   #page43 {
+     background-image: url('assets/backgrounds/page43.png');
+   }
+
+   #p43-t3 {
+     left: 120px;
+     top: 340px;
+     font-size: 18px;
+     color: #333333;
+   }
+*/

@@ -1,0 +1,18 @@
+/* page86.css — local overrides for page 86.
+   This file is created once and is NEVER overwritten by generate.py,
+   so it's safe to hand-edit. It loads AFTER style.css and
+   page86.generated.css, so any rule here wins.
+
+   Examples:
+
+   #page86 {
+     background-image: url('assets/backgrounds/page86.png');
+   }
+
+   #p86-t3 {
+     left: 120px;
+     top: 340px;
+     font-size: 18px;
+     color: #333333;
+   }
+*/

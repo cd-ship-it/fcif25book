@@ -1,0 +1,18 @@
+/* page4.css — local overrides for page 4.
+   This file is created once and is NEVER overwritten by generate.py,
+   so it's safe to hand-edit. It loads AFTER style.css and
+   page4.generated.css, so any rule here wins.
+
+   Examples:
+
+   #page4 {
+     background-image: url('assets/backgrounds/page4.png');
+   }
+
+   #p4-t3 {
+     left: 120px;
+     top: 340px;
+     font-size: 18px;
+     color: #333333;
+   }
+*/

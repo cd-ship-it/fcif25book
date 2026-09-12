@@ -1,0 +1,18 @@
+/* page58.css — local overrides for page 58.
+   This file is created once and is NEVER overwritten by generate.py,
+   so it's safe to hand-edit. It loads AFTER style.css and
+   page58.generated.css, so any rule here wins.
+
+   Examples:
+
+   #page58 {
+     background-image: url('assets/backgrounds/page58.png');
+   }
+
+   #p58-t3 {
+     left: 120px;
+     top: 340px;
+     font-size: 18px;
+     color: #333333;
+   }
+*/

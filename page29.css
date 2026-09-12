@@ -1,0 +1,18 @@
+/* page29.css — local overrides for page 29.
+   This file is created once and is NEVER overwritten by generate.py,
+   so it's safe to hand-edit. It loads AFTER style.css and
+   page29.generated.css, so any rule here wins.
+
+   Examples:
+
+   #page29 {
+     background-image: url('assets/backgrounds/page29.png');
+   }
+
+   #p29-t3 {
+     left: 120px;
+     top: 340px;
+     font-size: 18px;
+     color: #333333;
+   }
+*/

@@ -1,0 +1,72 @@
+/*
+ * Required structural CSS for the `page-flip` (StPageFlip) library.
+ *
+ * The npm package's `dist/` build does not ship a CSS file (only its
+ * TypeScript source under src/Style/stPageFlip.css does, and that file isn't
+ * bundled into dist/js/*.js). Without these rules the book's internal
+ * wrapper/canvas/item layers have no positioning and nothing renders
+ * correctly. Copied from node_modules/page-flip/src/Style/stPageFlip.css,
+ * with the upstream `.sft__wrapper` typo corrected to `.stf__wrapper`
+ * (verified against the actual class names used in dist/js/page-flip.module.js).
+ */
+
+.stf__parent {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  transform: translateZ(0);
+  -ms-touch-action: pan-y;
+  touch-action: pan-y;
+}
+
+.stf__wrapper {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.stf__parent canvas {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+}
+
+.stf__block {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  perspective: 2000px;
+}
+
+.stf__item {
+  display: none;
+  position: absolute;
+  transform-style: preserve-3d;
+}
+
+.stf__outerShadow {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.stf__innerShadow {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.stf__hardShadow {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.stf__hardInnerShadow {
+  position: absolute;
+  left: 0;
+  top: 0;
+}

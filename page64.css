@@ -1,0 +1,18 @@
+/* page64.css — local overrides for page 64.
+   This file is created once and is NEVER overwritten by generate.py,
+   so it's safe to hand-edit. It loads AFTER style.css and
+   page64.generated.css, so any rule here wins.
+
+   Examples:
+
+   #page64 {
+     background-image: url('assets/backgrounds/page64.png');
+   }
+
+   #p64-t3 {
+     left: 120px;
+     top: 340px;
+     font-size: 18px;
+     color: #333333;
+   }
+*/

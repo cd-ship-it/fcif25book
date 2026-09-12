@@ -1,0 +1,8 @@
+# Python venv used by extract.py/generate.py — regenerate with:
+#   python3 -m venv .venv && ./.venv/bin/pip install pymupdf
+.venv/
+
+__pycache__/
+*.pyc
+
+.DS_Store

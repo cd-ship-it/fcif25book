@@ -1,0 +1,18 @@
+/* page46.css — local overrides for page 46.
+   This file is created once and is NEVER overwritten by generate.py,
+   so it's safe to hand-edit. It loads AFTER style.css and
+   page46.generated.css, so any rule here wins.
+
+   Examples:
+
+   #page46 {
+     background-image: url('assets/backgrounds/page46.png');
+   }
+
+   #p46-t3 {
+     left: 120px;
+     top: 340px;
+     font-size: 18px;
+     color: #333333;
+   }
+*/

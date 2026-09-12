@@ -1,0 +1,18 @@
+/* page69.css — local overrides for page 69.
+   This file is created once and is NEVER overwritten by generate.py,
+   so it's safe to hand-edit. It loads AFTER style.css and
+   page69.generated.css, so any rule here wins.
+
+   Examples:
+
+   #page69 {
+     background-image: url('assets/backgrounds/page69.png');
+   }
+
+   #p69-t3 {
+     left: 120px;
+     top: 340px;
+     font-size: 18px;
+     color: #333333;
+   }
+*/
