@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>FiCF 25 — Timeline Test 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="timeline.css">
+</head>
+<body>
+<div class="pagewrap">
+  <div class="nav">
+    <a href="test1.html">← Prev</a>
+    <span>Timeline spread — page 2 / 2</span>
+    <span class="disabled">Next →</span>
+  </div>
+  <div class="page" id="tl-page-2">
+    <div class="corner-label">2016 — 2026</div>
+    <div class="footer-title">基督豐榮團<span class="big25">25</span>年恩典長河</div>
+  </div>
+</div>
+
+<script src="timeline.js"></script>
+<script>
+const points = [
+  {
+    year: 2016, dir: 'up', milestone: true,
+    events: [{ title: '十五週年慶', desc: '舉辦「姊妹與召命——精彩的下半生」大會。' }],
+  },
+  {
+    year: 2017, dir: 'down', milestone: false,
+    events: [
+      { tag: '【內程】', title: '靈命塑造', desc: '成立「靈命塑造」事工，提供實體與網路課程及屬靈導引等。' },
+      { title: '購置「基督豐榮中心」', desc: '購入北加州海沃（Hayward）物業作「豐榮中心」、辦公室、同工宿舍及退修場所，供女教牧、師母與宣教士靜修用。' },
+      { title: '成立「豐榮社區中心」', desc: '開展柬埔寨「豐榮社區中心」，服務當地家庭。' },
+    ],
+  },
+  {
+    year: 2018, dir: 'up', milestone: false,
+    events: [{ title: '成立「豐榮婦女之家」', desc: '於柬埔寨成立「豐榮婦女之家」，深化抗衡人口販賣。' }],
+  },
+  {
+    year: 2021, dir: 'down', milestone: false,
+    events: [{ title: '成立「聖經原文研經」小組', desc: '成立「聖經原文研經」小組，探討聖經中女性角色與地位，推動男女共融。' }],
+  },
+  {
+    year: 2022, dir: 'up', milestone: false,
+    events: [{ title: '成立「豐榮女子中學」', desc: '柬埔寨「豐榮女子中學」啟用，鼓勵女孩進深教育。' }],
+  },
+  {
+    year: 2023, dir: 'down', milestone: false,
+    events: [
+      { title: '會長更替', desc: '吳萃芳與潘蒙愛任共同會長。（吳萃芳2025年5月退休）' },
+      { title: '靈命塑造事工延伸', desc: '開展亞洲區「靈命塑造課程」。' },
+      { title: '拓展女教牧小組', desc: '成立12個「姊妹同路人」小組，定期線上或實體聚會。' },
+    ],
+  },
+  {
+    year: 2025, dir: 'up', milestone: false,
+    events: [{ title: '豐榮領袖3.0培植計劃', desc: '物色、儲備和培植3.0新生代，承傳開拓事工的1.0及2.0代領袖。' }],
+  },
+  {
+    year: 2026, dir: 'down', milestone: true,
+    events: [
+      { title: '靈命塑造事工延伸', desc: '開展粵語「靈命塑造課程」。' },
+      { title: '台灣分會成立', desc: '成立「台灣基督豐榮團契」，拓展豐榮事工。' },
+      { title: '25週年慶', desc: '舉辦「同心綻放主豐榮」大會。' },
+    ],
+  },
+];
+
+renderTimeline(document.getElementById('tl-page-2'), points);
+</script>
+</body>
+</html>

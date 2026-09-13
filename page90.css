@@ -16,3 +16,10 @@
      color: #333333;
    }
 */
+
+#p90-t3,
+#p90-t4 {
+  text-align: left;
+  text-align-last: left;
+  text-justify: auto;
+}

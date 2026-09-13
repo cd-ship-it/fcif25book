@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>FiCF 25 — Timeline Overlay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="timeline.css">
+<style>
+  /* Canvas here is just the real timeline1.jpg as a background — no
+     redrawn wave/bubbles, only absolutely-positioned title/tooltip
+     overlays on top (see timeline.js's renderTimelineOverlay). */
+  body { background: #6b6b6b; }
+  .canvas {
+    position: relative;
+    width: 1280px;
+    height: 828px;
+    margin: 24px auto;
+    background-image: url('timeline1.jpg');
+    background-size: 1280px 828px;
+    background-repeat: no-repeat;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+  }
+</style>
+</head>
+<body>
+<div class="canvas" id="canvas"></div>
+
+<script src="timeline.js"></script>
+<script>
+// x/y = each bubble's actual pixel center in timeline1.jpg (1280x828),
+// hand-measured against the image; dir = which side of the bubble the
+// title stack goes on (matches which side the bubble sits on in the image).
+const points = [
+  { year: 1997, x: 98,   y: 405, dir: 'up', events: [{
+    tag: '【啟程】', title: '肯定女性豐榮的身份與使命',
+    desc: '創辦人：邱清萍、劉秀嫻、吳淑儀合著並出版《還我伊甸的豐榮》，呼籲教會恢復男女在基督裡同尊同榮的身份及同工同盟的關係。',
+  }]},
+  { year: 1998, x: 175,  y: 625, dir: 'down', events: [
+    { title: '團契雛型', desc: '開始於不同地區成立女教牧團契。' },
+  ]},
+  { year: 2001, x: 232,  y: 213, dir: 'up', events: [
+    { title: '成立團契', desc: '「基督豐榮團契」於美國德州正式成立。' },
+  ]},
+  { year: 2006, x: 295,  y: 583, dir: 'down', events: [
+    { title: '首屆會長', desc: '邱清萍出任首屆會長。' },
+  ]},
+  { year: 2009, x: 345,  y: 297, dir: 'up', events: [
+    { title: '美國註冊', desc: '在美國正式註冊成為非營利機構。' },
+  ]},
+  { year: 2010, x: 406,  y: 505, dir: 'down', events: [
+    { tag: '【外程】', title: '開拓宣教', desc: '開展抗衡人口販賣事工，差派宣教士至柬埔寨。' },
+  ]},
+  { year: 2011, x: 456,  y: 186, dir: 'up', events: [
+    { title: '成立「豐榮女兒之家」', desc: '在柬埔寨收容受性侵及人口販賣女童。' },
+    { title: '十週年慶', desc: '舉辦「豐榮之旅」郵輪退修會。' },
+  ]},
+  { year: 2012, x: 536,  y: 578, dir: 'down', events: [
+    { title: '會長更替', desc: '吳淑儀接任會長。' },
+    { title: '香港分會成立', desc: '成立「香港基督豐榮團契」支援柬埔寨事工。' },
+  ]},
+  { year: 2015, x: 611,  y: 222, dir: 'up', events: [
+    { title: '成立「豐榮女子小學」', desc: '於柬埔寨開辦「豐榮女子小學」，鼓勵女孩接受教育。' },
+  ]},
+  { year: 2016, x: 670,  y: 467, dir: 'down', events: [
+    { title: '十五週年慶', desc: '舉辦「姊妹與召命——精彩的下半生」大會。' },
+  ]},
+  { year: 2017, x: 721,  y: 114, dir: 'up', events: [
+    { tag: '【內程】', title: '靈命塑造', desc: '成立「靈命塑造」事工，提供實體與網路課程及屬靈導引等。' },
+    { title: '購置「基督豐榮中心」', desc: '購入北加州海沃（Hayward）物業作「豐榮中心」、辦公室、同工宿舍及退修場所，供女教牧、師母與宣教士靜修用。' },
+    { title: '成立「豐榮社區中心」', desc: '開展柬埔寨「豐榮社區中心」，服務當地家庭。' },
+  ]},
+  { year: 2018, x: 797,  y: 601, dir: 'down', events: [
+    { title: '成立「豐榮婦女之家」', desc: '於柬埔寨成立「豐榮婦女之家」，深化抗衡人口販賣。' },
+  ]},
+  { year: 2021, x: 910,  y: 220, dir: 'up', events: [
+    { title: '成立「聖經原文研經」小組', desc: '成立「聖經原文研經」小組，探討聖經中女性角色與地位，推動男女共融。' },
+  ]},
+  { year: 2022, x: 964,  y: 635, dir: 'down', events: [
+    { title: '成立「豐榮女子中學」', desc: '柬埔寨「豐榮女子中學」啟用，鼓勵女孩進深教育。' },
+  ]},
+  { year: 2023, x: 1029, y: 119, dir: 'up', events: [
+    { title: '會長更替', desc: '吳萃芳與潘蒙愛任共同會長。（吳萃芳2025年5月退休）' },
+    { title: '靈命塑造事工延伸', desc: '開展亞洲區「靈命塑造課程」。' },
+    { title: '拓展女教牧小組', desc: '成立12個「姊妹同路人」小組，定期線上或實體聚會。' },
+  ]},
+  { year: 2025, x: 1101, y: 524, dir: 'down', events: [
+    { title: '豐榮領袖3.0培植計劃', desc: '物色、儲備和培植3.0新生代，承傳開拓事工的1.0及2.0代領袖。' },
+  ]},
+  { year: 2026, x: 1180, y: 231, dir: 'up', events: [
+    { title: '靈命塑造事工延伸', desc: '開展粵語「靈命塑造課程」。' },
+    { title: '台灣分會成立', desc: '成立「台灣基督豐榮團契」，拓展豐榮事工。' },
+    { title: '25週年慶', desc: '舉辦「同心綻放主豐榮」大會。' },
+  ]},
+];
+
+renderTimelineOverlay(document.getElementById('canvas'), points);
+</script>
+</body>
+</html>

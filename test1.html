@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>FiCF 25 — Timeline Test 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="timeline.css">
+</head>
+<body>
+<div class="pagewrap">
+  <div class="nav">
+    <span class="disabled">← Prev</span>
+    <span>Timeline spread — page 1 / 2</span>
+    <a href="test2.html">Next →</a>
+  </div>
+  <div class="page" id="tl-page-1">
+    <div class="corner-label">1997 — 2015</div>
+    <div class="footer-title">基督豐榮團<span class="big25">25</span>年恩典長河</div>
+  </div>
+</div>
+
+<script src="timeline.js"></script>
+<script>
+const points = [
+  {
+    year: 1997, dir: 'down', milestone: false,
+    events: [{
+      tag: '【啟程】',
+      title: '肯定女性豐榮的身份與使命',
+      desc: '創辦人：邱清萍、劉秀嫻、吳淑儀合著並出版《還我伊甸的豐榮》，呼籲教會恢復男女在基督裡同尊同榮的身份及同工同盟的關係。',
+    }],
+  },
+  {
+    year: 1998, dir: 'up', milestone: false,
+    events: [{ title: '團契雛型', desc: '開始於不同地區成立女教牧團契。' }],
+  },
+  {
+    year: 2001, dir: 'down', milestone: true,
+    events: [{ title: '成立團契', desc: '「基督豐榮團契」於美國德州正式成立。' }],
+  },
+  {
+    year: 2006, dir: 'up', milestone: false,
+    events: [{ title: '首屆會長', desc: '邱清萍出任首屆會長。' }],
+  },
+  {
+    year: 2009, dir: 'down', milestone: false,
+    events: [{ title: '美國註冊', desc: '在美國正式註冊成為非營利機構。' }],
+  },
+  {
+    year: 2010, dir: 'up', milestone: false,
+    events: [{
+      tag: '【外程】',
+      title: '開拓宣教',
+      desc: '開展抗衡人口販賣事工，差派宣教士至柬埔寨。',
+    }],
+  },
+  {
+    year: 2011, dir: 'down', milestone: true,
+    events: [
+      { title: '成立「豐榮女兒之家」', desc: '在柬埔寨收容受性侵及人口販賣女童。' },
+      { title: '十週年慶', desc: '舉辦「豐榮之旅」郵輪退修會。' },
+    ],
+  },
+  {
+    year: 2012, dir: 'up', milestone: false,
+    events: [
+      { title: '會長更替', desc: '吳淑儀接任會長。' },
+      { title: '香港分會成立', desc: '成立「香港基督豐榮團契」支援柬埔寨事工。' },
+    ],
+  },
+  {
+    year: 2015, dir: 'down', milestone: false,
+    events: [{ title: '成立「豐榮女子小學」', desc: '於柬埔寨開辦「豐榮女子小學」，鼓勵女孩接受教育。' }],
+  },
+];
+
+renderTimeline(document.getElementById('tl-page-1'), points);
+</script>
+</body>
+</html>

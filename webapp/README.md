@@ -13,10 +13,10 @@ one directory up) and adapts them into a single-page flipbook.
 ## Pipeline
 
 ```
-../FiCF 25 Book-level 1.pdf
+../FiCF 25 Book-Stage1.2.pdf
         │  extract.py   (PyMuPDF: renders text-free backgrounds, dumps text spans)
         ▼
-../data/pages.json, ../assets/backgrounds/*.png, ../assets/fonts/*
+../data/pages.json, ../assets/backgrounds/*.png|jpg, ../assets/fonts/*
         │  generate.py  (writes pageN.html, pageN.generated.css, pageN.css, data/titles.json)
         ▼
 ../pageN.html, ../pageN.generated.css, ../pageN.css, ../style.css
@@ -34,12 +34,15 @@ Re-run the sync step any time the parent project's pages change:
 node scripts/sync-from-source.mjs
 ```
 
-It's safe to re-run — it fully regenerates everything under `src/generated/`
-and `public/assets/` + `public/generated/`. It reads `../data/titles.json`
-to know how many pages exist, so extending this to all 93 pages later is
-just: extend the `range(1, 10)` → `range(1, 94)` loops in `../generate.py`,
-rebuild there, then re-run this sync script. Nothing in this app hardcodes
-"10".
+It's safe to re-run — it clears and fully regenerates everything under
+`src/generated/` and `public/assets/` + `public/generated/` (rather than just
+overwriting on top of what's there), so a source file that's renamed or
+deleted between runs — e.g. a page's background switching from `.png` to
+`.jpg` — doesn't leave a stale orphan copy behind. It reads
+`../data/titles.json` to know how many pages exist (currently all 93), so
+nothing in this app hardcodes a page count — re-running `../extract.py` +
+`../generate.py` against an updated source PDF (even one with a different
+page count) and then this sync script is enough to pick it up.
 
 ## Configuration
 
@@ -89,6 +92,29 @@ no other file should need touching for config-level changes.
   "閱讀全文" trigger sits *inside* `#book`, so its own click handler
   (`readmore.client.ts`) must call `e.stopPropagation()` — otherwise opening
   the details modal would also flip the page underneath it.
+- **Resume position (`localStorage['ficf25:lastPage']`)** — tapping a PDF
+  hyperlink opens it in a new tab; closing that tab and coming back can find
+  the browser has silently reloaded this tab from scratch under memory
+  pressure (especially on mobile, especially for a page this heavy — 93
+  full-page backgrounds + a live YouTube iframe), which with no persisted
+  state always restarted at `config.book.startPage`. `flipbook.client.ts`
+  saves the current page on every `'flip'` event and restores it on load.
+  The same lookup also fixes a second bug for free: `buildBook()` (called
+  again whenever the mobile/desktop breakpoint is crossed) used to always
+  reset to `config.book.startPage` too, since it read the config value
+  unconditionally instead of the live instance's current position — it now
+  reads the live `pageFlip`'s position when one exists (a rebuild) and only
+  falls back to the saved/config value when there isn't one yet (a real
+  fresh load).
+
+## PDF hyperlinks, YouTube embeds, full-image pages
+
+These are entirely `../generate.py`'s doing (real `<a target="_blank">`
+overlays for PDF hyperlinks, a live `<iframe>` for a YouTube link, a flat
+`.jpg` background with no text overlay for a page whose design can't be
+reproduced as horizontal text divs) — this app just receives them as part
+of the synced fragment HTML/CSS, no webapp-side code needed. See the root
+project's `README.md` for how `extract.py`/`generate.py` produce them.
 
 ## "閱讀全文" (Read Full Text) details modal
 

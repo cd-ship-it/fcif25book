@@ -5,375 +5,468 @@
  "pages": [
   {
    "page": 1,
-   "title": "封面"
+   "title": "封面",
+   "bgExt": "png"
   },
   {
    "page": 2,
-   "title": "電子書製作初心"
+   "title": "電子書製作初心",
+   "bgExt": "png"
   },
   {
    "page": 3,
-   "title": "鳴謝"
+   "title": "鳴謝",
+   "bgExt": "png"
   },
   {
    "page": 4,
-   "title": "經文頁"
+   "title": "經文頁",
+   "bgExt": "png"
   },
   {
    "page": 5,
-   "title": "目錄"
+   "title": "目錄",
+   "bgExt": "png"
   },
   {
    "page": 6,
-   "title": "感恩致謝（一）"
+   "title": "感恩致謝（一）",
+   "bgExt": "png"
   },
   {
    "page": 7,
-   "title": "感恩致謝（二）"
+   "title": "感恩致謝（二）",
+   "bgExt": "png"
   },
   {
    "page": 8,
-   "title": "（空白頁）"
+   "title": "（空白頁）",
+   "bgExt": "png"
   },
   {
    "page": 9,
-   "title": "（空白頁）"
+   "title": "（空白頁）",
+   "bgExt": "png"
   },
   {
    "page": 10,
-   "title": "孕育"
+   "title": "孕育",
+   "bgExt": "png"
   },
   {
    "page": 11,
-   "title": "萌芽"
+   "title": "萌芽",
+   "bgExt": "png"
   },
   {
    "page": 12,
-   "title": "圓夢的神、圓神的夢"
+   "title": "圓夢的神、圓神的夢",
+   "bgExt": "png"
   },
   {
    "page": 13,
-   "title": "孕育萌芽"
+   "title": "孕育萌芽",
+   "bgExt": "png"
   },
   {
    "page": 14,
-   "title": "一．夢"
+   "title": "一．夢",
+   "bgExt": "png"
   },
   {
    "page": 15,
-   "title": "二．共舞"
+   "title": "二．共舞",
+   "bgExt": "png"
   },
   {
    "page": 16,
-   "title": "三．樹成林"
+   "title": "三．樹成林",
+   "bgExt": "png"
   },
   {
    "page": 17,
-   "title": "四．綻放豐榮"
+   "title": "四．綻放豐榮",
+   "bgExt": "png"
   },
   {
    "page": 18,
-   "title": "培植同工，接替自己"
+   "title": "培植同工，接替自己",
+   "bgExt": "png"
   },
   {
    "page": 19,
-   "title": "孕育萌芽"
+   "title": "孕育萌芽",
+   "bgExt": "png"
   },
   {
    "page": 20,
-   "title": "頭十年："
+   "title": "頭十年：",
+   "bgExt": "png"
   },
   {
    "page": 21,
-   "title": "第二個十年："
+   "title": "第二個十年：",
+   "bgExt": "png"
   },
   {
    "page": 22,
-   "title": "第三個十年："
+   "title": "第三個十年：",
+   "bgExt": "png"
   },
   {
    "page": 23,
-   "title": "第 23 頁"
+   "title": "第 23 頁",
+   "bgExt": "png"
   },
   {
    "page": 24,
-   "title": "傳承 — 豐榮之旅"
+   "title": "傳承 — 豐榮之旅",
+   "bgExt": "png"
   },
   {
    "page": 25,
-   "title": "孕育萌芽"
+   "title": "孕育萌芽",
+   "bgExt": "png"
   },
   {
    "page": 26,
-   "title": "第一層面的傳承 ──"
+   "title": "第一層面的傳承 ──",
+   "bgExt": "png"
   },
   {
    "page": 27,
-   "title": "第二層面的傳承 ──"
+   "title": "第二層面的傳承 ──",
+   "bgExt": "png"
   },
   {
    "page": 28,
-   "title": "第三層面的傳承 ──"
+   "title": "第三層面的傳承 ──",
+   "bgExt": "png"
   },
   {
    "page": 29,
-   "title": "第 29 頁"
+   "title": "第 29 頁",
+   "bgExt": "png"
   },
   {
    "page": 30,
-   "title": "成長"
+   "title": "成長",
+   "bgExt": "png"
   },
   {
    "page": 31,
-   "title": "茁壯"
+   "title": "茁壯",
+   "bgExt": "png"
   },
   {
    "page": 32,
-   "title": "事工一：姊妹事奉"
+   "title": "事工一：姊妹事奉",
+   "bgExt": "png"
   },
   {
    "page": 33,
-   "title": "姊妹事奉事工 (WIM) 大事記"
+   "title": "姊妹事奉事工 (WIM) 大事記",
+   "bgExt": "png"
   },
   {
    "page": 34,
-   "title": "成長茁壯"
+   "title": "成長茁壯",
+   "bgExt": "png"
   },
   {
    "page": 35,
-   "title": "女教牧事工"
+   "title": "女教牧事工",
+   "bgExt": "png"
   },
   {
    "page": 36,
-   "title": "成長茁壯"
+   "title": "成長茁壯",
+   "bgExt": "png"
   },
   {
    "page": 37,
-   "title": "女教牧事工"
+   "title": "女教牧事工",
+   "bgExt": "png"
   },
   {
    "page": 38,
-   "title": "事工二：社會關懷"
+   "title": "事工二：社會關懷",
+   "bgExt": "png"
   },
   {
    "page": 39,
-   "title": "柬埔寨事工 (PMC) 大事記"
+   "title": "柬埔寨事工 (PMC) 大事記",
+   "bgExt": "png"
   },
   {
    "page": 40,
-   "title": "成長茁壯"
+   "title": "成長茁壯",
+   "bgExt": "png"
   },
   {
    "page": 41,
-   "title": "柬埔寨事工"
+   "title": "柬埔寨事工",
+   "bgExt": "png"
   },
   {
    "page": 42,
-   "title": "成長茁壯"
+   "title": "成長茁壯",
+   "bgExt": "png"
   },
   {
    "page": 43,
-   "title": "柬埔寨事工"
+   "title": "柬埔寨事工",
+   "bgExt": "png"
   },
   {
    "page": 44,
-   "title": "豐榮女子中學"
+   "title": "豐榮女子中學",
+   "bgExt": "png"
   },
   {
    "page": 45,
-   "title": "柬埔寨事工"
+   "title": "柬埔寨事工",
+   "bgExt": "png"
   },
   {
    "page": 46,
-   "title": "事工三：靈命塑造"
+   "title": "事工三：靈命塑造",
+   "bgExt": "png"
   },
   {
    "page": 47,
-   "title": "靈命塑造事工 (SFM) 大事記"
+   "title": "靈命塑造事工 (SFM) 大事記",
+   "bgExt": "png"
   },
   {
    "page": 48,
-   "title": "成長茁壯"
+   "title": "成長茁壯",
+   "bgExt": "png"
   },
   {
    "page": 49,
-   "title": "靈命塑造事工"
+   "title": "靈命塑造事工",
+   "bgExt": "png"
   },
   {
    "page": 50,
-   "title": "成長茁壯"
+   "title": "成長茁壯",
+   "bgExt": "png"
   },
   {
    "page": 51,
-   "title": "靈命塑造事工"
+   "title": "靈命塑造事工",
+   "bgExt": "png"
   },
   {
    "page": 52,
-   "title": "成長茁壯"
+   "title": "成長茁壯",
+   "bgExt": "png"
   },
   {
    "page": 53,
-   "title": "靈命塑造事工"
+   "title": "靈命塑造事工",
+   "bgExt": "png"
   },
   {
    "page": 54,
-   "title": "初熟"
+   "title": "初熟",
+   "bgExt": "png"
   },
   {
    "page": 55,
-   "title": "廿五年見證與慶賀"
+   "title": "廿五年見證與慶賀",
+   "bgExt": "png"
   },
   {
    "page": 56,
-   "title": "生命果子呈獻一"
+   "title": "生命果子呈獻一",
+   "bgExt": "png"
   },
   {
    "page": 57,
-   "title": "生命果子呈獻"
+   "title": "生命果子呈獻",
+   "bgExt": "png"
   },
   {
    "page": 58,
-   "title": "跨代師友同行"
+   "title": "跨代師友同行",
+   "bgExt": "png"
   },
   {
    "page": 59,
-   "title": "生命果子呈獻"
+   "title": "生命果子呈獻",
+   "bgExt": "png"
   },
   {
    "page": 60,
-   "title": "跨代師友同行"
+   "title": "跨代師友同行",
+   "bgExt": "png"
   },
   {
    "page": 61,
-   "title": "生命果子呈獻"
+   "title": "生命果子呈獻",
+   "bgExt": "png"
   },
   {
    "page": 62,
-   "title": "生命果子呈獻二"
+   "title": "生命果子呈獻二",
+   "bgExt": "png"
   },
   {
    "page": 63,
-   "title": "我的寶貝"
+   "title": "我的寶貝",
+   "bgExt": "png"
   },
   {
    "page": 64,
-   "title": "生命結連轉化"
+   "title": "生命結連轉化",
+   "bgExt": "png"
   },
   {
    "page": 65,
-   "title": "在豐榮21年的點滴"
+   "title": "在豐榮 21 年的點滴",
+   "bgExt": "png"
   },
   {
    "page": 66,
-   "title": "生命結連轉化"
+   "title": "生命結連轉化",
+   "bgExt": "png"
   },
   {
    "page": 67,
-   "title": "駛向光明"
+   "title": "駛向光明",
+   "bgExt": "png"
   },
   {
    "page": 68,
-   "title": "生命結連轉化"
+   "title": "生命結連轉化",
+   "bgExt": "png"
   },
   {
    "page": 69,
-   "title": "重新得力"
+   "title": "重新得力",
+   "bgExt": "png"
   },
   {
    "page": 70,
-   "title": "生命結連轉化"
+   "title": "生命結連轉化",
+   "bgExt": "png"
   },
   {
    "page": 71,
-   "title": "忠心好管家"
+   "title": "忠心好管家",
+   "bgExt": "png"
   },
   {
    "page": 72,
-   "title": "生命果子呈獻三"
+   "title": "生命果子呈獻三",
+   "bgExt": "png"
   },
   {
    "page": 73,
-   "title": "轉眼之間"
+   "title": "轉眼之間",
+   "bgExt": "png"
   },
   {
    "page": 74,
-   "title": "豐榮新知舊雨"
+   "title": "豐榮新知舊雨",
+   "bgExt": "png"
   },
   {
    "page": 75,
-   "title": "生命果子呈獻"
+   "title": "生命果子呈獻",
+   "bgExt": "png"
   },
   {
    "page": 76,
-   "title": "豐榮新知舊雨"
+   "title": "豐榮新知舊雨",
+   "bgExt": "png"
   },
   {
    "page": 77,
-   "title": "經歷醫治與轉化"
+   "title": "經歷醫治與轉化",
+   "bgExt": "png"
   },
   {
    "page": 78,
-   "title": "豐榮新知舊雨"
+   "title": "豐榮新知舊雨",
+   "bgExt": "png"
   },
   {
    "page": 79,
-   "title": "生命果子呈獻"
+   "title": "生命果子呈獻",
+   "bgExt": "png"
   },
   {
    "page": 80,
-   "title": "生命果子呈獻四"
+   "title": "生命果子呈獻四",
+   "bgExt": "png"
   },
   {
    "page": 81,
-   "title": "生命果子呈獻"
+   "title": "生命果子呈獻",
+   "bgExt": "png"
   },
   {
    "page": 82,
-   "title": "男女同盟 同尊同榮"
+   "title": "男女同盟 同尊同榮",
+   "bgExt": "png"
   },
   {
    "page": 83,
-   "title": "生命果子呈獻"
+   "title": "生命果子呈獻",
+   "bgExt": "png"
   },
   {
    "page": 84,
-   "title": "男女同盟 同尊同榮"
+   "title": "男女同盟 同尊同榮",
+   "bgExt": "png"
   },
   {
    "page": 85,
-   "title": "生命果子呈獻"
+   "title": "生命果子呈獻",
+   "bgExt": "png"
   },
   {
    "page": 86,
-   "title": "生命果子呈獻五"
+   "title": "生命果子呈獻五",
+   "bgExt": "png"
   },
   {
    "page": 87,
-   "title": "生命果子呈獻"
+   "title": "生命果子呈獻",
+   "bgExt": "png"
   },
   {
    "page": 88,
-   "title": "福音宣教 抗衡文化"
+   "title": "福音宣教 抗衡文化",
+   "bgExt": "png"
   },
   {
    "page": 89,
-   "title": "生命果子呈獻"
+   "title": "生命果子呈獻",
+   "bgExt": "png"
   },
   {
    "page": 90,
-   "title": "福音宣教 抗衡文化"
+   "title": "福音宣教 抗衡文化",
+   "bgExt": "png"
   },
   {
    "page": 91,
-   "title": "生命果子呈獻"
+   "title": "生命果子呈獻",
+   "bgExt": "png"
   },
   {
    "page": 92,
-   "title": "參與支持"
+   "title": "參與支持",
+   "bgExt": "png"
   },
   {
    "page": 93,
-   "title": "點擊單張，了解豐榮三大事工最新資訊："
+   "title": "點擊單張，了解豐榮三大事工最新資訊：",
+   "bgExt": "png"
   }
  ]
 }

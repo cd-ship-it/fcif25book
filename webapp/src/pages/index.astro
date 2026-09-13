@@ -9,6 +9,7 @@ import { readMoreLinks } from '../config/readmore.config';
 interface PageMeta {
   page: number;
   title: string;
+  bgExt?: string;
 }
 
 interface DetailFrontmatter {
@@ -67,7 +68,7 @@ function withBase(path: string): string {
 const pages = (manifest.pages as PageMeta[]).map((p) => ({
   ...p,
   html: fragmentFor(p.page),
-  thumb: withBase(`assets/backgrounds/page${p.page}.png`),
+  thumb: withBase(`assets/backgrounds/page${p.page}.${p.bgExt || 'png'}`),
 }));
 
 const total = manifest.total as number;

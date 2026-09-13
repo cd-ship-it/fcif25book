@@ -65,3 +65,25 @@ body {
   white-space: pre;
   margin: 0;
 }
+
+/* Transparent hit-area over a PDF hyperlink's already-visible text/button
+   in the background image — invisible until hovered, just for affordance. */
+.pdf-link {
+  position: absolute;
+  display: block;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background-color 0.15s ease;
+}
+
+.pdf-link:hover,
+.pdf-link:focus-visible {
+  background-color: rgba(98, 67, 147, 0.12);
+  outline: none;
+}
+
+.yt-embed {
+  position: absolute;
+  border: 0;
+  background: #000;
+}

@@ -16,3 +16,13 @@
      color: #333333;
    }
 */
+
+#p81-t4,
+#p81-t5,
+#p81-t9,
+#p81-t10,
+#p81-t11 {
+  text-align: left;
+  text-align-last: left;
+  text-justify: auto;
+}

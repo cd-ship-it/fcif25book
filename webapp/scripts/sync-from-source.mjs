@@ -11,7 +11,7 @@
 //
 // Usage: node scripts/sync-from-source.mjs
 
-import { readFileSync, writeFileSync, mkdirSync, copyFileSync, readdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, copyFileSync, readdirSync, existsSync, rmSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -32,9 +32,13 @@ const outFragments = join(outGenerated, 'fragments');
 const outAssetsBg = join(APP, 'public', 'assets', 'backgrounds');
 const outAssetsFonts = join(APP, 'public', 'assets', 'fonts');
 
-mkdirSync(outFragments, { recursive: true });
-mkdirSync(outAssetsBg, { recursive: true });
-mkdirSync(outAssetsFonts, { recursive: true });
+// Clear the output dirs first, not just overwrite — otherwise a source file
+// that's renamed or deleted (e.g. a page's background switching from .png
+// to .jpg) leaves a stale orphan copy behind instead of actually syncing.
+for (const dir of [outFragments, outAssetsBg, outAssetsFonts]) {
+  rmSync(dir, { recursive: true, force: true });
+  mkdirSync(dir, { recursive: true });
+}
 
 // 1. Copy background PNGs + fonts
 for (const file of readdirSync(join(ROOT, 'assets', 'backgrounds'))) {

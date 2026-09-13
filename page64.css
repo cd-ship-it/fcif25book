@@ -16,3 +16,10 @@
      color: #333333;
    }
 */
+
+#p64-t10,
+#p64-t11 {
+  text-align: left;
+  text-align-last: left;
+  text-justify: auto;
+}

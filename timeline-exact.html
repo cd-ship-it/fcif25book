@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>FiCF 25 — Timeline Exact Copy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+<style>
+@font-face {
+  font-family: 'TANAngleton';
+  src: url('assets/fonts/TANAngleton_3052.ttf') format('truetype');
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: #6b6b6b; font-family: 'Noto Sans TC', 'PingFang TC', sans-serif; }
+.wrap { display: flex; justify-content: center; padding: 24px; }
+.canvas {
+  position: relative;
+  width: 1280px;
+  height: 828px;
+  background: #ffffff;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+  overflow: hidden;
+}
+.wave-path { fill: none; stroke: #a3d1c9; stroke-width: 8; stroke-linecap: round; stroke-dasharray: 15 10; opacity: 0.95; }
+.stem { stroke: #cabfe6; stroke-width: 2; }
+.spine-dot { fill: #ffffff; stroke: #a3d1c9; stroke-width: 2; }
+.bubble {
+  position: absolute;
+  width: 76px; height: 76px;
+  margin-left: -38px; margin-top: -38px;
+  border-radius: 50%;
+  background: #ddd5f0;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 17px; color: #2b2440;
+}
+.footer-title {
+  position: absolute; left: 0; right: 0; bottom: 36px;
+  text-align: center; color: #2b2440; font-size: 22px; letter-spacing: 0.55em; text-indent: 0.55em;
+}
+.footer-title .big25 {
+  font-family: 'TANAngleton', 'Noto Sans TC', sans-serif;
+  font-size: 62px; color: #5b3f8f; letter-spacing: 0; vertical-align: -14px; margin: 0 10px;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="canvas" id="canvas"></div>
+</div>
+
+<script>
+// Explicit per-point coordinates (not auto-spaced), estimated by eye from
+// timeline1.jpg to reproduce its organic, varied stem-length composition —
+// as close a visual copy as is practical from a raster reference with no
+// vector source to trace exactly.
+const points = [
+  { year: 1997, x: 98,   y: 405, dir: 'up' },
+  { year: 1998, x: 175,  y: 625, dir: 'down' },
+  { year: 2001, x: 232,  y: 213, dir: 'up' },
+  { year: 2006, x: 295,  y: 583, dir: 'down' },
+  { year: 2009, x: 345,  y: 297, dir: 'up' },
+  { year: 2010, x: 406,  y: 505, dir: 'down' },
+  { year: 2011, x: 456,  y: 186, dir: 'up' },
+  { year: 2012, x: 536,  y: 578, dir: 'down' },
+  { year: 2015, x: 611,  y: 222, dir: 'up' },
+  { year: 2016, x: 670,  y: 467, dir: 'down' },
+  { year: 2017, x: 721,  y: 114, dir: 'up' },
+  { year: 2018, x: 797,  y: 601, dir: 'down' },
+  { year: 2021, x: 910,  y: 220, dir: 'up' },
+  { year: 2022, x: 964,  y: 635, dir: 'down' },
+  { year: 2023, x: 1029, y: 119, dir: 'up' },
+  { year: 2025, x: 1101, y: 524, dir: 'down' },
+  { year: 2026, x: 1180, y: 231, dir: 'up' },
+];
+
+const STEMS = {1997:90,1998:140,2001:170,2006:110,2009:130,2010:70,2011:190,2012:110,2015:150,2016:40,2017:230,2018:145,2021:145,2022:155,2023:215,2025:85,2026:155};
+const R = 38;
+
+points.forEach(p => {
+  const stem = STEMS[p.year];
+  p.spineY = p.dir === 'up' ? p.y + R + stem : p.y - R - stem;
+});
+
+const canvas = document.getElementById('canvas');
+const svgNS = 'http://www.w3.org/2000/svg';
+const svg = document.createElementNS(svgNS, 'svg');
+svg.setAttribute('width', 1280);
+svg.setAttribute('height', 828);
+svg.style.position = 'absolute';
+svg.style.inset = '0';
+
+// Flat plateau around each attach point, S-curve transition between them —
+// matches the reference's "stepped ribbon" character rather than a smooth
+// continuous sine wave.
+const FLAT = 18;
+let d = `M ${points[0].x - FLAT},${points[0].spineY} L ${points[0].x + FLAT},${points[0].spineY}`;
+for (let i = 1; i < points.length; i++) {
+  const a = points[i-1], b = points[i];
+  const ax = a.x + FLAT, bx = b.x - FLAT;
+  const midX = (ax + bx) / 2;
+  d += ` C ${midX},${a.spineY} ${midX},${b.spineY} ${bx},${b.spineY}`;
+  d += ` L ${b.x + FLAT},${b.spineY}`;
+}
+const path = document.createElementNS(svgNS, 'path');
+path.setAttribute('class', 'wave-path');
+path.setAttribute('d', d);
+svg.appendChild(path);
+
+points.forEach(p => {
+  const stem = document.createElementNS(svgNS, 'line');
+  stem.setAttribute('class', 'stem');
+  stem.setAttribute('x1', p.x);
+  stem.setAttribute('y1', p.spineY);
+  stem.setAttribute('x2', p.x);
+  stem.setAttribute('y2', p.dir === 'up' ? p.y + R : p.y - R);
+  svg.appendChild(stem);
+
+  const dot = document.createElementNS(svgNS, 'circle');
+  dot.setAttribute('class', 'spine-dot');
+  dot.setAttribute('cx', p.x);
+  dot.setAttribute('cy', p.spineY);
+  dot.setAttribute('r', 4);
+  svg.appendChild(dot);
+});
+
+canvas.appendChild(svg);
+
+points.forEach(p => {
+  const b = document.createElement('div');
+  b.className = 'bubble';
+  b.style.left = p.x + 'px';
+  b.style.top = p.y + 'px';
+  b.textContent = p.year;
+  canvas.appendChild(b);
+});
+
+const footer = document.createElement('div');
+footer.className = 'footer-title';
+footer.innerHTML = '基督豐榮團<span class="big25">25</span>年恩典長河';
+canvas.appendChild(footer);
+</script>
+</body>
+</html>

@@ -16,3 +16,18 @@
      color: #333333;
    }
 */
+
+#p47-t15,
+#p47-t16,#p47-t18 {
+  width: 100px;
+  text-align: left;
+  text-align-last: left;
+  text-justify: auto;
+}
+
+#p47-t23 {
+  width: auto;
+  text-align: left;
+  text-align-last: left;
+  text-justify: auto;
+}

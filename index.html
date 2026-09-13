@@ -26,7 +26,7 @@ fetch('data/titles.json')
       const a = document.createElement('a');
       a.className = 'thumb';
       a.href = `page${p.page}.html`;
-      a.innerHTML = `<img src="assets/backgrounds/page${p.page}.png" loading="lazy"><span>Page ${p.page}</span><span class="title">${p.title}</span>`;
+      a.innerHTML = `<img src="assets/backgrounds/page${p.page}.${p.bgExt || 'png'}" loading="lazy"><span>Page ${p.page}</span><span class="title">${p.title}</span>`;
       grid.appendChild(a);
     }
   });

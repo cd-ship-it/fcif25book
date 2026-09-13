@@ -1,0 +1,231 @@
+@font-face {
+  font-family: 'TANAngleton';
+  src: url('assets/fonts/TANAngleton_3052.ttf') format('truetype');
+  font-display: swap;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #6b6b6b;
+  font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+}
+
+.pagewrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0 60px;
+}
+
+.nav {
+  width: 695px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  color: #eee;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.nav a {
+  color: #fff;
+  text-decoration: none;
+  background: #444;
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+
+.nav a:hover { background: #666; }
+
+.nav .disabled {
+  color: #999;
+  background: #333;
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+
+.page {
+  position: relative;
+  width: 695px;
+  height: 900px;
+  background: linear-gradient(180deg, #fbfaf8 0%, #f6f3f9 55%, #f3eef8 100%);
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+  flex-shrink: 0;
+}
+
+/* faint decorative wash, echoing the rest of the book's watercolor pages */
+.page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 420px 300px at 88% 6%, rgba(143,191,160,0.16), transparent 70%),
+    radial-gradient(ellipse 380px 260px at 6% 96%, rgba(98,67,147,0.10), transparent 70%);
+  pointer-events: none;
+}
+
+.timeline-svg {
+  position: absolute;
+  inset: 0;
+  width: 695px;
+  height: 900px;
+}
+
+.wave-path {
+  fill: none;
+  stroke: #9fc6b3;
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-dasharray: 14 9;
+  opacity: 0.9;
+}
+
+.spine-dot {
+  fill: #ffffff;
+  stroke: #b9d7c8;
+  stroke-width: 2;
+}
+
+.stem {
+  stroke: #c9bfe0;
+  stroke-width: 2;
+}
+
+.bubble {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  margin-left: -32px;
+  margin-top: -32px;
+  border-radius: 50%;
+  background: #e6defc;
+  border: 1px solid #d3c4ee;
+  box-shadow: 0 3px 10px rgba(98,67,147,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  color: #3f2d5c;
+  letter-spacing: 0.02em;
+}
+
+.bubble.is-milestone {
+  background: #624393;
+  border-color: #4a3170;
+  color: #f4eeff;
+}
+
+.titles {
+  position: absolute;
+  width: 130px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.titles.dir-up {
+  transform: translate(-50%, -100%);
+}
+
+.titles.dir-down {
+  transform: translate(-50%, 0);
+}
+
+.event-title {
+  display: block;
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: #2b2530;
+  padding: 3px 6px;
+  border-radius: 4px;
+  cursor: help;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.event-title + .event-title {
+  margin-top: 1px;
+}
+
+.event-title:hover,
+.event-title.is-active {
+  background: rgba(98,67,147,0.12);
+  color: #4a3170;
+}
+
+.event-title .event-tag {
+  color: #8a6bb8;
+  font-weight: 700;
+}
+
+.footer-title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 34px;
+  text-align: center;
+  color: #2b2530;
+  font-size: 21px;
+  letter-spacing: 0.5em;
+  text-indent: 0.5em; /* compensate for trailing letter-spacing so it stays centered */
+}
+
+.footer-title .big25 {
+  font-family: 'TANAngleton', 'Noto Sans TC', sans-serif;
+  font-size: 46px;
+  color: #624393;
+  letter-spacing: 0;
+  vertical-align: -8px;
+  margin: 0 6px;
+}
+
+.corner-label {
+  position: absolute;
+  top: 28px;
+  left: 44px;
+  font-size: 13px;
+  letter-spacing: 0.3em;
+  color: #8a6bb8;
+  text-transform: uppercase;
+}
+
+/* ---- tooltip ---- */
+
+#tooltip {
+  position: fixed;
+  z-index: 100;
+  max-width: 260px;
+  background: #2b2530;
+  color: #f3ede0;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.6;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+
+#tooltip.open {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#tooltip .tt-title {
+  font-weight: 700;
+  color: #d7b8ff;
+  margin-bottom: 4px;
+}
+
+#tooltip .tt-year {
+  color: #c9a227;
+  font-weight: 700;
+  margin-right: 6px;
+}

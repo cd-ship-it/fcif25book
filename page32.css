@@ -16,3 +16,12 @@
      color: #333333;
    }
 */
+
+/* Right-align English line to original #p32-t1 right edge
+   (t1 left 260.49 + ~8em at 40.88px on a 695px page). */
+#p32-t3 {
+  left: auto;
+  right: calc(695px - 260.49px - 8 * 40.88px);
+  text-align: right;
+  letter-spacing: 0.05em;
+}

@@ -40,6 +40,43 @@ function init(): void {
   let bookEl: HTMLElement | null = null;
   let mobileMode = false;
 
+  // Resume-position persistence. Motivating bug: tapping a PDF hyperlink
+  // opens it in a new tab (target="_blank"); closing that tab and coming
+  // back can leave the browser having silently reloaded this (now
+  // background-then-foreground) tab from scratch under memory pressure —
+  // especially on mobile, and especially for a page this heavy (93
+  // full-page background images + a live YouTube iframe). With no state
+  // persisted anywhere, a reload always restarted at config.book.startPage.
+  const RESUME_KEY = 'ficf25:lastPage';
+
+  function saveCurrentPage(pageNum: number): void {
+    try {
+      localStorage.setItem(RESUME_KEY, String(pageNum));
+    } catch {
+      // Storage can throw (private browsing, disabled, quota) — resuming
+      // position is a nice-to-have, never worth breaking the book over.
+    }
+  }
+
+  function loadSavedPage(): number | null {
+    try {
+      const n = parseInt(localStorage.getItem(RESUME_KEY) ?? '', 10);
+      return Number.isFinite(n) && n >= 1 && n <= total ? n : null;
+    } catch {
+      return null;
+    }
+  }
+
+  // What page index should a (re)build open on? A rebuild triggered by a
+  // mobile/desktop breakpoint crossing should stay on whatever page the
+  // reader is ALREADY on (read the live instance), not jump back to the
+  // configured/saved start page — that's a separate, equally real bug this
+  // fixes as a side effect of sharing this logic with the reload case.
+  function getResumePageIndex(): number {
+    if (pageFlip) return pageFlip.getCurrentPageIndex();
+    return Math.max(0, (loadSavedPage() ?? config.book.startPage) - 1);
+  }
+
   const prevBtn = document.getElementById('btn-prev') as HTMLButtonElement | null;
   const nextBtn = document.getElementById('btn-next') as HTMLButtonElement | null;
   const indicator = document.getElementById('page-indicator');
@@ -76,6 +113,7 @@ function init(): void {
     if (prevBtnMobile) prevBtnMobile.disabled = atStart;
     if (nextBtnMobile) nextBtnMobile.disabled = atEnd;
     if (indicatorMobile) indicatorMobile.textContent = text;
+    saveCurrentPage(shown[0]);
   }
 
   // Desktop: scale the whole two-page spread (never upscaled) to fit
@@ -141,6 +179,10 @@ function init(): void {
     mobileMode = mobile;
     app!.classList.toggle('mobile-mode', mobile);
 
+    // Must read BEFORE tearing down the old pageFlip instance below — this
+    // is how a rebuild resumes the reader's current page.
+    const resumeIndex = getResumePageIndex();
+
     if (pageFlip) {
       pageFlip.destroy(); // also removes the old #book element from the DOM
       pageFlip = null;
@@ -160,7 +202,7 @@ function init(): void {
 
     const shared = {
       showCover: config.book.showCover,
-      startPage: Math.max(0, config.book.startPage - 1),
+      startPage: resumeIndex,
       flippingTime: config.book.flippingTime,
       maxShadowOpacity: config.book.maxShadowOpacity,
       drawShadow: config.book.drawShadow,

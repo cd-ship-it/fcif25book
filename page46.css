@@ -16,3 +16,17 @@
      color: #333333;
    }
 */
+
+/* Right-align title stack to original #p46-t1 right edge
+   (t1 left 260.51 + ~8em at 40.88px on a 695px page). */
+#p46-t1,
+#p46-t2,
+#p46-t3 {
+  left: auto;
+  right: calc(695px - 260.51px - 8 * 40.88px);
+  text-align: right;
+}
+
+#p46-t3 {
+  letter-spacing: 0.05em;
+}
