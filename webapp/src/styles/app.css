@@ -37,7 +37,7 @@ html, body {
   font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
 }
 
-@media (min-width: 701px) and (min-height: 701px) {
+@media (min-width: 701px) and ((min-height: 701px) or (pointer: fine)) {
   html, body {
     height: 100%;
     overflow: hidden;
@@ -50,7 +50,7 @@ html, body {
   background: var(--fpBgGradient, none), var(--fpBg, #26232b);
 }
 
-@media (min-width: 701px) and (min-height: 701px) {
+@media (min-width: 701px) and ((min-height: 701px) or (pointer: fine)) {
   #app {
     height: 100%;
   }
@@ -177,7 +177,7 @@ html, body {
    still counts as mobile instead of flashing into the desktop two-page
    layout; matches flipbook.client.ts's own matchMedia query, which must
    stay in sync with config.responsive.mobileBreakpointPx (700) here. */
-@media (min-width: 701px) and (min-height: 701px) {
+@media (min-width: 701px) and ((min-height: 701px) or (pointer: fine)) {
   .toolbar {
     display: none;
     /* Reserve room so the toolbar's own rightmost button never renders
@@ -229,7 +229,7 @@ html, body {
    backdrop; on mobile the page IS the page (see the mobile section below —
    plain white background, no surrounding stage), so the shadow would just
    look like a stray smudge under it. */
-@media (min-width: 701px) and (min-height: 701px) {
+@media (min-width: 701px) and ((min-height: 701px) or (pointer: fine)) {
   #book-shell {
     filter: drop-shadow(var(--fpPageShadow, 0 20px 60px rgba(0,0,0,0.55)));
   }
@@ -311,10 +311,15 @@ html, body {
 /* No top toolbar at all on mobile — navigation is the bottom dock only.
    Plain media query (not the JS-added .mobile-mode class), same reasoning
    as the desktop toolbar-toggle rule above: no dependency on script timing,
-   so there's no flash of the toolbar before flipbook.client.ts runs. Also
-   matches on height, not just width, so a phone in landscape stays mobile
-   — 700 matches config.responsive.mobileBreakpointPx in flipbook.config.ts. */
-@media (max-width: 700px), (max-height: 700px) {
+   so there's no flash of the toolbar before flipbook.client.ts runs. The
+   (max-height:700px) clause is gated on (pointer:coarse) — a phone in
+   landscape is wide but short AND touch-only, so it should stay mobile,
+   but a short desktop browser window (common on laptops once you subtract
+   browser chrome) has a real mouse and must NOT be caught by this or
+   desktop users see the mobile layout on a plenty-wide window — an actual
+   regression this shipped and had to be walked back. 700 matches
+   config.responsive.mobileBreakpointPx in flipbook.config.ts. */
+@media (max-width: 700px), ((max-height: 700px) and (pointer: coarse)) {
   .toolbar {
     display: none;
   }

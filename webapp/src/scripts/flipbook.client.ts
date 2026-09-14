@@ -38,10 +38,16 @@ function init(): void {
   // Checks height as well as width — a phone in landscape is wide but
   // short, and without the height half of this it would cross into
   // desktop's two-page page-flip layout just from rotating, then lose
-  // mobile's plain-scroll page entirely. Must stay in sync with app.css's
-  // own matching media queries (search mobileBreakpointPx there).
+  // mobile's plain-scroll page entirely. The height clause is gated on
+  // (pointer: coarse) so it only fires for an actual touch device — a
+  // short-but-wide DESKTOP browser window (very common on laptops once
+  // browser chrome eats into the viewport) has a real mouse and must NOT
+  // match, or desktop users see the mobile layout on a plenty-wide window
+  // (a real regression this shipped and had to be walked back). Must stay
+  // in sync with app.css's own matching media queries (search
+  // mobileBreakpointPx there).
   const bp = config.responsive.mobileBreakpointPx;
-  const mq = window.matchMedia(`(max-width: ${bp}px), (max-height: ${bp}px)`);
+  const mq = window.matchMedia(`(max-width: ${bp}px), ((max-height: ${bp}px) and (pointer: coarse))`);
   let pageFlip: PageFlip | null = null;
   let bookEl: HTMLElement | null = null;
   let mobileMode = false;
