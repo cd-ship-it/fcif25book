@@ -5,12 +5,18 @@
 // Chrome on iOS, and unfixed by two prior attempts: disabling native
 // pinch-zoom, then pinning html/body with position:fixed). This page is
 // deliberately as close to the ORIGINAL standalone page35.html as possible:
-// one page, in normal document flow, no page-flip, no #bottom-nav, no
-// toc-drawer, no fullscreen button, no resize/orientationchange/
-// visualViewport JS at all, and none of app.css's scroll-lock CSS either.
-// If the bug still reproduces here, it isn't caused by any of that — it's
-// something more fundamental. If it doesn't, the next round adds pieces
-// back one at a time until it breaks again.
+// one page, in normal document flow, no page-flip, no toc-drawer, no
+// fullscreen button, no resize/orientationchange/visualViewport JS at all,
+// and none of app.css's scroll-lock CSS either.
+//
+// ROUND 2: round 1 (no #bottom-nav at all) held up fine on real Safari and
+// Chrome on iOS — no shifting. This round adds back ONLY the #bottom-nav
+// floating dock (position:fixed, exact CSS/markup copied from app.css/
+// index.astro), with inert buttons (no click handlers, no page-flip behind
+// them) — testing in isolation whether a fixed-position element on screen
+// is what triggers the iOS elastic-bounce desync, independent of any JS.
+// If the bug reappears now, #bottom-nav (or fixed positioning generally)
+// is the cause. If it still doesn't, the next round adds something else.
 function withBase(path: string): string {
   return `${import.meta.env.BASE_URL.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
 }
@@ -62,10 +68,47 @@ function withBase(path: string): string {
       margin-top: 16px;
       padding: 8px 16px;
     }
+
+    /* Exact copy of app.css's #bottom-nav — round 2's only addition.
+       Always display:flex here (no #app.mobile-mode gate to wire up),
+       buttons are inert (no click handlers, no page-flip behind them). */
+    #bottom-nav {
+      position: fixed;
+      left: 50%;
+      bottom: calc(12px + env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+    }
+    #bottom-nav .dock-btn {
+      appearance: none;
+      border: none;
+      background: rgba(0, 0, 0, 0.06);
+      color: #262229;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+      line-height: 1;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   </style>
 </head>
 <body>
-  <div id="debug-banner">MOBILE DEBUG BUILD — page 35 only, no page-flip / bottom-nav / scroll-lock CSS</div>
+  <div id="debug-banner">MOBILE DEBUG ROUND 2 — page 35 + inert #bottom-nav only, still no page-flip / scroll-lock CSS</div>
   <div class="pagewrap">
     <div class="page" id="page35">
       <div class="t" id="p35-t1">女教牧事工</div>
@@ -87,6 +130,11 @@ function withBase(path: string): string {
       <button type="button" id="debug-modal-close">Close</button>
     </div>
   </div>
+
+  <nav id="bottom-nav" aria-label="頁面導覽 (inert — round 2 test)">
+    <button type="button" class="dock-btn" aria-label="上一頁">‹</button>
+    <button type="button" class="dock-btn" aria-label="下一頁">›</button>
+  </nav>
 
   <script>
     document.getElementById('p35-t2')?.addEventListener('click', () => {
