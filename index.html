@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>FiCF 25 — 目錄</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="pages/style.css">
 <style>
   .grid { width: 940px; margin: 40px auto; display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; }
   .thumb { display:block; text-decoration:none; color:#eee; text-align:center; font-size:13px; }
@@ -25,7 +25,7 @@ fetch('data/titles.json')
     for (const p of manifest.pages) {
       const a = document.createElement('a');
       a.className = 'thumb';
-      a.href = `page${p.page}.html`;
+      a.href = `pages/page${p.page}.html`;
       a.innerHTML = `<img src="assets/backgrounds/page${p.page}.${p.bgExt || 'png'}" loading="lazy"><span>Page ${p.page}</span><span class="title">${p.title}</span>`;
       grid.appendChild(a);
     }

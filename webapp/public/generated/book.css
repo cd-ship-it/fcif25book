@@ -417,7 +417,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page1 {
-     background-image: url('../assets/backgrounds/page1.png');
+     background-image: url('assets/backgrounds/page1.png');
    }
 
    #p1-t3 {
@@ -440,7 +440,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page2 {
-     background-image: url('../assets/backgrounds/page2.png');
+     background-image: url('assets/backgrounds/page2.png');
    }
 
    #p2-t3 {
@@ -472,7 +472,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page3 {
-     background-image: url('../assets/backgrounds/page3.png');
+     background-image: url('assets/backgrounds/page3.png');
    }
 
    #p3-t3 {
@@ -496,7 +496,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page4 {
-     background-image: url('../assets/backgrounds/page4.png');
+     background-image: url('assets/backgrounds/page4.png');
    }
 
    #p4-t3 {
@@ -547,7 +547,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page5 {
-     background-image: url('../assets/backgrounds/page5.png');
+     background-image: url('assets/backgrounds/page5.png');
    }
 
    #p5-t3 {
@@ -574,7 +574,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page6 {
-     background-image: url('../assets/backgrounds/page6.png');
+     background-image: url('assets/backgrounds/page6.png');
    }
 
    #p6-t3 {
@@ -601,7 +601,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page7 {
-     background-image: url('../assets/backgrounds/page7.png');
+     background-image: url('assets/backgrounds/page7.png');
    }
 
    #p7-t3 {
@@ -637,7 +637,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page8 {
-     background-image: url('../assets/backgrounds/page8.png');
+     background-image: url('assets/backgrounds/page8.png');
    }
 
    #p8-t3 {
@@ -676,7 +676,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page9 {
-     background-image: url('../assets/backgrounds/page9.png');
+     background-image: url('assets/backgrounds/page9.png');
    }
 
    #p9-t3 {
@@ -703,7 +703,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page10 {
-     background-image: url('../assets/backgrounds/page10.png');
+     background-image: url('assets/backgrounds/page10.png');
    }
 
    #p10-t3 {
@@ -729,7 +729,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page11 {
-     background-image: url('../assets/backgrounds/page11.png');
+     background-image: url('assets/backgrounds/page11.png');
    }
 
    #p11-t3 {
@@ -753,7 +753,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page12 {
-     background-image: url('../assets/backgrounds/page12.png');
+     background-image: url('assets/backgrounds/page12.png');
    }
 
    #p12-t3 {
@@ -778,7 +778,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page13 {
-     background-image: url('../assets/backgrounds/page13.png');
+     background-image: url('assets/backgrounds/page13.png');
    }
 
    #p13-t3 {
@@ -802,7 +802,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page14 {
-     background-image: url('../assets/backgrounds/page14.png');
+     background-image: url('assets/backgrounds/page14.png');
    }
 
    #p14-t3 {
@@ -827,7 +827,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page15 {
-     background-image: url('../assets/backgrounds/page15.png');
+     background-image: url('assets/backgrounds/page15.png');
    }
 
    #p15-t3 {
@@ -868,7 +868,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page16 {
-     background-image: url('../assets/backgrounds/page16.png');
+     background-image: url('assets/backgrounds/page16.png');
    }
 
    #p16-t3 {
@@ -907,7 +907,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page17 {
-     background-image: url('../assets/backgrounds/page17.png');
+     background-image: url('assets/backgrounds/page17.png');
    }
 
    #p17-t3 {
@@ -946,7 +946,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page18 {
-     background-image: url('../assets/backgrounds/page18.png');
+     background-image: url('assets/backgrounds/page18.png');
    }
 
    #p18-t3 {
@@ -1047,7 +1047,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page19 {
-     background-image: url('../assets/backgrounds/page19.png');
+     background-image: url('assets/backgrounds/page19.png');
    }
 
    #p19-t3 {
@@ -1071,7 +1071,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page20 {
-     background-image: url('../assets/backgrounds/page20.png');
+     background-image: url('assets/backgrounds/page20.png');
    }
 
    #p20-t3 {
@@ -1104,7 +1104,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page21 {
-     background-image: url('../assets/backgrounds/page21.png');
+     background-image: url('assets/backgrounds/page21.png');
    }
 
    #p21-t3 {
@@ -1128,7 +1128,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page22 {
-     background-image: url('../assets/backgrounds/page22.png');
+     background-image: url('assets/backgrounds/page22.png');
    }
 
    #p22-t3 {
@@ -1153,7 +1153,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page23 {
-     background-image: url('../assets/backgrounds/page23.png');
+     background-image: url('assets/backgrounds/page23.png');
    }
 
    #p23-t3 {
@@ -1185,7 +1185,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page24 {
-     background-image: url('../assets/backgrounds/page24.png');
+     background-image: url('assets/backgrounds/page24.png');
    }
 
    #p24-t3 {
@@ -1210,7 +1210,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page25 {
-     background-image: url('../assets/backgrounds/page25.png');
+     background-image: url('assets/backgrounds/page25.png');
    }
 
    #p25-t3 {
@@ -1234,7 +1234,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page26 {
-     background-image: url('../assets/backgrounds/page26.png');
+     background-image: url('assets/backgrounds/page26.png');
    }
 
    #p26-t3 {
@@ -1277,7 +1277,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page27 {
-     background-image: url('../assets/backgrounds/page27.png');
+     background-image: url('assets/backgrounds/page27.png');
    }
 
    #p27-t3 {
@@ -1301,7 +1301,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page28 {
-     background-image: url('../assets/backgrounds/page28.png');
+     background-image: url('assets/backgrounds/page28.png');
    }
 
    #p28-t3 {
@@ -1326,7 +1326,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page29 {
-     background-image: url('../assets/backgrounds/page29.png');
+     background-image: url('assets/backgrounds/page29.png');
    }
 
    #p29-t3 {
@@ -1350,7 +1350,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page30 {
-     background-image: url('../assets/backgrounds/page30.png');
+     background-image: url('assets/backgrounds/page30.png');
    }
 
    #p30-t3 {
@@ -1374,7 +1374,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page31 {
-     background-image: url('../assets/backgrounds/page31.png');
+     background-image: url('assets/backgrounds/page31.png');
    }
 
    #p31-t3 {
@@ -1398,7 +1398,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page32 {
-     background-image: url('../assets/backgrounds/page32.png');
+     background-image: url('assets/backgrounds/page32.png');
    }
 
    #p32-t3 {
@@ -1422,7 +1422,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page33 {
-     background-image: url('../assets/backgrounds/page33.png');
+     background-image: url('assets/backgrounds/page33.png');
    }
 
    #p33-t3 {
@@ -1455,7 +1455,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page34 {
-     background-image: url('../assets/backgrounds/page34.png');
+     background-image: url('assets/backgrounds/page34.png');
    }
 
    #p34-t3 {
@@ -1488,7 +1488,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page35 {
-     background-image: url('../assets/backgrounds/page35.png');
+     background-image: url('assets/backgrounds/page35.png');
    }
 
    #p35-t3 {
@@ -1503,7 +1503,7 @@ body.timeline-hint-dismissed .timeline-hint {
 /* ---- page 36 ---- */
 #page36 { background-image: url('../assets/backgrounds/page36.webp'); }
 #p36-readmore1 { left:432.20px; top:425.96px; width:62.64px; height:19.73px; }
-#p36-photo1 { left:69.50px; top:555.50px; width:406.52px; height:372.88px; }
+#p36-photo1 { left:69.50px; top:385.67px; width:406.52px; height:542.71px; }
 #p36-pagenum { left:24px; }
 
 /* page36.css — local overrides for page 36.
@@ -1514,7 +1514,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page36 {
-     background-image: url('../assets/backgrounds/page36.png');
+     background-image: url('assets/backgrounds/page36.png');
    }
 
    #p36-t3 {
@@ -1543,7 +1543,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page37 {
-     background-image: url('../assets/backgrounds/page37.png');
+     background-image: url('assets/backgrounds/page37.png');
    }
 
    #p37-t3 {
@@ -1577,7 +1577,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page38 {
-     background-image: url('../assets/backgrounds/page38.png');
+     background-image: url('assets/backgrounds/page38.png');
    }
 
    #p38-t3 {
@@ -1601,7 +1601,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page39 {
-     background-image: url('../assets/backgrounds/page39.png');
+     background-image: url('assets/backgrounds/page39.png');
    }
 
    #p39-t3 {
@@ -1636,7 +1636,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page40 {
-     background-image: url('../assets/backgrounds/page40.png');
+     background-image: url('assets/backgrounds/page40.png');
    }
 
    #p40-t3 {
@@ -1678,7 +1678,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page41 {
-     background-image: url('../assets/backgrounds/page41.png');
+     background-image: url('assets/backgrounds/page41.png');
    }
 
    #p41-t3 {
@@ -1704,7 +1704,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page42 {
-     background-image: url('../assets/backgrounds/page42.png');
+     background-image: url('assets/backgrounds/page42.png');
    }
 
    #p42-t3 {
@@ -1738,7 +1738,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page43 {
-     background-image: url('../assets/backgrounds/page43.png');
+     background-image: url('assets/backgrounds/page43.png');
    }
 
    #p43-t3 {
@@ -1771,7 +1771,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page44 {
-     background-image: url('../assets/backgrounds/page44.png');
+     background-image: url('assets/backgrounds/page44.png');
    }
 
    #p44-t3 {
@@ -1800,7 +1800,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page45 {
-     background-image: url('../assets/backgrounds/page45.png');
+     background-image: url('assets/backgrounds/page45.png');
    }
 
    #p45-t3 {
@@ -1824,7 +1824,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page46 {
-     background-image: url('../assets/backgrounds/page46.png');
+     background-image: url('assets/backgrounds/page46.png');
    }
 
    #p46-t3 {
@@ -1848,7 +1848,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page47 {
-     background-image: url('../assets/backgrounds/page47.png');
+     background-image: url('assets/backgrounds/page47.png');
    }
 
    #p47-t3 {
@@ -1889,7 +1889,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page48 {
-     background-image: url('../assets/backgrounds/page48.png');
+     background-image: url('assets/backgrounds/page48.png');
    }
 
    #p48-t3 {
@@ -1915,7 +1915,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page49 {
-     background-image: url('../assets/backgrounds/page49.png');
+     background-image: url('assets/backgrounds/page49.png');
    }
 
    #p49-t3 {
@@ -1941,7 +1941,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page50 {
-     background-image: url('../assets/backgrounds/page50.png');
+     background-image: url('assets/backgrounds/page50.png');
    }
 
    #p50-t3 {
@@ -1968,7 +1968,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page51 {
-     background-image: url('../assets/backgrounds/page51.png');
+     background-image: url('assets/backgrounds/page51.png');
    }
 
    #p51-t3 {
@@ -1993,7 +1993,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page52 {
-     background-image: url('../assets/backgrounds/page52.png');
+     background-image: url('assets/backgrounds/page52.png');
    }
 
    #p52-t3 {
@@ -2022,7 +2022,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page53 {
-     background-image: url('../assets/backgrounds/page53.png');
+     background-image: url('assets/backgrounds/page53.png');
    }
 
    #p53-t3 {
@@ -2054,7 +2054,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page54 {
-     background-image: url('../assets/backgrounds/page54.png');
+     background-image: url('assets/backgrounds/page54.png');
    }
 
    #p54-t3 {
@@ -2078,7 +2078,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page55 {
-     background-image: url('../assets/backgrounds/page55.png');
+     background-image: url('assets/backgrounds/page55.png');
    }
 
    #p55-t3 {
@@ -2102,7 +2102,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page56 {
-     background-image: url('../assets/backgrounds/page56.png');
+     background-image: url('assets/backgrounds/page56.png');
    }
 
    #p56-t3 {
@@ -2128,7 +2128,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page57 {
-     background-image: url('../assets/backgrounds/page57.png');
+     background-image: url('assets/backgrounds/page57.png');
    }
 
    #p57-t3 {
@@ -2154,7 +2154,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page58 {
-     background-image: url('../assets/backgrounds/page58.png');
+     background-image: url('assets/backgrounds/page58.png');
    }
 
    #p58-t3 {
@@ -2180,7 +2180,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page59 {
-     background-image: url('../assets/backgrounds/page59.png');
+     background-image: url('assets/backgrounds/page59.png');
    }
 
    #p59-t3 {
@@ -2206,7 +2206,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page60 {
-     background-image: url('../assets/backgrounds/page60.png');
+     background-image: url('assets/backgrounds/page60.png');
    }
 
    #p60-t3 {
@@ -2232,7 +2232,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page61 {
-     background-image: url('../assets/backgrounds/page61.png');
+     background-image: url('assets/backgrounds/page61.png');
    }
 
    #p61-t3 {
@@ -2263,7 +2263,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page62 {
-     background-image: url('../assets/backgrounds/page62.png');
+     background-image: url('assets/backgrounds/page62.png');
    }
 
    #p62-t3 {
@@ -2290,7 +2290,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page63 {
-     background-image: url('../assets/backgrounds/page63.png');
+     background-image: url('assets/backgrounds/page63.png');
    }
 
    #p63-t3 {
@@ -2317,7 +2317,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page64 {
-     background-image: url('../assets/backgrounds/page64.png');
+     background-image: url('assets/backgrounds/page64.png');
    }
 
    #p64-t3 {
@@ -2352,7 +2352,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page65 {
-     background-image: url('../assets/backgrounds/page65.png');
+     background-image: url('assets/backgrounds/page65.png');
    }
 
    #p65-t3 {
@@ -2378,7 +2378,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page66 {
-     background-image: url('../assets/backgrounds/page66.png');
+     background-image: url('assets/backgrounds/page66.png');
    }
 
    #p66-t3 {
@@ -2404,7 +2404,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page67 {
-     background-image: url('../assets/backgrounds/page67.png');
+     background-image: url('assets/backgrounds/page67.png');
    }
 
    #p67-t3 {
@@ -2432,7 +2432,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page68 {
-     background-image: url('../assets/backgrounds/page68.png');
+     background-image: url('assets/backgrounds/page68.png');
    }
 
    #p68-t3 {
@@ -2460,7 +2460,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page69 {
-     background-image: url('../assets/backgrounds/page69.png');
+     background-image: url('assets/backgrounds/page69.png');
    }
 
    #p69-t3 {
@@ -2494,7 +2494,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page70 {
-     background-image: url('../assets/backgrounds/page70.png');
+     background-image: url('assets/backgrounds/page70.png');
    }
 
    #p70-t3 {
@@ -2522,7 +2522,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page71 {
-     background-image: url('../assets/backgrounds/page71.png');
+     background-image: url('assets/backgrounds/page71.png');
    }
 
    #p71-t3 {
@@ -2546,7 +2546,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page72 {
-     background-image: url('../assets/backgrounds/page72.png');
+     background-image: url('assets/backgrounds/page72.png');
    }
 
    #p72-t3 {
@@ -2574,7 +2574,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page73 {
-     background-image: url('../assets/backgrounds/page73.png');
+     background-image: url('assets/backgrounds/page73.png');
    }
 
    #p73-t3 {
@@ -2602,7 +2602,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page74 {
-     background-image: url('../assets/backgrounds/page74.png');
+     background-image: url('assets/backgrounds/page74.png');
    }
 
    #p74-t3 {
@@ -2630,7 +2630,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page75 {
-     background-image: url('../assets/backgrounds/page75.png');
+     background-image: url('assets/backgrounds/page75.png');
    }
 
    #p75-t3 {
@@ -2665,7 +2665,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page76 {
-     background-image: url('../assets/backgrounds/page76.png');
+     background-image: url('assets/backgrounds/page76.png');
    }
 
    #p76-t3 {
@@ -2693,7 +2693,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page77 {
-     background-image: url('../assets/backgrounds/page77.png');
+     background-image: url('assets/backgrounds/page77.png');
    }
 
    #p77-t3 {
@@ -2721,7 +2721,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page78 {
-     background-image: url('../assets/backgrounds/page78.png');
+     background-image: url('assets/backgrounds/page78.png');
    }
 
    #p78-t3 {
@@ -2748,7 +2748,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page79 {
-     background-image: url('../assets/backgrounds/page79.png');
+     background-image: url('assets/backgrounds/page79.png');
    }
 
    #p79-t3 {
@@ -2772,7 +2772,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page80 {
-     background-image: url('../assets/backgrounds/page80.png');
+     background-image: url('assets/backgrounds/page80.png');
    }
 
    #p80-t3 {
@@ -2799,7 +2799,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page81 {
-     background-image: url('../assets/backgrounds/page81.png');
+     background-image: url('assets/backgrounds/page81.png');
    }
 
    #p81-t3 {
@@ -2835,7 +2835,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page82 {
-     background-image: url('../assets/backgrounds/page82.png');
+     background-image: url('assets/backgrounds/page82.png');
    }
 
    #p82-t3 {
@@ -2861,7 +2861,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page83 {
-     background-image: url('../assets/backgrounds/page83.png');
+     background-image: url('assets/backgrounds/page83.png');
    }
 
    #p83-t3 {
@@ -2887,7 +2887,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page84 {
-     background-image: url('../assets/backgrounds/page84.png');
+     background-image: url('assets/backgrounds/page84.png');
    }
 
    #p84-t3 {
@@ -2913,7 +2913,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page85 {
-     background-image: url('../assets/backgrounds/page85.png');
+     background-image: url('assets/backgrounds/page85.png');
    }
 
    #p85-t3 {
@@ -2944,7 +2944,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page86 {
-     background-image: url('../assets/backgrounds/page86.png');
+     background-image: url('assets/backgrounds/page86.png');
    }
 
    #p86-t3 {
@@ -2970,7 +2970,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page87 {
-     background-image: url('../assets/backgrounds/page87.png');
+     background-image: url('assets/backgrounds/page87.png');
    }
 
    #p87-t3 {
@@ -2996,7 +2996,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page88 {
-     background-image: url('../assets/backgrounds/page88.png');
+     background-image: url('assets/backgrounds/page88.png');
    }
 
    #p88-t3 {
@@ -3022,7 +3022,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page89 {
-     background-image: url('../assets/backgrounds/page89.png');
+     background-image: url('assets/backgrounds/page89.png');
    }
 
    #p89-t3 {
@@ -3055,7 +3055,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page90 {
-     background-image: url('../assets/backgrounds/page90.png');
+     background-image: url('assets/backgrounds/page90.png');
    }
 
    #p90-t3 {
@@ -3086,7 +3086,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page91 {
-     background-image: url('../assets/backgrounds/page91.png');
+     background-image: url('assets/backgrounds/page91.png');
    }
 
    #p91-t3 {
@@ -3113,7 +3113,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page92 {
-     background-image: url('../assets/backgrounds/page92.png');
+     background-image: url('assets/backgrounds/page92.png');
    }
 
    #p92-t3 {
@@ -3140,7 +3140,7 @@ body.timeline-hint-dismissed .timeline-hint {
    Examples:
 
    #page93 {
-     background-image: url('../assets/backgrounds/page93.png');
+     background-image: url('assets/backgrounds/page93.png');
    }
 
    #p93-t3 {

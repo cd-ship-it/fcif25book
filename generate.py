@@ -1,5 +1,12 @@
 import json, os, re
 
+# Standalone preview pages (pageN.html/.css/.generated.css + style.css) live
+# here, one level below the project root — keeps 280+ generated files out of
+# the root listing. index.html/timeline.js/assets/ stay at the root, so
+# every reference to them from inside this folder needs a '../' prefix;
+# same-folder references (style.css, pageN.css, other pageN.html) don't.
+PAGES_DIR = 'pages'
+
 PAGE_W_PT = 612.0
 PAGE_H_PT = 792.0
 CSS_W = 695
@@ -202,7 +209,7 @@ HEAD = """<!doctype html>
 <body>
 <div class="pagewrap">
 <div class="nav">
-  <a href="index.html">目錄 Index</a>
+  <a href="../index.html">目錄 Index</a>
   {prev}
   <span>Page {n} / {total}</span>
   {next}
@@ -224,7 +231,7 @@ CUSTOM_CSS_STUB = """/* page{n}.css — local overrides for page {n}.
    Examples:
 
    #page{n} {{
-     background-image: url('assets/backgrounds/page{n}.webp');
+     background-image: url('../assets/backgrounds/page{n}.webp');
    }}
 
    #p{n}-photo1 {{
@@ -235,6 +242,8 @@ CUSTOM_CSS_STUB = """/* page{n}.css — local overrides for page {n}.
    }}
 */
 """
+
+os.makedirs(PAGES_DIR, exist_ok=True)
 
 for p in data:
     n = p['page']
@@ -254,7 +263,7 @@ for p in data:
     # that). DOMContentLoaded-wrapped since <head> runs before the .page
     # div below it even exists yet.
     extra_head = (
-        f'<script src="timeline.js"></script>\n'
+        f'<script src="../timeline.js"></script>\n'
         f'<script>document.addEventListener("DOMContentLoaded", '
         f'() => {{ wireTimelineTooltip(document.getElementById("page{n}")); wireTimelineHint(); }});</script>\n'
         if n in TIMELINE_PAGES else ''
@@ -263,7 +272,7 @@ for p in data:
     # alongside the original .png (kept on disk, unreferenced here).
     html = [HEAD.format(title=title, n=n, prev=prev, next=nxt, total=TOTAL, extra_head=extra_head)]
     css_rules = [
-        f"#page{n} {{ background-image: url('assets/backgrounds/page{n}.webp'); }}\n"
+        f"#page{n} {{ background-image: url('../assets/backgrounds/page{n}.webp'); }}\n"
     ]
 
     lines = p.get('lines', [])
@@ -390,7 +399,7 @@ for p in data:
         height = (y1 - y0) * sy
         el_id = f"p{n}-photo{photo_idx}"
         html.append(
-            f'<div class="photo-zoom" id="{el_id}" data-photo-src="assets/photos/{photo["file"]}" '
+            f'<div class="photo-zoom" id="{el_id}" data-photo-src="../assets/photos/{photo["file"]}" '
             f'role="button" tabindex="0" aria-label="放大照片"></div>\n'
         )
         css_rules.append(
@@ -423,8 +432,8 @@ for p in data:
             hidden_attr = '' if i == 0 else ' hidden'
             loading_attr = '' if i == 0 else ' loading="lazy"'
             html.append(
-                f'<img class="photo-album-img" src="assets/photos/{photo["file"]}" '
-                f'data-photo-src="assets/photos/{photo["full"]}" '
+                f'<img class="photo-album-img" src="../assets/photos/{photo["file"]}" '
+                f'data-photo-src="../assets/photos/{photo["full"]}" '
                 f'alt="" data-caption="{esc_attr(photo["caption"])}"{hidden_attr}{loading_attr}>\n'
             )
         html.append(
@@ -490,15 +499,15 @@ for p in data:
 
     html.append(FOOT)
 
-    with open(f'page{n}.html', 'w', encoding='utf-8') as f:
+    with open(f'{PAGES_DIR}/page{n}.html', 'w', encoding='utf-8') as f:
         f.write(''.join(html))
 
     # Generated CSS is always rewritten (positions derived from the PDF).
-    with open(f'page{n}.generated.css', 'w', encoding='utf-8') as f:
+    with open(f'{PAGES_DIR}/page{n}.generated.css', 'w', encoding='utf-8') as f:
         f.write(''.join(css_rules))
 
     # Custom override CSS is created only once and left alone afterwards.
-    custom_path = f'page{n}.css'
+    custom_path = f'{PAGES_DIR}/page{n}.css'
     if not os.path.exists(custom_path):
         with open(custom_path, 'w', encoding='utf-8') as f:
             f.write(CUSTOM_CSS_STUB.format(n=n))

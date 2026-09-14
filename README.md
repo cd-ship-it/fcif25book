@@ -15,12 +15,12 @@ extract.py                 — PDF -> assets/backgrounds/*.png|jpg (text-redacte
                                  + assets/photos/*.jpg (original-resolution real photos, see below)
                               + data/pages.json (text spans, PDF hyperlinks, photos, position/font/size/color)
                               + data/outline.json (PDF bookmarks, for auto page titles)
-generate.py                — data/pages.json -> pageN.html / pageN.generated.css / pageN.css
+generate.py                — data/pages.json -> pages/pageN.html / pageN.generated.css / pageN.css
                               (per page: standalone preview + generated + hand-editable CSS)
                               + data/titles.json (manifest: page count + titles)
-style.css                  — shared CSS for the standalone pageN.html previews
-index.html                 — thumbnail gallery of all pageN.html previews
-pageN.html/.css            — one set per PDF page (generated + hand-editable, see below)
+pages/                     — the 93 standalone previews + their shared style.css, one directory
+                              down from the root (assets/ paths inside are '../assets/...')
+index.html                 — thumbnail gallery of all pages/pageN.html previews
 assets/                    — backgrounds (PNG/JPG + WebP) + fonts + original-res photos per page
 
 details/*.md               — "閱讀全文" article source (title/author/body, see below)
@@ -51,7 +51,7 @@ cd webapp && node scripts/sync-from-source.mjs && npm run build
 `extract.py` takes the PDF path as an optional first argument (defaults to the
 constant at the top of the file) — no need to hand-edit the script for a new PDF.
 
-Only `webapp/` is what actually ships — the root-level `pageN.html` files and
+Only `webapp/` is what actually ships — the `pages/pageN.html` files and
 `index.html` gallery are a standalone preview/debugging aid, not part of the
 deployed site.
 

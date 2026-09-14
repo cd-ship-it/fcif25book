@@ -128,22 +128,22 @@ console.log(`[sync-details] Transformed ${detailsMeta.length} articles, copied $
 
 // ---------------------------------------------------------------------
 // 3. Auto-generate readmore.config.ts from the parent project's already-
-//    generated pageN.html / pageN.generated.css (root, not webapp/src —
-//    this doesn't depend on sync-from-source.mjs having run).
+//    generated pages/pageN.html / pageN.generated.css (root's pages/ dir,
+//    not webapp/src — this doesn't depend on sync-from-source.mjs having run).
 // ---------------------------------------------------------------------
 
 const byPage = new Map(); // page -> [{ id, left, top }]
 
 for (const meta of detailsMeta) {
   if (byPage.has(meta.page)) continue; // already scanned this page's HTML
-  const htmlPath = join(ROOT, `page${meta.page}.html`);
-  const cssPath = join(ROOT, `page${meta.page}.generated.css`);
+  const htmlPath = join(ROOT, 'pages', `page${meta.page}.html`);
+  const cssPath = join(ROOT, 'pages', `page${meta.page}.generated.css`);
   let html, css;
   try {
     html = readFileSync(htmlPath, 'utf-8');
     css = readFileSync(cssPath, 'utf-8');
   } catch {
-    console.warn(`[sync-details] Missing page${meta.page}.html/.generated.css — run generate.py first. Skipping page ${meta.page}.`);
+    console.warn(`[sync-details] Missing pages/page${meta.page}.html/.generated.css — run generate.py first. Skipping page ${meta.page}.`);
     continue;
   }
 
