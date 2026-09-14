@@ -360,15 +360,19 @@ function init(): void {
   buildBook(mq.matches);
 
   // iOS Safari's native pinch-to-zoom (the viewport meta tag deliberately
-  // doesn't disable it) can trigger a `resize` here mid-gesture on some iOS
-  // versions, even though nothing about the actual page/window size really
-  // changed — window.innerWidth/stage.clientWidth stay the LAYOUT size, but
-  // re-running fitMobile()'s scale-to-fit math while the visual viewport is
-  // transiently zoomed produces a wrong transform (reported bug: the mobile
-  // page shifting sideways with a large blank gap after pinch-zooming).
-  // window.visualViewport.scale reliably reports "actively pinch-zoomed"
-  // (!= 1) vs. a real resize/rotation (== 1), so skip re-fitting for the
-  // former and let it settle once the pinch ends.
+  // doesn't disable it — see index.astro) can trigger a `resize` here
+  // mid-gesture on some iOS versions, even though nothing about the actual
+  // page/window size really changed — window.innerWidth/stage.clientWidth
+  // stay the LAYOUT size, but re-running fitMobile()'s scale-to-fit math
+  // while the visual viewport is transiently zoomed would produce a wrong
+  // transform. window.visualViewport.scale reliably reports "actively
+  // pinch-zoomed" (!= 1) vs. a real resize/rotation (== 1), so this skips
+  // re-fitting for the former and lets it settle once the pinch ends. A
+  // staged real-device test confirmed this whole combination (native
+  // pinch-zoom + this guard + a position:fixed #bottom-nav) is stable —
+  // an earlier theory blamed a *different*, unconfirmed mechanism for a
+  // reported touch-shift bug; see app.css's html/body comment for what
+  // that testing actually ruled in and out.
   function isPinchZoomed(): boolean {
     return !!window.visualViewport && window.visualViewport.scale !== 1;
   }
