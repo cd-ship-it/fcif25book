@@ -16,3 +16,79 @@
      color: #333333;
    }
 */
+
+/* Clones of #p18-t1, tops stepped by 27.28px from 423.46 */
+#p18-t1-1 {
+  left: 69.50px;
+  top: 450.74px; /* 423.46 + 27.28 */
+  font-size: 18.17px;
+  line-height: 26.32px;
+  color: #000000;
+  font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+  font-weight: 400;
+  width: 365.68px;
+  white-space: normal;
+  text-align: justify;
+  width: 365.68px;
+}
+
+#p18-t1-2 {
+  left: 69.50px;
+  top: 478.02px; /* 450.74 + 27.28 */
+  font-size: 18.17px;
+  line-height: 26.32px;
+  color: #000000;
+  font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+  font-weight: 400;
+  width: 365.68px;
+  white-space: normal;
+  text-align: justify;
+  text-align-last: justify;
+  text-justify: inter-character;
+}
+
+#p18-t1-3 {
+  left: 69.50px;
+  top: 505.30px; /* 478.02 + 27.28 */
+  font-size: 18.17px;
+  line-height: 26.32px;
+  color: #000000;
+  font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+  font-weight: 400;
+  width: auto;
+  white-space: normal;
+  text-align: left;
+  text-align-last: left;
+  text-justify: auto;
+  width: 365.68px;
+}
+
+#p18-t1-4 {
+  left: 69.50px;
+  top: 532.58px; /* 505.30 + 27.28 */
+  font-size: 18.17px;
+  line-height: 26.32px;
+  color: #000000;
+  font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+  font-weight: 400;
+  width: 365.68px;
+  white-space: normal;
+  text-align: justify;
+  text-align-last: left;
+  text-justify: inter-character;
+}
+
+#p18-t2,
+#p18-t3 {
+  width: 365.68px;
+  text-align: justify;
+  text-align-last: justify;
+  text-justify: inter-character;
+}
+
+#p18-t4 {
+  width: auto;
+  text-align: left;
+  text-align-last: left;
+  text-justify: auto;
+}

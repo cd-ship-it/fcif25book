@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>FiCF 25 — Timeline (production art) test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../timeline.css">
+<style>
+  /* This page's own concerns only: the two-page spread frame + the
+     invisible hover hotspots. Tooltip (#tooltip, .tt-title, .tt-year) and
+     the page look come from ../timeline.css / ../timeline.js unchanged —
+     see ../TIMELINE-ALGORITHM.md for why (don't redraw a finished graphic,
+     only overlay what the image doesn't already have). The one difference
+     from that doc's model: this PDF's title/tag/bullet TEXT is already
+     part of the artwork (it's a real designed PDF, not a placeholder
+     photo), so the hotspots stay fully invisible — no visible label is
+     drawn, just a hoverable area exactly over the existing text. */
+  body { background: #2a2730; }
+  .spread {
+    display: flex;
+    width: max-content;
+    margin: 40px auto;
+    box-shadow: 0 24px 70px rgba(0,0,0,0.5);
+  }
+  .tl-canvas {
+    position: relative;
+    height: 900px;
+    background-image: url('timeline-bg.png');
+    background-repeat: no-repeat;
+    background-size: 1391.45px 900px; /* full artwork, both pages, at page-height scale */
+    background-color: #fff;
+  }
+  #tl-left { width: 695.5px; background-position: 0 0; }
+  #tl-right { width: 695.9px; background-position: -695.5px 0; border-left: 1px dashed rgba(0,0,0,0.15); }
+
+  .event-hotspot {
+    position: absolute;
+    display: block;
+    padding: 0;
+    margin: 0;
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+  }
+  .event-hotspot:hover,
+  .event-hotspot.is-active {
+    background: rgba(98,67,147,0.14);
+    outline: 1px solid rgba(98,67,147,0.35);
+  }
+  .tt-tag {
+    color: #8a6bb8;
+    font-weight: 700;
+    margin-right: 2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="spread">
+  <div class="tl-canvas" id="tl-left"></div>
+  <div class="tl-canvas" id="tl-right"></div>
+</div>
+
+<script src="../timeline.js"></script>
+<script>
+  // Source: Timeline-Years and Titles.pdf (real vector text — extracted
+  // programmatically, not hand-measured) + Timeline-Years and Titles.md
+  // (event descriptions). Coordinates are in CSS px, already split/rebased
+  // per page (see the Python one-off that produced this — not part of any
+  // pipeline script, this is prototype data for this test only).
+  const EVENTS = [{"year": 2011, "tag": null, "title": "成立「豐榮女兒之家」", "desc": "在柬埔寨收容受性侵及人口販賣女童。", "page": "left", "x": 417.7, "y": 134.3, "w": 170.3, "h": 24.7}, {"year": 2011, "tag": null, "title": "十週年慶", "desc": "舉辦「豐榮之旅」郵輪退修會。", "page": "left", "x": 417.7, "y": 157.3, "w": 68.1, "h": 24.7}, {"year": 2001, "tag": null, "title": "成立團契", "desc": "「基督豐榮團契」於美國德州正式成立。", "page": "left", "x": 189.9, "y": 287.3, "w": 68.1, "h": 24.7}, {"year": 1997, "tag": "【啟程】", "title": "肯定女性豐榮的身份與使命", "desc": "創辦人邱清萍、劉秀嫻、吳淑儀合著並出版《還我伊甸的豐榮》，呼籲教會恢復男女在基督裡同尊同榮的身份及同工同盟的關係。", "page": "left", "x": 33.7, "y": 351.9, "w": 132.7, "h": 70.7}, {"year": 1998, "tag": null, "title": "團契雛型", "desc": "開始於不同地區成立女教牧團契。", "page": "left", "x": 129.5, "y": 731.4, "w": 68.1, "h": 24.7}, {"year": 2006, "tag": null, "title": "首屆會長", "desc": "邱清萍出任首屆會長。", "page": "left", "x": 243.8, "y": 787.7, "w": 68.1, "h": 24.7}, {"year": 2010, "tag": "【外程】", "title": "開拓宣教", "desc": "開展抗衡人口販賣事工，差派宣教士至柬埔寨。", "page": "left", "x": 332.4, "y": 679.7, "w": 98.7, "h": 47.7}, {"year": 2012, "tag": null, "title": "會長更替", "desc": "吳淑儀接任會長。", "page": "left", "x": 480.7, "y": 582.8, "w": 68.1, "h": 24.7}, {"year": 2012, "tag": null, "title": "香港分會成立", "desc": "成立「香港基督豐榮團契」支援柬埔寨事工。", "page": "left", "x": 480.7, "y": 605.9, "w": 102.2, "h": 24.7}, {"year": 2009, "tag": null, "title": "美國註冊", "desc": "在美國正式註冊成為非營利機構。", "page": "left", "x": 295.8, "y": 192.0, "w": 68.1, "h": 24.7}, {"year": 2015, "tag": null, "title": "成立「豐榮女子小學」", "desc": "於柬埔寨開辦「豐榮女子小學」，鼓勵女孩接受教育。", "page": "left", "x": 530.2, "y": 251.0, "w": 170.3, "h": 24.7}, {"year": 2017, "tag": "【內程】", "title": "靈命塑造", "desc": "成立「靈命塑造」事工，提供實體與網路課程及屬靈導引等。", "page": "right", "x": 76.3, "y": 156.5, "w": 98.7, "h": 47.7}, {"year": 2017, "tag": null, "title": "購置「基督豐榮中心」", "desc": "購入北加州海沃（Hayward）物業作「豐榮中心」、辦公室、同工宿舍及退修場所，供女教牧、師母與宣教士靜修用。", "page": "right", "x": 105.2, "y": 202.5, "w": 170.3, "h": 24.7}, {"year": 2017, "tag": null, "title": "成立「豐榮社區中心」", "desc": "開展柬埔寨「豐榮社區中心」，服務當地家庭。", "page": "right", "x": 105.2, "y": 225.5, "w": 170.3, "h": 24.7}, {"year": 2016, "tag": null, "title": "十五週年慶", "desc": "舉辦「姊妹與召命，精彩的下半生」大會。", "page": "right", "x": 72.5, "y": 565.2, "w": 85.2, "h": 24.7}, {"year": 2018, "tag": null, "title": "成立「豐榮婦女之家」", "desc": "於柬埔寨成立「豐榮婦女之家」，深化抗衡人口販賣。", "page": "right", "x": 136.2, "y": 669.9, "w": 170.3, "h": 24.7}, {"year": 2022, "tag": null, "title": "成立「豐榮女子中學」", "desc": "柬埔寨「豐榮女子中學」啟用，鼓勵女孩進深教育。", "page": "right", "x": 288.0, "y": 727.6, "w": 170.3, "h": 24.7}, {"year": 2025, "tag": null, "title": "豐榮領袖3.0培植計劃", "desc": "物色、儲備和培植3.0新生代，承傳開拓事工的1.0及2.0代領袖。", "page": "right", "x": 452.1, "y": 626.8, "w": 167.5, "h": 24.7}, {"year": 2021, "tag": null, "title": "成立「聖經原文研經」小組", "desc": "成立「聖經原文研經」小組，探討聖經中女性角色與地位，推動男女共融。", "page": "right", "x": 228.2, "y": 109.4, "w": 208.2, "h": 24.7}, {"year": 2023, "tag": null, "title": "會長更替", "desc": "吳萃芳與潘蒙愛任共同會長。（吳萃芳2025年5月退休）", "page": "right", "x": 369.5, "y": 245.1, "w": 68.1, "h": 24.7}, {"year": 2023, "tag": null, "title": "靈命塑造事工延伸", "desc": "開展亞洲區「靈命塑造課程」。", "page": "right", "x": 369.5, "y": 268.2, "w": 136.3, "h": 24.7}, {"year": 2023, "tag": null, "title": "拓展女教牧小組", "desc": "成立12個「姊妹同路人」小組，定期線上或實體聚會。", "page": "right", "x": 369.5, "y": 291.2, "w": 119.2, "h": 24.7}, {"year": 2026, "tag": null, "title": "靈命塑造事工延伸", "desc": "開展粵語「靈命塑造課程」。", "page": "right", "x": 509.8, "y": 133.8, "w": 136.3, "h": 24.7}, {"year": 2026, "tag": null, "title": "台灣分會成立", "desc": "成立「台灣基督豐榮團契」，拓展豐榮事工。", "page": "right", "x": 509.8, "y": 156.9, "w": 102.2, "h": 24.7}, {"year": 2026, "tag": null, "title": "25週年慶", "desc": "舉辦「同心綻放主豐榮」大會。", "page": "right", "x": 509.8, "y": 179.9, "w": 73.8, "h": 24.7}];
+
+  const left = document.getElementById('tl-left');
+  const right = document.getElementById('tl-right');
+
+  for (const ev of EVENTS) {
+    const host = ev.page === 'left' ? left : right;
+    const el = document.createElement('div');
+    el.className = 'event-title event-hotspot';
+    el.tabIndex = 0;
+    el.style.left = ev.x + 'px';
+    el.style.top = ev.y + 'px';
+    el.style.width = ev.w + 'px';
+    el.style.height = ev.h + 'px';
+    el.dataset.year = ev.year;
+    el.dataset.title = (ev.tag ? `<span class="tt-tag">${ev.tag}</span>` : '') + ev.title;
+    el.dataset.desc = ev.desc;
+    host.appendChild(el);
+  }
+
+  wireTimelineTooltip(document.querySelector('.spread'));
+</script>
+</body>
+</html>

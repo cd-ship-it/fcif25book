@@ -2,6 +2,7 @@
 import '../styles/page-flip-base.css';
 import '../styles/app.css';
 import '../styles/details.css';
+import '../styles/photo-lightbox.css';
 import config from '../config/flipbook.config';
 import manifest from '../generated/manifest.json';
 import { readMoreLinks } from '../config/readmore.config';
@@ -103,6 +104,16 @@ const total = manifest.total as number;
 </style>
 <body>
   <div id="app">
+    {config.toolbar.hideOnDesktopUntilToggled && (
+      <button
+        id="btn-toolbar-toggle"
+        type="button"
+        aria-label={config.labels.toolbarToggle}
+        aria-expanded="false"
+      >
+        ⋮
+      </button>
+    )}
     <header class="toolbar">
       <span class="brand">基督豐榮．同行25載</span>
       <div class="spacer"></div>
@@ -146,9 +157,9 @@ const total = manifest.total as number;
 
     {config.responsive.bottomNavOnMobile && (
       <nav id="bottom-nav" aria-label="頁面導覽">
-        <button id="btn-prev-mobile" type="button" aria-label={config.labels.prev}>← {config.labels.prev}</button>
-        <span id="page-indicator-mobile" class="page-indicator"></span>
-        <button id="btn-next-mobile" type="button" aria-label={config.labels.next}>{config.labels.next} →</button>
+        <button id="btn-prev-mobile" type="button" class="dock-btn" aria-label={config.labels.prev}>‹</button>
+        <span id="page-indicator-mobile" class="sr-only"></span>
+        <button id="btn-next-mobile" type="button" class="dock-btn" aria-label={config.labels.next}>›</button>
       </nav>
     )}
   </div>
@@ -178,7 +189,7 @@ const total = manifest.total as number;
         <div id="detail-body">
           {detailPanels.map((d) => (
             <article class="detail-panel" data-detail-panel={d.detailsFile} hidden>
-              <h2>{d.frontmatter.title}</h2>
+              <h2 class="detail-title">{d.frontmatter.title}</h2>
               {d.frontmatter.subtitle && <p class="detail-subtitle">{d.frontmatter.subtitle}</p>}
               <div class="detail-content">
                 <d.Content />
@@ -190,9 +201,17 @@ const total = manifest.total as number;
     </div>
   )}
 
+  <div id="photo-lightbox" aria-hidden="true">
+    <button type="button" id="photo-lightbox-close" aria-label="關閉">✕</button>
+    <img id="photo-lightbox-img" src="" alt="" />
+  </div>
+
   <script>
     import '../scripts/flipbook.client.ts';
     import '../scripts/readmore.client.ts';
+    import '../scripts/photo-zoom.client.ts';
+    import '../scripts/photo-album.client.ts';
+    import '../scripts/timeline-tooltip.client.ts';
   </script>
 </body>
 </html>

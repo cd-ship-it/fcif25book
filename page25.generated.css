@@ -1,3 +1,5 @@
-#page25 { background-image: url('assets/backgrounds/page25.png'); }
+#page25 { background-image: url('assets/backgrounds/page25.webp'); }
 #p25-t1 { left:139.15px; top:786.04px; font-size:14.76px; line-height:21.39px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
 #p25-t2 { left:550.09px; top:111.96px; font-size:18.17px; line-height:26.32px; color:#624393; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
+#p25-photo1 { left:105.45px; top:422.50px; width:531.68px; height:356.54px; }
+#p25-pagenum { right:24px; }

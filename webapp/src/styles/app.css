@@ -4,6 +4,18 @@
 
 * { box-sizing: border-box; }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 html, body {
   margin: 0;
   padding: 0;
@@ -102,6 +114,63 @@ html, body {
   text-align: center;
 }
 
+/* ---------------- Toolbar toggle (desktop only) ----------------
+   A small "⋮" button fixed in the top-right corner, independent of the
+   toolbar's own display state so it's always reachable to bring the
+   toolbar back. Desktop only for now — mobile keeps its own always-visible
+   #bottom-nav, untouched (see #app.mobile-mode rule below). */
+
+#btn-toolbar-toggle {
+  display: none;
+  position: fixed;
+  top: 10px;
+  right: 16px;
+  z-index: 21;
+  appearance: none;
+  border: 1px solid var(--fpPrimary, #624393);
+  background: var(--fpPrimary, #624393);
+  color: #ffffff;
+  border-radius: 6px;
+  width: 34px;
+  height: 34px;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+#btn-toolbar-toggle:hover {
+  background: #ffffff;
+  border-color: var(--fpPrimary, #624393);
+  color: var(--fpPrimary, #624393);
+}
+
+/* Hidden by default until the toggle is clicked — desktop only. Uses a
+   plain media query (not the JS-added .mobile-mode class) so there's no
+   dependency on script timing: .mobile-mode is only added once
+   flipbook.client.ts runs, and gating on it here would flash the toolbar
+   hidden-then-shown on mobile before that happens. 701px must stay in sync
+   with config.responsive.mobileBreakpointPx (700) in flipbook.config.ts. */
+@media (min-width: 701px) {
+  .toolbar {
+    display: none;
+    /* Reserve room so the toolbar's own rightmost button never renders
+       underneath the fixed #btn-toolbar-toggle sitting at right:16px. */
+    padding-right: 60px;
+  }
+
+  #app.toolbar-open .toolbar {
+    display: flex;
+  }
+
+  /* Mobile keeps the toolbar exactly as it already behaved (always visible,
+     nav-group hidden in favor of #bottom-nav) — the toggle button plays no
+     part there yet, so it only exists above the breakpoint too. */
+  #btn-toolbar-toggle {
+    display: block;
+  }
+}
+
 /* ---------------- Stage ---------------- */
 
 #stage {
@@ -119,14 +188,52 @@ html, body {
 }
 
 #book-shell {
-  filter: drop-shadow(var(--fpPageShadow, 0 20px 60px rgba(0,0,0,0.55)));
+  position: relative;
   transform-origin: center center;
   flex: 0 0 auto;
   overflow: hidden;
 }
 
+/* The floating-book-prop shadow makes sense against desktop's dark stage
+   backdrop; on mobile the page IS the page (see the mobile section below —
+   plain white background, no surrounding stage), so the shadow would just
+   look like a stray smudge under it. */
+@media (min-width: 701px) {
+  #book-shell {
+    filter: drop-shadow(var(--fpPageShadow, 0 20px 60px rgba(0,0,0,0.55)));
+  }
+}
+
 #book .page {
   background-color: #ffffff;
+}
+
+/* Click-to-flip hit zones — outer strips of each page (see
+   flipbook.client.ts's createTurnZone for why: a full-width click handler
+   on #book meant clicking a link/button anywhere also flipped the page
+   underneath it). Safe to widen freely regardless of what real content
+   sits underneath, since real page content (links, photos, timeline
+   hotspots) is appended into #book AFTER these zones, so it always paints
+   on top and wins hit-testing wherever the two overlap; only clicks that
+   land on genuinely empty page area ever reach the zone at all. Custom
+   purple arrow cursor instead of a plain w-resize/e-resize keyword, which
+   CSS can't recolor or resize. */
+.turn-zone {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 5%;
+  z-index: 1;
+}
+
+.turn-zone-prev {
+  left: 0;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 24 24'%3E%3Cpath d='M15 3L6 12L15 21' stroke='%23624393' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E") 15 15, w-resize;
+}
+
+.turn-zone-next {
+  right: 0;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 24 24'%3E%3Cpath d='M9 3L18 12L9 21' stroke='%23624393' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E") 15 15, e-resize;
 }
 
 .loading-note {
@@ -140,66 +247,97 @@ html, body {
 /* ---------------- Mobile (single-page) mode ----------------
    Toggled by flipbook.client.ts adding/removing .mobile-mode on #app,
    driven by the SAME matchMedia breakpoint (config.responsive.
-   mobileBreakpointPx) it uses to decide whether to build page-flip in
-   portrait (one page) vs landscape (two-page spread) — one source of
-   truth, so the CSS and the JS can never disagree about the breakpoint. */
+   mobileBreakpointPx) it uses to decide whether to build a page-flip
+   two-page spread (desktop) or a single plain page in normal document flow
+   (mobile, see buildMobileBook) — one source of truth, so the CSS and the
+   JS can never disagree about the breakpoint.
+
+   Mobile deliberately drops page-flip entirely rather than just switching
+   it to single-page mode: a page-turn library's own touch handling (drag-
+   to-fold, swipe detection) competes with the browser's native pinch-to-
+   zoom/pan for the same touch gestures, which is exactly the "floating
+   canvas diluting pinch-zoom" feel this fixes. A plain page in normal flow,
+   scaled to fit width with CSS, has no touch handling of its own at all —
+   nothing to compete with native zoom/pan. */
 
 #app.mobile-mode #stage {
   align-items: flex-start;
   justify-content: center;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 16px 8px calc(84px + env(safe-area-inset-bottom));
+  /* Must exactly match the dock's own footprint below (12px offset + 8px*2
+     padding + 40px button = 68px) — just enough that the dock never
+     overlaps content, no more. */
+  padding: 0 0 calc(68px + env(safe-area-inset-bottom));
+  background: #ffffff;
 }
 
-/* The top toolbar's Prev/Next/indicator are redundant with #bottom-nav on
-   mobile (and there isn't room for both) — hide this copy, not that one. */
-#app.mobile-mode .toolbar .nav-group {
+/* No book-shaped chrome on mobile — just the page, like a plain webpage. */
+#app.mobile-mode .turn-zone {
   display: none;
 }
 
+/* No top toolbar at all on mobile — navigation is the bottom dock only.
+   Plain media query (not the JS-added .mobile-mode class), same reasoning
+   as the desktop toolbar-toggle rule above: no dependency on script timing,
+   so there's no flash of the toolbar before flipbook.client.ts runs. 700px
+   matches config.responsive.mobileBreakpointPx in flipbook.config.ts. */
+@media (max-width: 700px) {
+  .toolbar {
+    display: none;
+  }
+}
+
+/* Apple-style frosted-glass dock: just the two round arrow buttons, no
+   page-count text (that's kept for screen readers only, see .sr-only on
+   #page-indicator-mobile in index.astro) — pinch-zoom already lets someone
+   read a page up close, so the dock stays out of the way. */
 #bottom-nav {
   display: none;
   position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: 50%;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
   z-index: 40;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
-  background: var(--fpToolbarBg, rgba(20,20,24,0.92));
-  border-top: 1px solid var(--fpToolbarBorder, rgba(200,170,60,0.3));
+  gap: 20px;
+  padding: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
 }
 
 #app.mobile-mode #bottom-nav {
   display: flex;
 }
 
-#bottom-nav button {
+#bottom-nav .dock-btn {
   appearance: none;
-  border: 1px solid var(--fpToolbarBorder, rgba(200,170,60,0.3));
-  background: rgba(255,255,255,0.04);
-  color: var(--fpToolbarText, #f3ede0);
-  border-radius: 6px;
-  padding: 10px 16px;
-  font-size: 14px;
+  border: none;
+  background: rgba(0, 0, 0, 0.06);
+  color: #262229;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  line-height: 1;
   font-family: inherit;
   cursor: pointer;
-  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-#bottom-nav button:disabled {
-  opacity: 0.35;
+#bottom-nav .dock-btn:active {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+#bottom-nav .dock-btn:disabled {
+  opacity: 0.3;
   cursor: default;
-}
-
-#bottom-nav .page-indicator {
-  flex: 1 1 auto;
-  text-align: center;
-  font-size: 13px;
-  color: var(--fpToolbarText, #f3ede0);
 }
 
 /* ---------------- TOC drawer ---------------- */

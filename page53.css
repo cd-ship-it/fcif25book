@@ -16,3 +16,11 @@
      color: #333333;
    }
 */
+
+#p53-t2,
+#p53-t3 {
+  width: auto;
+  text-align: left;
+  text-align-last: left;
+  text-justify: auto;
+}

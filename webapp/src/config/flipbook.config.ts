@@ -64,6 +64,13 @@ export interface FlipbookConfig {
     showKeyboardNav: boolean;
     /** Reserved: play a page-turn sound effect. Requires `sound.flipSoundUrl`. */
     showSound: boolean;
+    /**
+     * Desktop only (mobile keeps its own always-visible bottom nav, unrelated
+     * to this): hide the top toolbar by default behind a small "⋮" button
+     * fixed in the top-right corner, so the book has the full stage to
+     * itself until the reader asks for the controls.
+     */
+    hideOnDesktopUntilToggled: boolean;
   };
 
   labels: {
@@ -78,6 +85,7 @@ export interface FlipbookConfig {
     jumpPlaceholder: string;
     jumpButton: string;
     loading: string;
+    toolbarToggle: string;
     /** current = [leftPage, rightPage] for a spread, or a single number for a cover page. */
     pageIndicator: (current: number[] | number, total: number) => string;
   };
@@ -127,6 +135,7 @@ const config: FlipbookConfig = {
     showPageJump: true,
     showKeyboardNav: true,
     showSound: false,
+    hideOnDesktopUntilToggled: true,
   },
 
   labels: {
@@ -141,6 +150,7 @@ const config: FlipbookConfig = {
     jumpPlaceholder: '頁碼',
     jumpButton: '跳至',
     loading: '書本載入中…',
+    toolbarToggle: '顯示／隱藏工具列',
     pageIndicator: (current, total) => {
       if (Array.isArray(current)) {
         const [a, b] = current;

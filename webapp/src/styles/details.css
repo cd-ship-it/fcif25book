@@ -55,24 +55,33 @@
   margin: -20px -24px 0 0;
   appearance: none;
   border: none;
-  background: transparent;
-  color: #6b6470;
-  font-size: 18px;
+  background: var(--fpPrimary, #624393);
+  color: #ffffff;
+  font-size: 19px;
   line-height: 1;
   cursor: pointer;
-  padding: 10px;
+  padding: 10.5px;
   border-radius: 50%;
 }
 
 #detail-close:hover {
-  background: rgba(0, 0, 0, 0.06);
-  color: #262229;
+  background: var(--fpPrimaryDark, #453168);
+  color: #ffffff;
 }
 
-.detail-panel h2 {
+.detail-title {
   margin: 0 0 4px;
   font-size: 22px;
   color: var(--fpPrimary, #624393);
+}
+
+/* "## Heading" inside the article body — a section header, smaller than
+   the article title above and black rather than purple so it doesn't
+   compete with it. */
+.detail-content h2 {
+  margin: 1.2em 0 0.6em;
+  font-size: 17px;
+  color: #000000;
 }
 
 .detail-panel .detail-subtitle {
@@ -82,12 +91,27 @@
 }
 
 .detail-content {
-  font-size: 15px;
+  font-size: 18px;
   line-height: 1.9;
 }
 
 .detail-content p {
   margin: 0 0 1em;
+  text-align: justify;
+  /* A short paragraph that's only one line is still always the block's
+     "last line" (browsers never justify that regardless of text-align),
+     so this rule alone already covers both "full-justify the body" and
+     "left-justify the last line of each paragraph" — no separate case
+     needed for genuinely single-line paragraphs. */
+  text-align-last: left;
+}
+
+.detail-content img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 12px 0;
+  border-radius: 6px;
 }
 
 .detail-content blockquote {

@@ -16,3 +16,20 @@
      color: #333333;
    }
 */
+
+#p15-t2,
+#p15-t3,
+#p15-t5,
+#p15-t6,
+#p15-t7,
+#p15-t8,
+#p15-t9,
+#p15-t12,
+#p15-t13,
+#p15-t16,
+#p15-t17 {
+  width: auto;
+  text-align: left;
+  text-align-last: left;
+  text-justify: auto;
+}

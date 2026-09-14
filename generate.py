@@ -35,6 +35,13 @@ def youtube_embed_url(uri):
     m = YOUTUBE_RE.search(uri)
     return f'https://www.youtube-nocookie.com/embed/{m.group(1)}' if m else None
 
+def bbox_overlap_area(a, b):
+    ax0, ay0, ax1, ay1 = a
+    bx0, by0, bx1, by1 = b
+    ox0, oy0 = max(ax0, bx0), max(ay0, by0)
+    ox1, oy1 = min(ax1, bx1), min(ay1, by1)
+    return max(0.0, ox1 - ox0) * max(0.0, oy1 - oy0)
+
 # Hand-curated titles for pages we've actually looked at. Takes priority
 # over the outline-derived guess below for any page listed here.
 PAGE_TITLES = {
@@ -152,6 +159,48 @@ def group_paragraph_lines(lines):
 # text. Those still get technique B if they're >= MIN_PARAGRAPH_GROUP.
 MIN_MERGE_GROUP_LINES = 4
 
+# Section-divider pages (事工N：... subtitle + big Chinese title + an
+# English subtitle) — the English line's original PDF spans alternate
+# between a bold-capital span and a plain-remainder span per word (e.g.
+# "W" / "omen "), which generate.py's default per-span rendering turns into
+# a scattering of separate divs. Clean those up into a single div per page:
+# whole line in one <div>, first letter of each word wrapped in <b>, right-
+# aligned to the line above it (both sit on the same right margin in the
+# original design), with a bit of extra letter-spacing.
+TITLE_PAGES = {32, 38, 46}
+TITLE_RIGHT_ALIGN_NUDGE_PX = 17.0
+
+# Pages of free-verse poetry — the paragraph-justify heuristics below are
+# tuned for prose (matching runs of same-style, evenly-spaced lines) and
+# can't tell a poem's deliberate line breaks from a prose paragraph that
+# happens to wrap at a similar width. Merging a stanza and letting the
+# browser reflow it, or even just stretch-justifying each of its original
+# lines, both destroy line breaks the poet chose on purpose. Pages here skip
+# paragraph grouping entirely — every line renders on its own, exactly at
+# its original PDF position, ragged (unjustified), like the source.
+NO_JUSTIFY_PAGES = {14}
+
+# Timeline spread — see extract.py's TIMELINE_PAGES/extract_timeline_events
+# for how these pages' background + 'timeline_events' data are produced.
+# The title/tag text is already part of that background image (a real
+# designed PDF, not a placeholder), so — unlike TITLE_PAGES above — nothing
+# here draws visible text; each event just gets an invisible hover hotspot
+# over its existing text, wired to a tooltip by the shared timeline
+# tooltip script (timeline.js for the standalone previews,
+# webapp/src/scripts/timeline-tooltip.client.ts for the app).
+TIMELINE_PAGES = {8, 9}
+
+# "Photo Slides" pages — see extract.py's PHOTO_ALBUM_PAGES/
+# extract_photo_albums() for how each page's 'photo_album' list of already
+# letterboxed, pre-compressed slides (assets/photos/pageN-albumI.jpg) is
+# produced, and PHOTO_ALBUM_BOX_PT (same value here) for where that
+# placeholder graphic actually renders on the page. Emits a prev/next
+# carousel div at that position; webapp's photo-album.client.ts (event
+# delegation on #stage, same pattern as readmore.client.ts/
+# photo-zoom.client.ts) wires up the buttons.
+PHOTO_ALBUM_PAGES = {37, 45, 53}
+PHOTO_ALBUM_BOX_PT = (61.2, 215.16, 488.7194, 314.16)
+
 def group_overlaps_a_link(lines, group, links):
     """True if any line in this group's original position coincides with a
     PDF hyperlink's rect (page.get_links(), extracted by extract.py).
@@ -195,7 +244,7 @@ HEAD = """<!doctype html>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="page{n}.generated.css">
 <link rel="stylesheet" href="page{n}.css">
-</head>
+{extra_head}</head>
 <body>
 <div class="pagewrap">
 <div class="nav">
@@ -221,7 +270,7 @@ CUSTOM_CSS_STUB = """/* page{n}.css — local overrides for page {n}.
    Examples:
 
    #page{n} {{
-     background-image: url('assets/backgrounds/page{n}.png');
+     background-image: url('assets/backgrounds/page{n}.webp');
    }}
 
    #p{n}-t3 {{
@@ -240,13 +289,32 @@ for p in data:
     nxt = f'<a href="page{n+1}.html">Next →</a>' if n < TOTAL else '<span class="disabled">Next →</span>'
 
     bg_ext = p.get('bg_ext', 'png')
-    html = [HEAD.format(title=title, n=n, prev=prev, next=nxt, total=TOTAL)]
+    # Standalone-preview-only wiring for the timeline spread (pages 8-9) —
+    # deliberately in <head>, not inside the .page div below: sync-from-
+    # source.mjs extracts exactly the `.page` div's own contents for the
+    # webapp, so anything placed inside it would leak into the app too,
+    # where timeline.js doesn't exist and this would duplicate the app's
+    # own webapp/src/scripts/timeline-tooltip.client.ts (event-delegated on
+    # #stage instead, since #book's content is destroyed/recreated on
+    # desktop/mobile rebuilds — a direct call like this wouldn't survive
+    # that). DOMContentLoaded-wrapped since <head> runs before the .page
+    # div below it even exists yet.
+    extra_head = (
+        f'<script src="timeline.js"></script>\n'
+        f'<script>document.addEventListener("DOMContentLoaded", '
+        f'() => {{ wireTimelineTooltip(document.getElementById("page{n}")); wireTimelineHint(); }});</script>\n'
+        if n in TIMELINE_PAGES else ''
+    )
+    # The displayed background is always the WebP copy extract.py generates
+    # alongside the original .png/.jpg (kept on disk, unreferenced here, for
+    # a future full-resolution click-to-zoom feature).
+    html = [HEAD.format(title=title, n=n, prev=prev, next=nxt, total=TOTAL, extra_head=extra_head)]
     css_rules = [
-        f"#page{n} {{ background-image: url('assets/backgrounds/page{n}.{bg_ext}'); }}\n"
+        f"#page{n} {{ background-image: url('assets/backgrounds/page{n}.webp'); }}\n"
     ]
 
     page_links = p.get('links', [])
-    all_groups = group_paragraph_lines(p['lines'])
+    all_groups = [] if n in NO_JUSTIFY_PAGES else group_paragraph_lines(p['lines'])
     merge_groups = [
         g for g in all_groups
         if len(g) >= MIN_MERGE_GROUP_LINES and not group_overlaps_a_link(p['lines'], g, page_links)
@@ -260,8 +328,49 @@ for p in data:
         merge_start[group[0]] = group
         merge_skip.update(group)
 
+    title_line_idx = len(p['lines']) - 1 if n in TITLE_PAGES and p['lines'] else None
+
     idx = 0
     for line_idx, line in enumerate(p['lines']):
+        if line_idx == title_line_idx:
+            spans = line['spans']
+            first_s = spans[0]
+            idx += 1
+            el_id = f"p{n}-t{idx}"
+            merged_text = ''.join(s['text'] for s in spans).strip()
+            esc = merged_text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+            words = esc.split(' ')
+            bolded = ' '.join(
+                f'<b>{w[0]}</b>{w[1:]}' if w else w
+                for w in words
+            )
+            top = min(s['bbox'][1] for s in spans) * sy
+            size = first_s['size'] * sx
+            line_height_px = (first_s['bbox'][3] - first_s['bbox'][1]) * sy
+            fam = font_family(first_s['font'])
+            color = color_hex(first_s['color'])
+            # Right-align to the line directly above (the big Chinese
+            # title) — both sit on the same right margin in the original
+            # PDF design. Anchored with CSS `right` (not `left` + width)
+            # so it stays pinned to that edge regardless of how wide the
+            # bolded/letter-spaced English text renders in the browser.
+            # +TITLE_RIGHT_ALIGN_NUDGE_PX corrects for the browser's
+            # substituted Latin glyphs (Noto Sans TC's Latin metrics, not
+            # the PDF's original font) rendering visually wider/tighter
+            # than the exact bbox math predicts — confirmed by eye against
+            # the rendered page, same correction across all TITLE_PAGES
+            # since they share font/size/word-count-scale.
+            prev_line_right_pt = p['lines'][line_idx - 1]['bbox'][2]
+            right_px = CSS_W - prev_line_right_pt * sx + TITLE_RIGHT_ALIGN_NUDGE_PX
+
+            html.append(f'<div class="t" id="{el_id}">{bolded}</div>\n')
+            css_rules.append(
+                f"#{el_id} {{ right:{right_px:.2f}px; top:{top:.2f}px; "
+                f"font-size:{size:.2f}px; line-height:{line_height_px:.2f}px; "
+                f"color:{color}; font-family:{fam}; font-weight:400; "
+                f"letter-spacing:0.05em; text-align:right; }}\n"
+            )
+            continue
         if line_idx in merge_start:
             group = merge_start[line_idx]
             group_lines = [p['lines'][i] for i in group]
@@ -360,7 +469,134 @@ for p in data:
             f"width:{width:.2f}px; height:{height:.2f}px; }}\n"
         )
 
+    # Click-to-zoom overlays for real content photos (extract.py's
+    # data/pages.json 'photos' list — already filtered down to unique JPEGs,
+    # excluding decorative art and reused placeholder graphics). Invisible
+    # hit-area over the photo already visible in the background image;
+    # webapp/src/scripts/photo-zoom.client.ts opens the full-resolution
+    # original (assets/photos/pageN-photoI.jpg, never resized/recompressed)
+    # in a lightbox on click.
+    #
+    # Skip a photo whose bbox mostly coincides with a PDF link's (e.g. page
+    # 63: the YouTube video's own thumbnail image is BOTH a unique JPEG
+    # extract.py correctly keeps as a "real photo" AND the link-annotated
+    # area a YouTube <iframe> gets emitted over, in the exact same spot).
+    # Both overlays would otherwise stack at that position and, since this
+    # photo-zoom loop runs after the links loop above, the photo-zoom div —
+    # later in DOM order — visually wins hit-testing and silently steals
+    # every click meant for the video, opening a static lightbox instead of
+    # playing it. The underlying link/iframe already provides interactivity
+    # for that region, so it should win, not a redundant zoom affordance.
+    link_bboxes = [tuple(link['bbox']) for link in p.get('links', [])]
+    for photo_idx, photo in enumerate(p.get('photos', []), start=1):
+        x0, y0, x1, y1 = photo['bbox']
+        photo_area = (x1 - x0) * (y1 - y0)
+        if photo_area > 0 and any(
+            bbox_overlap_area((x0, y0, x1, y1), lb) / photo_area > 0.5 for lb in link_bboxes
+        ):
+            continue
+        left = x0 * sx
+        top = y0 * sy
+        width = (x1 - x0) * sx
+        height = (y1 - y0) * sy
+        el_id = f"p{n}-photo{photo_idx}"
+        html.append(
+            f'<div class="photo-zoom" id="{el_id}" data-photo-src="assets/photos/{photo["file"]}" '
+            f'role="button" tabindex="0" aria-label="放大照片"></div>\n'
+        )
+        css_rules.append(
+            f"#{el_id} {{ left:{left:.2f}px; top:{top:.2f}px; "
+            f"width:{width:.2f}px; height:{height:.2f}px; }}\n"
+        )
+
+    # "Photo Slides" pages (see PHOTO_ALBUM_PAGES above) — a prev/next
+    # carousel of real photos (extract.py's 'photo_album' list) replacing
+    # the reused placeholder graphic at PHOTO_ALBUM_BOX_PT. Every image is
+    # already letterboxed to that exact box by extract.py, so no
+    # object-fit/cropping logic is needed here — just position the
+    # container and stack the <img> tags, all but the first `hidden`. Each
+    # also carries data-photo-src pointing at its un-letterboxed, larger
+    # 'full' version — clicking the currently-visible slide opens that in
+    # the lightbox for free, via the SAME [data-photo-src] delegation
+    # photo-zoom.client.ts already runs on #stage for regular content
+    # photos elsewhere in the book (no photo-album-specific script needed).
+    album_photos = p.get('photo_album', [])
+    if n in PHOTO_ALBUM_PAGES and album_photos:
+        box_left, box_top, box_w, box_h = PHOTO_ALBUM_BOX_PT
+        left = box_left * sx
+        top = box_top * sy
+        width = box_w * sx
+        height = box_h * sy
+        el_id = f"p{n}-album"
+
+        def esc(s):
+            return s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
+
+        html.append(f'<div class="photo-album" id="{el_id}" role="group" aria-label="相片幻燈片" tabindex="0">\n')
+        for i, photo in enumerate(album_photos):
+            hidden_attr = '' if i == 0 else ' hidden'
+            loading_attr = '' if i == 0 else ' loading="lazy"'
+            html.append(
+                f'<img class="photo-album-img" src="assets/photos/{photo["file"]}" '
+                f'data-photo-src="assets/photos/{photo["full"]}" '
+                f'alt="" data-caption="{esc(photo["caption"])}"{hidden_attr}{loading_attr}>\n'
+            )
+        html.append(
+            '<button type="button" class="photo-album-nav photo-album-prev" aria-label="上一張">‹</button>\n'
+            '<button type="button" class="photo-album-nav photo-album-next" aria-label="下一張">›</button>\n'
+            f'<div class="photo-album-caption">{esc(album_photos[0]["caption"])}</div>\n'
+            '</div>\n'
+        )
+        css_rules.append(
+            f"#{el_id} {{ left:{left:.2f}px; top:{top:.2f}px; "
+            f"width:{width:.2f}px; height:{height:.2f}px; }}\n"
+        )
+
+    # Timeline spread hover hotspots (extract.py's 'timeline_events') — the
+    # title/tag text is already part of the background image (see
+    # TIMELINE_PAGES above), so this is just an invisible hit-area over it,
+    # wired to a popup by the shared timeline tooltip script.
+    for ev_idx, ev in enumerate(p.get('timeline_events', []), start=1):
+        x0, y0, x1, y1 = ev['bbox']
+        left = x0 * sx
+        top = y0 * sy
+        width = (x1 - x0) * sx
+        height = (y1 - y0) * sy
+        el_id = f"p{n}-tl{ev_idx}"
+        esc_title = ev['title'].replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
+        esc_desc = ev['desc'].replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
+        if ev.get('tag'):
+            esc_tag = ev['tag'].replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
+            esc_title = f'<span class="tt-tag">{esc_tag}</span>{esc_title}'
+        html.append(
+            f'<div class="event-title event-hotspot" id="{el_id}" tabindex="0" '
+            f"data-year=\"{ev['year']}\" data-title='{esc_title}' data-desc=\"{esc_desc}\"></div>\n"
+        )
+        css_rules.append(
+            f"#{el_id} {{ left:{left:.2f}px; top:{top:.2f}px; "
+            f"width:{width:.2f}px; height:{height:.2f}px; }}\n"
+        )
+
+    # Folio-style page-number badge — skipped on page 1 (the cover has no
+    # folio). Even page numbers sit on the LEFT side of a spread, odd on the
+    # RIGHT — the fixed pagination pattern produced by showCover:true in the
+    # webapp's page-flip config (page 1 alone, then 2-3, 4-5, ... as spreads).
+    if n != 1:
+        el_id = f"p{n}-pagenum"
+        html.append(f'<div class="page-num" id="{el_id}">{n}</div>\n')
+        side = 'left' if n % 2 == 0 else 'right'
+        css_rules.append(f"#{el_id} {{ {side}:24px; }}\n")
+
+    if n in TIMELINE_PAGES:
+        html.append(
+            '<div class="timeline-hint" role="status">'
+            '<span class="timeline-hint-text">移動滑鼠到大事紀查看詳情</span>'
+            '<button type="button" class="timeline-hint-close" aria-label="關閉提示">×</button>'
+            '</div>\n'
+        )
+
     html.append(FOOT)
+
     with open(f'page{n}.html', 'w', encoding='utf-8') as f:
         f.write(''.join(html))
 

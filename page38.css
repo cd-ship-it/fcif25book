@@ -16,12 +16,4 @@
      color: #333333;
    }
 */
-
-/* Right-align English line to original #p38-t1 right edge
-   (t1 left 260.51 + ~8em at 40.88px on a 695px page). */
-#p38-t3 {
-  left: auto;
-  right: calc(695px - 260.51px - 8 * 40.88px);
-  text-align: right;
-  letter-spacing: 0.05em;
-}
+#p38-t3 { right:108.26px; top:396.71px; font-size:34.07px; line-height:34.09px; color:#624393; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; letter-spacing:0.02em; text-align:right; }

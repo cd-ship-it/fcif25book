@@ -1,2 +1,6 @@
-#page93 { background-image: url('assets/backgrounds/page93.png'); }
+#page93 { background-image: url('assets/backgrounds/page93.webp'); }
 #p93-t1 { left:70.74px; top:152.95px; font-size:18.17px; line-height:26.32px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
+#p93-photo1 { left:69.33px; top:213.22px; width:381.52px; height:294.38px; }
+#p93-photo2 { left:158.37px; top:303.26px; width:381.52px; height:294.38px; }
+#p93-photo3 { left:243.61px; top:397.41px; width:381.52px; height:294.38px; }
+#p93-pagenum { right:24px; }

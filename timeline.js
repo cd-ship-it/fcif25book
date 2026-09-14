@@ -184,6 +184,37 @@ function wireTimelineTooltip(container) {
   });
 }
 
+// Dismissible floating hint on pages 8–9. Closing one dismisses both
+// (and stays dismissed across reloads / flipbook rebuilds) via localStorage
+// + a body class that CSS uses to hide every .timeline-hint.
+const TIMELINE_HINT_KEY = 'ficf-timeline-hint-dismissed';
+
+function dismissTimelineHint() {
+  try {
+    localStorage.setItem(TIMELINE_HINT_KEY, '1');
+  } catch (_) { /* private mode / blocked storage */ }
+  document.body.classList.add('timeline-hint-dismissed');
+}
+
+function wireTimelineHint() {
+  try {
+    if (localStorage.getItem(TIMELINE_HINT_KEY) === '1') {
+      document.body.classList.add('timeline-hint-dismissed');
+    }
+  } catch (_) { /* ignore */ }
+
+  if (wireTimelineHint._wired) return;
+  wireTimelineHint._wired = true;
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.timeline-hint-close');
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    dismissTimelineHint();
+  });
+}
+
 // renderTimelineOverlay(container, points, opts) — for timeline-overlay.html.
 // Draws ONLY the event-title labels + hover tooltip wiring on top of an
 // existing background (the real timeline1.jpg), reusing the same

@@ -13,7 +13,7 @@ one directory up) and adapts them into a single-page flipbook.
 ## Pipeline
 
 ```
-../FiCF 25 Book-Stage1.2.pdf
+../FiCF 25 Book-Stage1.3.pdf
         │  extract.py   (PyMuPDF: renders text-free backgrounds, dumps text spans)
         ▼
 ../data/pages.json, ../assets/backgrounds/*.png|jpg, ../assets/fonts/*
@@ -116,6 +116,51 @@ reproduced as horizontal text divs) — this app just receives them as part
 of the synced fragment HTML/CSS, no webapp-side code needed. See the root
 project's `README.md` for how `extract.py`/`generate.py` produce them.
 
+## Click-to-zoom photos
+
+`../generate.py` positions an invisible `.photo-zoom` overlay div over every
+real content photo it kept (see the root `README.md` for the JPEG-format +
+uniqueness heuristic that separates real photos from decorative art).
+`src/scripts/photo-zoom.client.ts` delegates click/Enter/Space handling on
+the stable `#stage` element (same reasoning as `readmore.client.ts` below —
+the actual `.photo-zoom` triggers live inside `#book`, which gets destroyed
+and recreated on every desktop/mobile rebuild) and opens the matching
+`assets/photos/pageN-photoI.jpg` — the untouched original, never resized or
+recompressed — in a shared lightbox (`#photo-lightbox` in `index.astro`,
+styled in `src/styles/photo-lightbox.css`).
+
+## Photo Slides carousels (pages 37/45/53)
+
+`../generate.py` positions a `.photo-album` div over the reused "Photo
+Slides" placeholder graphic on these 3 pages (see the root `README.md` for
+how `../extract.py` letterboxes each page's real photos from
+`../PhotoAlbums/Page N Photo Slides/*` into `assets/photos/pageN-albumI.jpg`
+and produces the caption). Every slide's `<img>` is stacked inside the div
+up front (all but the first `hidden`) along with prev/next `<button>`s and
+a caption div. `src/scripts/photo-album.client.ts` delegates click handling
+on the stable `#stage` element (same reasoning as `photo-zoom.client.ts`
+above), toggles which `<img>` is `hidden`, and updates the caption text —
+looping at both ends, always starting from slide 1 (no position memory,
+even across a desktop/mobile rebuild). Native `<button>`s mean Enter/Space
+activation works for free, no extra keydown handling needed like
+`readmore.client.ts`'s triggers (plain divs) require below.
+
+## Timeline spread (pages 8-9)
+
+`../generate.py` positions an invisible `.event-hotspot` overlay div over
+every event title on the timeline spread (see the root `README.md` for how
+`../extract.py` produces those two pages from a separate artwork PDF). The
+title/tag text is already part of the background image, so nothing here
+draws a visible label — `src/scripts/timeline-tooltip.client.ts` delegates
+hover/focus/click handling on the stable `#stage` element (same reasoning
+as `photo-zoom.client.ts` above) and shows a popup (`#tooltip`, created
+lazily on first use) with that event's year/title/description, styled in
+`../style.css` (`.event-hotspot`, `#tooltip`, `.tt-*`). This is a direct
+TypeScript port of `../timeline.js`'s `wireTimelineTooltip` — the same
+function the standalone `../pageN.html` previews for pages 8/9 call
+directly (they don't need delegation; their DOM never gets rebuilt) — keep
+the two in sync if either changes.
+
 ## "閱讀全文" (Read Full Text) details modal
 
 Each "閱讀全文" button in the source PDF is a button-shaped graphic baked
@@ -123,20 +168,40 @@ into that page's background PNG, with only its text as real HTML (one of
 the `.t` spans in `src/generated/fragments/pageN.html`). Clicking it pops
 open a modal showing the full article, sourced from a markdown file.
 
-- **`src/config/readmore.config.ts`** — maps each trigger's element id
-  (`p{page}-t{n}`, found by grepping the parent project's
-  `data/pages.json` for "閱讀全文" then checking that page's `.html` for the
-  id `generate.py` assigned) to a markdown filename under `src/details/`.
-- **`src/details/pageNreadmore.md`** — one file per button, frontmatter
-  `title` / `subtitle` / `page` + the article body in Markdown. A link in
-  `readmore.config.ts` with no matching file is skipped with a build-time
-  `console.warn`, not a build failure.
-- Currently pages 6 and 7 (the only "閱讀全文" buttons in pages 1–10) have
-  **placeholder/bogus content** — the PDF only contains each article's
-  opening teaser, not the full text, so `page6readmore.md` /
-  `page7readmore.md` are stand-ins clearly marked as such. Replace their
-  body text with the real articles before shipping.
+- **`../details/*.md` + `../details/images/`** — the source of truth (same
+  idea as `../Timeline/` for the timeline feature). One file per button:
+  `Page N.md` for a page with one "閱讀全文" button, `Page N Left.md` /
+  `Page N Right.md` or `Page N Top.md` / `Page N Bottom.md` for a page with
+  two (a trailing parenthetical like `Page 57 (with in text photos).md` is
+  ignored when matching — it's just a note-to-self in the filename). Each
+  file is plain Markdown: `# Title` heading, an `*Author*` line, then the
+  article body — no frontmatter, and an inline image is a normal
+  `![](images/foo.jpg)` reference to a same-named file in `../details/images/`.
+- **`scripts/sync-details.mjs`** — reads all of the above and:
+  1. Writes `src/details/pageNreadmore[Left|Right|Top|Bottom].md`, pulling
+     the `#` heading and `*italic*` author line into YAML frontmatter
+     (`title`/`subtitle`/`page`) the way `index.astro` expects, and
+     rewriting image references to `assets/details-images/...`.
+  2. Copies `../details/images/*` to `public/assets/details-images/`.
+  3. Auto-generates **`src/config/readmore.config.ts`** — do not hand-edit
+     it, it's overwritten on every run. It matches each markdown file to
+     its trigger element id (`p{page}-t{n}`) by reading the parent
+     project's already-generated `pageN.html`/`pageN.generated.css`
+     directly; a page with two buttons is disambiguated by comparing their
+     actual rendered position (whichever axis — x or y — actually differs
+     between the two decides Left/Right vs Top/Bottom), not a hardcoded
+     page list, so a future PDF revision that changes which pages have one
+     vs two buttons doesn't need this script updated.
+  Run it any time `../details/` changes: `node scripts/sync-details.mjs`
+  (order relative to `sync-from-source.mjs` doesn't matter — it reads the
+  root project's `pageN.html`/`.generated.css` directly, not the synced
+  copies).
 - `src/pages/index.astro` renders one hidden `.detail-panel` per matched
   link inside a shared `#detail-overlay`; `readmore.client.ts` shows/hides
   the right panel on click and closes on the ✕ button, Escape, or backdrop
   click.
+- Article paragraphs are full-justified with the last line left-aligned
+  (`.detail-content p` in `src/styles/details.css`) — a single-line
+  paragraph is always treated as a block's "last line" by browsers (never
+  justified regardless of `text-align`), so this one rule already covers
+  both cases with no separate handling needed.

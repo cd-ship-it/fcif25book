@@ -2,6 +2,7 @@ import { readMoreLinks } from '../config/readmore.config';
 
 function init(): void {
   const overlay = document.getElementById('detail-overlay');
+  const card = document.getElementById('detail-card');
   const closeBtn = document.getElementById('detail-close');
   const stage = document.getElementById('stage');
   if (!overlay || !stage) return; // no detail panels were rendered (no matching .md files)
@@ -24,6 +25,14 @@ function init(): void {
     if (!found) return;
     overlay!.classList.add('open');
     overlay!.setAttribute('aria-hidden', 'false');
+    // All panels share one scrolling container (#detail-card); its
+    // scrollTop otherwise carries over from whichever article was open
+    // last, so a new article can open already scrolled part-way down.
+    // Must happen AFTER the overlay becomes visible above — scrolling a
+    // still-`display:none` element is a no-op, so calling this any earlier
+    // silently does nothing and the stale scrollTop shows through once the
+    // overlay opens.
+    card?.scrollTo(0, 0);
   }
 
   function triggerSlugFor(target: EventTarget | null): string | null {

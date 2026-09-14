@@ -1,4 +1,4 @@
-#page26 { background-image: url('assets/backgrounds/page26.png'); }
+#page26 { background-image: url('assets/backgrounds/page26.webp'); }
 #p26-t1 { left:69.50px; top:141.40px; font-size:29.52px; line-height:42.77px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; width:281.84px; text-align:justify; text-align-last:justify; text-justify:inter-character; }
 #p26-t2 { left:69.50px; top:185.72px; font-size:29.52px; line-height:42.77px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
 #p26-t3 { left:69.50px; top:256.00px; font-size:18.17px; line-height:26.32px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
@@ -12,7 +12,6 @@
 #p26-t11 { left:69.50px; top:665.09px; font-size:18.17px; line-height:26.32px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; width:396.40px; text-align:justify; text-align-last:justify; text-justify:inter-character; }
 #p26-t12 { left:69.50px; top:692.36px; font-size:18.17px; line-height:26.32px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
 #p26-t13 { left:69.50px; top:719.63px; font-size:18.17px; line-height:26.32px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
-#p26-t14 { left:353.17px; top:724.72px; font-size:18.17px; line-height:18.18px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
-#p26-t15 { left:372.08px; top:719.63px; font-size:18.17px; line-height:26.32px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
 #p26-t16 { left:69.50px; top:746.90px; font-size:18.17px; line-height:26.32px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; width:396.40px; text-align:justify; text-align-last:justify; text-justify:inter-character; }
 #p26-t17 { left:69.50px; top:774.18px; font-size:18.17px; line-height:26.32px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
+#p26-pagenum { left:24px; }

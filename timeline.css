@@ -199,12 +199,12 @@ body {
 #tooltip {
   position: fixed;
   z-index: 100;
-  max-width: 260px;
+  max-width: 340px;
   background: #2b2530;
   color: #f3ede0;
   border-radius: 8px;
-  padding: 12px 14px;
-  font-size: 13px;
+  padding: 14px 16px;
+  font-size: 19.5px;
   line-height: 1.6;
   box-shadow: 0 12px 30px rgba(0,0,0,0.35);
   pointer-events: none;

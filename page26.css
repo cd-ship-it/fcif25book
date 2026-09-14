@@ -16,3 +16,22 @@
      color: #333333;
    }
 */
+
+#p26-t4,
+#p26-t5,
+#p26-t7,
+#p26-t8 {
+  width: auto;
+  text-align: left;
+  text-align-last: left;
+  text-justify: auto;
+}
+
+/* Match 創造／救贖: label on its own line, body wraps below */
+#p26-t6 {
+  width: 396.40px;
+  white-space: normal;
+  text-align: left;
+  text-align-last: left;
+  text-justify: auto;
+}

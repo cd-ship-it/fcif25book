@@ -31,21 +31,28 @@ const outGenerated = join(APP, 'src', 'generated');
 const outFragments = join(outGenerated, 'fragments');
 const outAssetsBg = join(APP, 'public', 'assets', 'backgrounds');
 const outAssetsFonts = join(APP, 'public', 'assets', 'fonts');
+const outAssetsPhotos = join(APP, 'public', 'assets', 'photos');
 
 // Clear the output dirs first, not just overwrite — otherwise a source file
 // that's renamed or deleted (e.g. a page's background switching from .png
 // to .jpg) leaves a stale orphan copy behind instead of actually syncing.
-for (const dir of [outFragments, outAssetsBg, outAssetsFonts]) {
+for (const dir of [outFragments, outAssetsBg, outAssetsFonts, outAssetsPhotos]) {
   rmSync(dir, { recursive: true, force: true });
   mkdirSync(dir, { recursive: true });
 }
 
-// 1. Copy background PNGs + fonts
+// 1. Copy background PNGs + fonts + full-resolution photos (the click-to-
+// zoom source files — never resized/recompressed, see extract.py)
 for (const file of readdirSync(join(ROOT, 'assets', 'backgrounds'))) {
   copyFileSync(join(ROOT, 'assets', 'backgrounds', file), join(outAssetsBg, file));
 }
 for (const file of readdirSync(join(ROOT, 'assets', 'fonts'))) {
   copyFileSync(join(ROOT, 'assets', 'fonts', file), join(outAssetsFonts, file));
+}
+if (existsSync(join(ROOT, 'assets', 'photos'))) {
+  for (const file of readdirSync(join(ROOT, 'assets', 'photos'))) {
+    copyFileSync(join(ROOT, 'assets', 'photos', file), join(outAssetsPhotos, file));
+  }
 }
 
 // 2. Concatenate the CSS cascade: style.css, then pageN.generated.css + pageN.css for each page.

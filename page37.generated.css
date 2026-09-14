@@ -1,12 +1,13 @@
-#page37 { background-image: url('assets/backgrounds/page37.png'); }
+#page37 { background-image: url('assets/backgrounds/page37.webp'); }
 #p37-t1 { left:531.02px; top:111.96px; font-size:18.17px; line-height:26.32px; color:#624393; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
 #p37-t2 { left:69.50px; top:668.91px; font-size:18.17px; line-height:26.32px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:700; }
 #p37-t3 { left:100.39px; top:695.33px; font-size:18.17px; line-height:26.32px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; width:535.42px; text-align:justify; text-align-last:justify; text-justify:inter-character; }
 #p37-t4 { left:100.39px; top:721.75px; font-size:18.17px; line-height:26.32px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; width:535.42px; text-align:justify; text-align-last:justify; text-justify:inter-character; }
 #p37-t5 { left:100.39px; top:748.17px; font-size:18.17px; line-height:26.32px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
 #p37-t6 { left:69.50px; top:801.01px; font-size:18.17px; line-height:26.32px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
-#p37-t7 { left:260.02px; top:401.78px; font-size:29.52px; line-height:42.77px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
 #p37-link1 { left:100.16px; top:695.97px; width:293.84px; height:26.42px; }
 #p37-link2 { left:100.16px; top:722.39px; width:91.99px; height:26.42px; }
 #p37-link3 { left:100.16px; top:748.81px; width:238.48px; height:26.42px; }
 #p37-link4 { left:198.11px; top:801.65px; width:73.25px; height:26.42px; }
+#p37-album { left:69.50px; top:244.50px; width:555.00px; height:357.00px; }
+#p37-pagenum { right:24px; }

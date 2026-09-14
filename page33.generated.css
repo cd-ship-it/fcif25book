@@ -1,4 +1,4 @@
-#page33 { background-image: url('assets/backgrounds/page33.png'); }
+#page33 { background-image: url('assets/backgrounds/page33.webp'); }
 #p33-t1 { left:69.50px; top:65.62px; font-size:29.52px; line-height:42.77px; color:#624393; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
 #p33-t2 { left:463.45px; top:82.22px; font-size:18.17px; line-height:18.18px; color:#624393; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
 #p33-t3 { left:179.99px; top:277.34px; font-size:22.71px; line-height:32.90px; color:#624393; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:700; }
@@ -14,7 +14,7 @@
 #p33-t13 { left:350.20px; top:414.29px; font-size:14.76px; line-height:21.39px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
 #p33-t14 { left:393.41px; top:563.19px; font-size:14.76px; line-height:21.39px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; width:148.92px; text-align:justify; text-align-last:justify; text-justify:inter-character; }
 #p33-t15 { left:393.41px; top:585.35px; font-size:14.76px; line-height:21.39px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
-#p33-t16 { left:473.33px; top:759.66px; font-size:14.76px; line-height:21.39px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; width:172.50px; text-align:justify; text-align-last:justify; text-justify:inter-character; }
+#p33-t16 { left:473.33px; top:759.66px; font-size:14.76px; line-height:21.39px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; width:178.73px; text-align:justify; text-align-last:justify; text-justify:inter-character; }
 #p33-t17 { left:473.33px; top:781.82px; font-size:14.76px; line-height:21.39px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
 #p33-t18 { left:205.32px; top:186.51px; font-size:14.76px; line-height:21.39px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; width:168.13px; text-align:justify; text-align-last:justify; text-justify:inter-character; }
 #p33-t19 { left:205.32px; top:208.66px; font-size:14.76px; line-height:21.39px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
@@ -27,3 +27,4 @@
 #p33-t26 { left:445.10px; top:656.58px; font-size:14.76px; line-height:21.39px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
 #p33-t27 { left:445.10px; top:689.98px; font-size:14.76px; line-height:21.39px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; width:208.54px; text-align:justify; text-align-last:justify; text-justify:inter-character; }
 #p33-t28 { left:445.10px; top:712.14px; font-size:14.76px; line-height:21.39px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
+#p33-pagenum { right:24px; }
