@@ -359,16 +359,37 @@ function init(): void {
 
   buildBook(mq.matches);
 
+  // iOS Safari's native pinch-to-zoom (the viewport meta tag deliberately
+  // doesn't disable it) can trigger a `resize` here mid-gesture on some iOS
+  // versions, even though nothing about the actual page/window size really
+  // changed — window.innerWidth/stage.clientWidth stay the LAYOUT size, but
+  // re-running fitMobile()'s scale-to-fit math while the visual viewport is
+  // transiently zoomed produces a wrong transform (reported bug: the mobile
+  // page shifting sideways with a large blank gap after pinch-zooming).
+  // window.visualViewport.scale reliably reports "actively pinch-zoomed"
+  // (!= 1) vs. a real resize/rotation (== 1), so skip re-fitting for the
+  // former and let it settle once the pinch ends.
+  function isPinchZoomed(): boolean {
+    return !!window.visualViewport && window.visualViewport.scale !== 1;
+  }
+
   window.addEventListener('resize', () => {
+    if (isPinchZoomed()) return;
     if (mq.matches !== mobileMode) buildBook(mq.matches);
     else applyFit();
   });
   // Some browsers fire this distinctly from (and before) `resize` on rotation.
   window.addEventListener('orientationchange', () => {
     setTimeout(() => {
+      if (isPinchZoomed()) return;
       if (mq.matches !== mobileMode) buildBook(mq.matches);
       else applyFit();
     }, 100);
+  });
+  // Once the user finishes pinch-zooming (scale returns to 1), re-apply the
+  // fit in case a resize was skipped above while they were mid-gesture.
+  window.visualViewport?.addEventListener('resize', () => {
+    if (!isPinchZoomed()) applyFit();
   });
   document.addEventListener('fullscreenchange', () => setTimeout(applyFit, 50));
 
