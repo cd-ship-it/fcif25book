@@ -9,26 +9,14 @@
 //   - TypeScript types instead of vanilla JS.
 // Keep this in sync with timeline.js's wireTimelineTooltip if either changes.
 
-const TIMELINE_HINT_KEY = 'ficf-timeline-hint-dismissed';
-
+// Dismissible floating hint on pages 8-9. Closing it hides it for the rest
+// of THIS view only (a body class CSS uses to hide every .timeline-hint) —
+// deliberately not persisted anywhere, so a refresh always shows it again.
 function dismissTimelineHint(): void {
-  try {
-    localStorage.setItem(TIMELINE_HINT_KEY, '1');
-  } catch {
-    /* private mode / blocked storage */
-  }
   document.body.classList.add('timeline-hint-dismissed');
 }
 
 function wireTimelineHint(): void {
-  try {
-    if (localStorage.getItem(TIMELINE_HINT_KEY) === '1') {
-      document.body.classList.add('timeline-hint-dismissed');
-    }
-  } catch {
-    /* ignore */
-  }
-
   const stage = document.getElementById('stage');
   if (!stage || stage.dataset.timelineHintWired === '1') return;
   stage.dataset.timelineHintWired = '1';

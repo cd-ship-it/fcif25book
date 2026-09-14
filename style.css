@@ -367,13 +367,13 @@ body {
   max-width: calc(100% - 48px);
   padding: 8px 10px 8px 14px;
   border-radius: 10px;
-  background: rgba(43, 37, 48, 0.92);
-  color: #f3ede0;
+  background: #e2e2e2;
+  color: #624393;
   font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
   font-size: 14px;
   line-height: 1.4;
   letter-spacing: 0.02em;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
   pointer-events: auto;
   animation: timeline-hint-float 2.6s ease-in-out infinite;
 }
@@ -388,10 +388,10 @@ body {
   width: 22px;
   height: 22px;
   padding: 0;
-  border: 1px solid rgba(243, 237, 224, 0.45);
+  border: 1px solid rgba(98, 67, 147, 0.35);
   border-radius: 4px;
-  background: rgba(255, 255, 255, 0.08);
-  color: #f3ede0;
+  background: rgba(98, 67, 147, 0.08);
+  color: #624393;
   font-size: 16px;
   line-height: 1;
   cursor: pointer;
@@ -402,7 +402,7 @@ body {
 
 .timeline-hint-close:hover,
 .timeline-hint-close:focus-visible {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(98, 67, 147, 0.18);
   outline: none;
 }
 

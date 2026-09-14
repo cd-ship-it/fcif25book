@@ -421,7 +421,15 @@ function init(): void {
     const fsBtn = document.getElementById('btn-fullscreen');
     fsBtn?.addEventListener('click', () => {
       if (!document.fullscreenElement) {
-        stage!.requestFullscreen?.().catch(() => {});
+        // The whole document, not just #stage: the Fullscreen API only
+        // keeps the fullscreened element's OWN descendants rendered/
+        // interactive — every overlay this app opens on top of the book
+        // (#detail-overlay, #photo-lightbox, #toc-drawer, and the
+        // dynamically-created #tooltip) is a sibling of #stage, not a
+        // descendant of it, so fullscreening #stage alone silently broke
+        // all of them (in every browser — this is spec behavior, not a
+        // browser bug) the instant fullscreen was entered.
+        document.documentElement.requestFullscreen?.().catch(() => {});
       } else {
         document.exitFullscreen?.().catch(() => {});
       }

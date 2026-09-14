@@ -184,25 +184,15 @@ function wireTimelineTooltip(container) {
   });
 }
 
-// Dismissible floating hint on pages 8–9. Closing one dismisses both
-// (and stays dismissed across reloads / flipbook rebuilds) via localStorage
-// + a body class that CSS uses to hide every .timeline-hint.
-const TIMELINE_HINT_KEY = 'ficf-timeline-hint-dismissed';
-
+// Dismissible floating hint on pages 8–9. Closing one dismisses both for
+// the rest of THIS view only (a body class CSS uses to hide every
+// .timeline-hint) — deliberately not persisted anywhere, so a refresh
+// always shows it again.
 function dismissTimelineHint() {
-  try {
-    localStorage.setItem(TIMELINE_HINT_KEY, '1');
-  } catch (_) { /* private mode / blocked storage */ }
   document.body.classList.add('timeline-hint-dismissed');
 }
 
 function wireTimelineHint() {
-  try {
-    if (localStorage.getItem(TIMELINE_HINT_KEY) === '1') {
-      document.body.classList.add('timeline-hint-dismissed');
-    }
-  } catch (_) { /* ignore */ }
-
   if (wireTimelineHint._wired) return;
   wireTimelineHint._wired = true;
 

@@ -183,7 +183,12 @@ html, body {
   min-height: 0;
 }
 
-#stage:fullscreen {
+/* The fullscreen target is now the whole document (see flipbook.client.ts),
+   not #stage itself, so this matches :root rather than #stage — kept as a
+   safety net since #app already carries the same background unconditionally
+   (line ~33) and fills the viewport height, so this rule rarely has
+   anything left to do. */
+:fullscreen {
   background: var(--fpBg, #26232b);
 }
 
