@@ -354,10 +354,11 @@ body {
   margin-right: 2px;
 }
 
-/* Floating nudge on the timeline spread (pages 8–9). */
+/* Floating nudge on the timeline spread (pages 8–9). left/right is set per
+   page in pageN.generated.css (generate.py) — near the spine on each page,
+   not a fixed side, since the two pages need opposite sides. */
 .timeline-hint {
   position: absolute;
-  left: 24px;
   bottom: 72px;
   z-index: 6;
   display: flex;

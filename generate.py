@@ -474,12 +474,19 @@ for p in data:
         css_rules.append(f"#{el_id} {{ {side}:24px; }}\n")
 
     if n in TIMELINE_PAGES:
+        # Sits at the INNER edge of each page — near the spine, page 8 (the
+        # left/even page of the spread) on its right, page 9 (right/odd) on
+        # its left — the mirror image of the page-num badge above, which
+        # sits at each page's OUTER edge instead.
+        hint_id = f"p{n}-timeline-hint"
+        hint_side = 'right' if n % 2 == 0 else 'left'
         html.append(
-            '<div class="timeline-hint" role="status">'
+            f'<div class="timeline-hint" id="{hint_id}" role="status">'
             '<span class="timeline-hint-text">移動滑鼠到大事紀查看詳情</span>'
             '<button type="button" class="timeline-hint-close" aria-label="關閉提示">×</button>'
             '</div>\n'
         )
+        css_rules.append(f"#{hint_id} {{ {hint_side}:24px; }}\n")
 
     html.append(FOOT)
 

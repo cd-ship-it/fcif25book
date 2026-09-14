@@ -354,10 +354,11 @@ body {
   margin-right: 2px;
 }
 
-/* Floating nudge on the timeline spread (pages 8–9). */
+/* Floating nudge on the timeline spread (pages 8–9). left/right is set per
+   page in pageN.generated.css (generate.py) — near the spine on each page,
+   not a fixed side, since the two pages need opposite sides. */
 .timeline-hint {
   position: absolute;
-  left: 24px;
   bottom: 72px;
   z-index: 6;
   display: flex;
@@ -636,6 +637,7 @@ body.timeline-hint-dismissed .timeline-hint {
 #p8-tl10 { left:295.56px; top:192.01px; width:68.09px; height:24.67px; }
 #p8-tl11 { left:529.84px; top:251.04px; width:170.22px; height:24.67px; }
 #p8-pagenum { left:24px; }
+#p8-timeline-hint { right:24px; }
 
 /* page8.css — local overrides for page 8.
    This file is created once and is NEVER overwritten by generate.py,
@@ -674,6 +676,7 @@ body.timeline-hint-dismissed .timeline-hint {
 #p9-tl13 { left:509.50px; top:156.86px; width:102.13px; height:24.67px; }
 #p9-tl14 { left:509.50px; top:179.87px; width:73.77px; height:24.67px; }
 #p9-pagenum { right:24px; }
+#p9-timeline-hint { left:24px; }
 
 /* page9.css — local overrides for page 9.
    This file is created once and is NEVER overwritten by generate.py,
