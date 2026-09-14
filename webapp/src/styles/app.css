@@ -16,18 +16,34 @@
   border: 0;
 }
 
+/* position:fixed + inset:0 (not just overflow:hidden) on the outer document
+   is deliberate: iOS Safari (and Chrome on iOS, same WKWebView underneath)
+   can still elastically rubber-band-scroll/bounce the BODY on any touch
+   even when it has overflow:hidden — that's a separate OS-level gesture
+   CSS overflow alone doesn't block. Root cause of a reported bug: any touch
+   on mobile visually shifted the whole page (content cut off on one edge,
+   blank space on the other), recoverable only by a reload — classic
+   symptom of the outer document bouncing and a position:fixed descendant
+   (#bottom-nav) desyncing from it mid-bounce. Pinning html/body here means
+   there is no outer document to bounce at all; #app.mobile-mode #stage
+   below is the only thing that ever scrolls, and overscroll-behavior on it
+   stops that scroll from chaining back up into a bounce anyway. */
 html, body {
+  position: fixed;
+  inset: 0;
   margin: 0;
   padding: 0;
+  width: 100%;
   height: 100%;
   background: var(--fpBg, #26232b);
   color: var(--fpToolbarText, #f3ede0);
   font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
   overflow: hidden;
+  overscroll-behavior: none;
 }
 
 #app {
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   background: var(--fpBgGradient, none), var(--fpBg, #26232b);
@@ -269,6 +285,8 @@ html, body {
   align-items: flex-start;
   justify-content: center;
   overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
   /* Must exactly match the dock's own footprint below (12px offset + 8px*2
      padding + 40px button = 68px) — just enough that the dock never
