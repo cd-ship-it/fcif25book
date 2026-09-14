@@ -15,17 +15,25 @@
 // index.astro), inert buttons — also held up fine, so a fixed-position
 // element on screen by itself isn't the cause either.
 //
-// ROUND 3: the one big architectural difference left untested is HOW the
-// page scrolls. Rounds 1-2 let the plain document/body scroll natively.
-// The real app instead nests scrolling inside #app (height:100%, flex
-// column) > #stage (overflow-y:auto, -webkit-overflow-scrolling:touch —
-// iOS's old momentum-scroll opt-in, a well-known source of exactly this
-// class of desync bug when combined with a position:fixed sibling like
-// #bottom-nav). This round reproduces that exact nested-scroll-container
-// structure (CSS/markup copied from app.css/index.astro) around the same
-// page35 content, still with #bottom-nav, still with zero resize/fit JS.
-// If the bug reappears now, the nested momentum-scroll container is the
-// cause. If it still doesn't, the next round adds the resize/fit JS itself.
+// ROUND 3: added the real app's nested momentum-scroll container (#app >
+// #stage with overflow-y:auto + -webkit-overflow-scrolling:touch) around
+// the same content — also held up fine on real Safari/Chrome on iOS. So
+// neither #bottom-nav nor the nested scroll container, alone, is the
+// cause. Decision after round 3: drop the nested container from the real
+// app's mobile mode anyway — it added nothing (that CSS property is a
+// vestigial iOS 12-era opt-in; every scrollable region gets momentum
+// scrolling by default since iOS 13) and the user wants the simpler,
+// already-proven-stable plain-body-scroll shape (round 2) going forward.
+//
+// ROUND 4: back to round 2's plain document/body scroll (no nested
+// container) + #bottom-nav, now adding the one remaining big untested
+// difference — the real app's resize-driven CSS scale() fit logic
+// (flipbook.client.ts's fitMobile()/applyFit(), copied near-verbatim
+// here), which recalculates and reapplies a transform on every `resize`,
+// `orientationchange`, and `visualViewport` `resize` event. This was the
+// original leading theory for the "shifted, with blank space" symptom: a
+// stale/wrong width read mid-touch producing a bad transform. If the bug
+// reappears now, this recalculation logic is the cause.
 function withBase(path: string): string {
   return `${import.meta.env.BASE_URL.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
 }
@@ -115,57 +123,42 @@ function withBase(path: string): string {
       justify-content: center;
     }
 
-    /* Round 3's only addition: the real app's nested momentum-scroll
-       container (app.css's html,body / #app / #app.mobile-mode #stage
-       rules, copied verbatim), replacing rounds 1-2's plain document
-       scroll. No resize/fit JS yet — the page renders at its native
-       695px width, just scrollable inside #stage instead of the body. */
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow: hidden;
+    /* Round 4: back to plain body scroll (round 3's nested #stage
+       container removed — tested harmless but unnecessary, and the user
+       wants the simpler shape). #book-shell wraps the page so the fit JS
+       below has something to apply its CSS transform to, matching how
+       app.css's real #book-shell/#book work. */
+    body {
       background: #6b6b6b;
     }
-    #app {
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-    }
-    #stage {
-      flex: 1 1 auto;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      background: #ffffff;
-      padding: 0 0 calc(68px + env(safe-area-inset-bottom));
+    #book-shell {
       display: flex;
       justify-content: center;
+      transform-origin: top center;
     }
   </style>
 </head>
 <body>
-  <div id="app">
-    <div id="debug-banner">MOBILE DEBUG ROUND 3 — page 35 + #bottom-nav + nested #stage momentum-scroll container, still no resize/fit JS</div>
-    <div id="stage">
-      <div class="page" id="page35">
-        <div class="t" id="p35-t1">女教牧事工</div>
-        <div class="t" id="p35-t2" role="button" tabindex="0" aria-label="閱讀全文">閱讀全文</div>
-        <div class="t" id="p35-t3">大約十年前，神感動丈夫和我來到現在的教會服事，因</div>
-        <div class="t" id="p35-t4">著全新的角色及陌生的環境，我逐漸感受到當師母那份</div>
-        <div class="t" id="p35-t5">不為人知的孤單……</div>
-        <div class="t" id="p35-t6">生命中的伊利莎白</div>
-        <div class="t" id="p35-t7">張麗珊（Karol Lam）｜聖經原文研經小組組員 </div>
-        <div class="t" id="p35-t8">2026年張麗珊（右上）與原文研究小組組員共聚。</div>
-        <div class="photo-zoom" id="p35-photo1" data-photo-src={withBase('assets/photos/page35-photo1.jpg')} role="button" tabindex="0" aria-label="放大照片"></div>
-        <div class="page-num" id="p35-pagenum">35</div>
-      </div>
+  <div id="debug-banner">MOBILE DEBUG ROUND 4 — page 35 + #bottom-nav + real resize/fit JS, plain body scroll (no nested container)</div>
+  <div id="book-shell">
+    <div class="page" id="page35">
+      <div class="t" id="p35-t1">女教牧事工</div>
+      <div class="t" id="p35-t2" role="button" tabindex="0" aria-label="閱讀全文">閱讀全文</div>
+      <div class="t" id="p35-t3">大約十年前，神感動丈夫和我來到現在的教會服事，因</div>
+      <div class="t" id="p35-t4">著全新的角色及陌生的環境，我逐漸感受到當師母那份</div>
+      <div class="t" id="p35-t5">不為人知的孤單……</div>
+      <div class="t" id="p35-t6">生命中的伊利莎白</div>
+      <div class="t" id="p35-t7">張麗珊（Karol Lam）｜聖經原文研經小組組員 </div>
+      <div class="t" id="p35-t8">2026年張麗珊（右上）與原文研究小組組員共聚。</div>
+      <div class="photo-zoom" id="p35-photo1" data-photo-src={withBase('assets/photos/page35-photo1.jpg')} role="button" tabindex="0" aria-label="放大照片"></div>
+      <div class="page-num" id="p35-pagenum">35</div>
     </div>
-
-    <nav id="bottom-nav" aria-label="頁面導覽 (inert — round 3 test)">
-      <button type="button" class="dock-btn" aria-label="上一頁">‹</button>
-      <button type="button" class="dock-btn" aria-label="下一頁">›</button>
-    </nav>
   </div>
+
+  <nav id="bottom-nav" aria-label="頁面導覽 (inert — round 4 test)">
+    <button type="button" class="dock-btn" aria-label="上一頁">‹</button>
+    <button type="button" class="dock-btn" aria-label="下一頁">›</button>
+  </nav>
 
   <div id="debug-modal">
     <div id="debug-modal-card">
@@ -180,6 +173,38 @@ function withBase(path: string): string {
     });
     document.getElementById('debug-modal-close')?.addEventListener('click', () => {
       document.getElementById('debug-modal')?.classList.remove('open');
+    });
+
+    // Copied near-verbatim from flipbook.client.ts's fitMobile()/applyFit()
+    // and its resize/orientationchange/visualViewport listeners — the one
+    // remaining untested piece of the real app's mobile behavior. NATURAL_W
+    // matches config.book.pageWidth (695, page35's real rendered width).
+    const bookShell = document.getElementById('book-shell');
+    const NATURAL_W = 695;
+
+    function fitMobile() {
+      if (!bookShell) return;
+      const scale = Math.min(window.innerWidth / NATURAL_W, 1);
+      bookShell.style.transform = `scale(${Math.max(scale, 0.1)})`;
+    }
+    fitMobile();
+
+    function isPinchZoomed() {
+      return !!window.visualViewport && window.visualViewport.scale !== 1;
+    }
+
+    window.addEventListener('resize', () => {
+      if (isPinchZoomed()) return;
+      fitMobile();
+    });
+    window.addEventListener('orientationchange', () => {
+      setTimeout(() => {
+        if (isPinchZoomed()) return;
+        fitMobile();
+      }, 100);
+    });
+    window.visualViewport?.addEventListener('resize', () => {
+      if (!isPinchZoomed()) fitMobile();
     });
   </script>
 </body>
