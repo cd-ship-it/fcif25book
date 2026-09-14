@@ -16,3 +16,12 @@
      color: #333333;
    }
 */
+
+#p20-t1, #p20-t2 {
+  width: auto;
+  text-align: left;
+  text-align-last: left;
+  text-justify: auto;
+}
+
+#p20-t1::after { content: none; }

@@ -208,6 +208,32 @@ function init(): void {
     else pageFlip?.flipNext();
   }
 
+  // Page 5's table-of-contents entries (generate.py's TOC_TARGETS) are real
+  // anchors carrying BOTH an href and data-goto: the href is what makes the
+  // standalone pageN.html previews navigate, but following it here would
+  // leave the app entirely, so it's pre-empted and routed through goToPage.
+  //
+  // Delegated on #stage in the CAPTURE phase, same two reasons as
+  // readmore.client.ts: #stage survives the #book teardown/rebuild that a
+  // desktop/mobile breakpoint crossing triggers, and capture runs before
+  // #book's own bubble-phase click-to-flip handler, so stopPropagation here
+  // actually prevents a stray page turn. The TOC drawer's own [data-goto]
+  // thumbnails are unaffected — #toc-drawer is a sibling of #stage, not a
+  // descendant, and keeps its direct listeners further down.
+  stage!.addEventListener(
+    'click',
+    (e) => {
+      const el = (e.target as Element | null)?.closest?.<HTMLElement>('[data-goto]');
+      if (!el) return;
+      const n = parseInt(el.dataset.goto ?? '', 10);
+      if (Number.isNaN(n)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      goToPage(n);
+    },
+    { capture: true }
+  );
+
   // With useMouseEvents:false, page-flip attaches none of its own mouse
   // handling (no hover-curl preview, no drag-follow) — restore click-to-flip
   // ourselves. This used to be one click handler on the whole #book element

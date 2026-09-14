@@ -1,17 +1,6 @@
 #page76 { background-image: url('assets/backgrounds/page76.webp'); }
-#p76-t1 { left:356.11px; top:809.39px; font-size:14.76px; line-height:21.39px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
-#p76-t2 { left:69.50px; top:275.10px; font-size:18.17px; line-height:26.32px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; width:155.12px; white-space:normal; text-align:justify; text-align-last:left; text-justify:inter-character; }
-#p76-t3 { left:83.36px; top:469.56px; font-size:13.62px; line-height:19.73px; color:#737373; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:700; }
-#p76-t4 { left:83.36px; top:738.08px; font-size:13.62px; line-height:19.73px; color:#737373; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:700; }
-#p76-t5 { left:69.50px; top:628.36px; font-size:18.17px; line-height:26.32px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; width:269.19px; text-align:justify; text-align-last:justify; text-justify:inter-character; }
-#p76-t6 { left:69.50px; top:655.63px; font-size:18.17px; line-height:26.32px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; width:269.19px; text-align:justify; text-align-last:justify; text-justify:inter-character; }
-#p76-t7 { left:69.50px; top:682.90px; font-size:18.17px; line-height:26.32px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
-#p76-t8 { left:69.50px; top:184.32px; font-size:29.52px; line-height:42.77px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
-#p76-t9 { left:69.50px; top:229.88px; font-size:18.17px; line-height:26.32px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
-#p76-t10 { left:69.50px; top:537.58px; font-size:29.52px; line-height:42.77px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
-#p76-t11 { left:69.50px; top:583.14px; font-size:18.17px; line-height:26.32px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
-#p76-t12 { left:245.33px; top:456.13px; font-size:14.76px; line-height:21.39px; color:#000000; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
-#p76-t13 { left:69.50px; top:111.96px; font-size:18.17px; line-height:26.32px; color:#624393; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:400; }
+#p76-readmore1 { left:83.36px; top:469.56px; width:62.64px; height:19.73px; }
+#p76-readmore2 { left:83.36px; top:738.08px; width:62.64px; height:19.73px; }
 #p76-photo1 { left:302.69px; top:544.43px; width:354.51px; height:265.89px; }
 #p76-photo2 { left:245.33px; top:272.03px; width:380.36px; height:182.35px; }
 #p76-pagenum { left:24px; }

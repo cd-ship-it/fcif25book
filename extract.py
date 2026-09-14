@@ -14,11 +14,21 @@ CSS_W = 695
 CSS_H = 900
 RENDER_SCALE = 2  # retina background
 
-# Pages whose design (rotated/curved text following hand-drawn art, e.g. a
-# vine) can't be reproduced as our usual horizontal absolutely-positioned
-# text divs — rendered as a single flat image with NO text overlay at all,
-# instead of the normal redact-text-then-overlay-divs treatment.
-FULL_IMAGE_PAGES = set()
+# Every page is rendered as a single flat, pixel-perfect image of the PDF's
+# own layout — no text redaction, no HTML text reconstruction. This used to
+# be a special case (FULL_IMAGE_PAGES) for a handful of pages whose design
+# (rotated/curved text following hand-drawn art) couldn't be reproduced as
+# absolutely-positioned text divs; it's now how every page works, since
+# reconstructing body text as HTML turned out to have a structural ceiling
+# on fidelity (paragraph-justify heuristics that can't always tell a real
+# paragraph from a short label block, font/glyph substitution differences,
+# and — the one no amount of heuristic tuning can fix — different browsers'
+# text-layout engines rendering the same CSS+fonts with slightly different
+# metrics). `lines_out` (span text/bbox/font/size/color) is still extracted
+# below and saved to data/pages.json — generate.py still needs it to locate
+# specific trigger text (the "閱讀全文" readmore buttons, page 5's table of
+# contents) for invisible interactive overlays — it's just never redacted
+# out of the background or reconstructed as visible HTML anymore.
 
 # Timeline spread (pages 8-9): a separately hand-designed artwork
 # (Timeline/Timeline-Years and Titles.pdf) replaces whatever the main book's
@@ -48,7 +58,6 @@ TIMELINE_SPLIT_PT = 612.0  # x, in the timeline PDF's own point space
 # its exact position — see generate.py for the HTML/CSS it emits.
 PHOTO_ALBUM_DIR = 'PhotoAlbums'
 PHOTO_ALBUM_PAGES = {37: 'Page 37 Photo Slides', 45: 'Page 45 Photo Slides', 53: 'Page 53 Photo Slides'}
-PHOTO_ALBUM_LABEL_TEXT = 'Photo Slides'  # literal PDF text label over the placeholder; suppressed on these pages
 # left, top, width, height, in this book's normal 612x792pt page space.
 # Measured from the rendered placeholder graphic itself, NOT
 # get_image_info()'s declared bbox — like page 36's photo, that bbox
@@ -330,44 +339,28 @@ for i in range(NUM_PAGES):
             r = link['from']
             links_out.append({'uri': link['uri'], 'bbox': [r.x0, r.y0, r.x1, r.y1]})
 
-    if n in FULL_IMAGE_PAGES:
-        lines_out = []
-        bg_ext = 'jpg'
-    else:
-        bg_ext = 'png'
-        d = page.get_text('dict')
-        lines_out = []
-        for b in d['blocks']:
-            if b['type'] != 0:
-                continue
-            for l in b['lines']:
-                spans_out = []
-                for s in l['spans']:
-                    spans_out.append({
-                        'text': s['text'],
-                        'bbox': s['bbox'],
-                        'size': s['size'],
-                        'font': s['font'],
-                        'color': s['color'],
-                        'origin': s['origin'],
-                    })
-                if spans_out:
-                    line_text = ''.join(s['text'] for s in spans_out)
-                    if n in PHOTO_ALBUM_PAGES and line_text.strip() == PHOTO_ALBUM_LABEL_TEXT:
-                        continue  # replaced by the real photo-album carousel below
-                    lines_out.append({'bbox': l['bbox'], 'spans': spans_out})
-
-        # Redact text (not images/vectors) on this in-memory copy so the
-        # rendered background is clean underneath the HTML text overlay.
-        for b in d['blocks']:
-            if b['type'] != 0:
-                continue
-            for l in b['lines']:
-                for s in l['spans']:
-                    r = fitz.Rect(s['bbox'])
-                    page.add_redact_annot(r, fill=None)
-        if d['blocks']:
-            page.apply_redactions(images=fitz.PDF_REDACT_IMAGE_NONE)
+    # lines_out is metadata only now (never redacted out, never reconstructed
+    # as visible HTML) — generate.py uses it purely to locate specific
+    # trigger text (readmore buttons, page 5's TOC) for invisible overlays.
+    bg_ext = 'png'
+    d = page.get_text('dict')
+    lines_out = []
+    for b in d['blocks']:
+        if b['type'] != 0:
+            continue
+        for l in b['lines']:
+            spans_out = []
+            for s in l['spans']:
+                spans_out.append({
+                    'text': s['text'],
+                    'bbox': s['bbox'],
+                    'size': s['size'],
+                    'font': s['font'],
+                    'color': s['color'],
+                    'origin': s['origin'],
+                })
+            if spans_out:
+                lines_out.append({'bbox': l['bbox'], 'spans': spans_out})
 
     pages_data.append({
         'page': n, 'lines': lines_out, 'links': links_out, 'bg_ext': bg_ext,
@@ -390,9 +383,21 @@ for i in range(NUM_PAGES):
     # feature has a source to use.
     webp_path = f'assets/backgrounds/page{n}.webp'
     webp_quality = 82 if bg_ext == 'jpg' else 85
-    Image.frombuffer('RGB', (pix.width, pix.height), pix.samples, 'raw', 'RGB', 0, 1).save(
-        webp_path, 'WEBP', quality=webp_quality, method=6
-    )
+    bg_img = Image.frombuffer('RGB', (pix.width, pix.height), pix.samples, 'raw', 'RGB', 0, 1)
+    bg_img.save(webp_path, 'WEBP', quality=webp_quality, method=6)
+    # Almost every page lands well under this at the quality above (photo-
+    # sparse, mostly white/text) — but a photo-heavy full-bleed page (e.g.
+    # 44) can come out 2-3x the size of its neighbors. Step quality down
+    # further, same technique as extract_photo_albums()'s save_capped,
+    # rather than hand-tuning one page's number.
+    BG_MAX_BYTES = 300 * 1024
+    if os.path.getsize(webp_path) > BG_MAX_BYTES:
+        for q in (78, 72, 65, 58, 50, 42):
+            bg_img.save(webp_path, 'WEBP', quality=q, method=6)
+            if os.path.getsize(webp_path) <= BG_MAX_BYTES:
+                break
+        print(f'  (page {n} background re-compressed to fit under 300KB: '
+              f'{os.path.getsize(webp_path)} bytes)')
 
     print('page', n, 'lines:', len(lines_out), 'links:', len(links_out), 'photos:', len(photos_by_page[n]), 'bg saved', pix.width, pix.height, bg_path, '+ webp')
 

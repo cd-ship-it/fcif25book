@@ -16,19 +16,3 @@
      color: #333333;
    }
 */
-
-/* Verse block: merged from former p1-t1…t10 into one wrapping, full-justified div */
-#p1-t1 {
-  left: 69.50px;
-  top: 483.52px;
-  font-size: 18.17px;
-  line-height: 26.32px;
-  color: #000000;
-  font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
-  font-weight: 400;
-  width: 220.57px;
-  white-space: normal;
-  text-align: justify;
-  text-align-last: right;
-  text-justify: inter-character;
-}

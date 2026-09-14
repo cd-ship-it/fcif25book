@@ -28,6 +28,12 @@ def font_weight(font):
 def color_hex(c):
     return '#%06x' % c
 
+def esc_html(s):
+    return s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+
+def esc_attr(s):
+    return esc_html(s).replace('"', '&quot;')
+
 YOUTUBE_RE = re.compile(r'(?:youtube\.com/watch\?v=|youtu\.be/|youtube\.com/embed/)([\w-]{6,})')
 
 def youtube_embed_url(uri):
@@ -92,102 +98,25 @@ def page_title(n):
         return OUTLINE_TITLES[n]
     return f'第 {n} 頁'
 
-# --- Shared: detect "paragraph" groups (consecutive same-style, ---------
-# same-left-margin, evenly-spaced single-span lines) that the two
-# experiments below both build on top of.
-MIN_PARAGRAPH_GROUP = 2  # a "paragraph" of 1 line has nothing to justify/merge against
-
-def _same_style(a, b):
-    return a['font'] == b['font'] and abs(a['size'] - b['size']) < 0.01 and a['color'] == b['color']
-
-def group_paragraph_lines(lines):
-    """Return a list of paragraph groups, each a list of line-indices into
-    `lines`, for consecutive lines that look like one wrapped paragraph:
-    same font/size/color, same left edge, and a consistent line-to-line gap."""
-    groups = []
-    current = []
-
-    def flush():
-        if len(current) >= MIN_PARAGRAPH_GROUP:
-            groups.append(list(current))
-        current.clear()
-
-    for i, line in enumerate(lines):
-        spans = line['spans']
-        if len(spans) != 1 or not spans[0]['text'].strip():
-            flush()
-            continue
-        s = spans[0]
-        if current:
-            prev_line = lines[current[-1]]
-            prev_s = prev_line['spans'][0]
-            same_left = abs(line['bbox'][0] - prev_line['bbox'][0]) < 1.0
-            gap = line['bbox'][1] - prev_line['bbox'][1]
-            reasonable_gap = 0 < gap < s['size'] * 2.0
-            if _same_style(s, prev_s) and same_left and reasonable_gap:
-                current.append(i)
-            else:
-                flush()
-                current.append(i)
-        else:
-            current.append(i)
-    flush()
-    return groups
-
-# --- Full-justify paragraphs, book-wide ----------------------------------
-# Every paragraph-like group (see group_paragraph_lines above) gets full
-# justification, via one of two techniques depending on how long it is:
-#
-# A) MERGE-AND-REFLOW (>= MIN_MERGE_GROUP_LINES lines — real body-text
-#    paragraphs): merge the group's lines into a single wrapping <div>
-#    (white-space:normal, width = the group's widest original line) and
-#    let the browser re-flow the text from scratch — true CSS justify
-#    (text-align:justify + text-align-last:left, so only the last line
-#    stays unstretched), rather than faking it line-by-line. In testing
-#    (pages 68/69) this reproduced line breaks nearly identical to the
-#    PDF's own, since the width matches the original column.
-#
-# B) PER-LINE STRETCH (2-3 lines — short quote/caption blocks too short to
-#    safely reflow): keep the PDF's own line breaks and just stretch each
-#    line except the last to the group's widest line via text-align-last:
-#    justify. This is the fallback for anything under the merge threshold.
-#
-# Groups shorter than MIN_MERGE_GROUP_LINES are deliberately NOT merged —
-# testing on page 68 showed merging also caught 2-line headings (same
-# font/size/color/left-edge run, just short), and justify-stretching a
-# large bold heading looks stretched/awkward in a way it doesn't for body
-# text. Those still get technique B if they're >= MIN_PARAGRAPH_GROUP.
-MIN_MERGE_GROUP_LINES = 4
-
-# Section-divider pages (事工N：... subtitle + big Chinese title + an
-# English subtitle) — the English line's original PDF spans alternate
-# between a bold-capital span and a plain-remainder span per word (e.g.
-# "W" / "omen "), which generate.py's default per-span rendering turns into
-# a scattering of separate divs. Clean those up into a single div per page:
-# whole line in one <div>, first letter of each word wrapped in <b>, right-
-# aligned to the line above it (both sit on the same right margin in the
-# original design), with a bit of extra letter-spacing.
-TITLE_PAGES = {32, 38, 46}
-TITLE_RIGHT_ALIGN_NUDGE_PX = 17.0
-
-# Pages of free-verse poetry — the paragraph-justify heuristics below are
-# tuned for prose (matching runs of same-style, evenly-spaced lines) and
-# can't tell a poem's deliberate line breaks from a prose paragraph that
-# happens to wrap at a similar width. Merging a stanza and letting the
-# browser reflow it, or even just stretch-justifying each of its original
-# lines, both destroy line breaks the poet chose on purpose. Pages here skip
-# paragraph grouping entirely — every line renders on its own, exactly at
-# its original PDF position, ragged (unjustified), like the source.
-NO_JUSTIFY_PAGES = {14}
+# Every page is rendered as a single flat, pixel-perfect image of the PDF's
+# own layout (see extract.py) — there is no live body-text reconstruction
+# anymore, so none of that machinery (paragraph-justify heuristics, font
+# matching, per-browser text-layout variance) exists to go wrong. What's
+# below is only the INTERACTIVE overlay layer: invisible, absolutely-
+# positioned hit-areas/embeds over content that's already visible in the
+# background image, driven by bbox coordinates extract.py already extracted.
+# extract.py's 'lines' data is kept purely as metadata now, to locate a
+# couple of specific pieces of trigger text (below) — never redacted out of
+# the background or reconstructed as visible HTML.
 
 # Timeline spread — see extract.py's TIMELINE_PAGES/extract_timeline_events
 # for how these pages' background + 'timeline_events' data are produced.
 # The title/tag text is already part of that background image (a real
-# designed PDF, not a placeholder), so — unlike TITLE_PAGES above — nothing
-# here draws visible text; each event just gets an invisible hover hotspot
-# over its existing text, wired to a tooltip by the shared timeline
-# tooltip script (timeline.js for the standalone previews,
-# webapp/src/scripts/timeline-tooltip.client.ts for the app).
+# designed PDF, not a placeholder), so nothing here draws visible text; each
+# event just gets an invisible hover hotspot over its existing text, wired
+# to a tooltip by the shared timeline tooltip script (timeline.js for the
+# standalone previews, webapp/src/scripts/timeline-tooltip.client.ts for the
+# app).
 TIMELINE_PAGES = {8, 9}
 
 # "Photo Slides" pages — see extract.py's PHOTO_ALBUM_PAGES/
@@ -201,37 +130,62 @@ TIMELINE_PAGES = {8, 9}
 PHOTO_ALBUM_PAGES = {37, 45, 53}
 PHOTO_ALBUM_BOX_PT = (61.2, 215.16, 488.7194, 314.16)
 
-def group_overlaps_a_link(lines, group, links):
-    """True if any line in this group's original position coincides with a
-    PDF hyperlink's rect (page.get_links(), extracted by extract.py).
-    A merged/reflowed paragraph doesn't wrap the same way the original did
-    (e.g. an unbreakable URL like "ficfellowship.org" may push to a new
-    line), but the link overlay stays at its ORIGINAL coordinates — found
-    on page 92, where a paragraph ending in a URL grew a line on reflow and
-    swallowed the link's now-misaligned hitbox. Simplest safe fix: never
-    merge a group a link is anchored inside; it keeps the PDF's exact line
-    positions via the per-line stretch technique instead, so the link
-    overlay (positioned against those same original coordinates) stays
-    correctly aligned with the visible text under it."""
-    for i in group:
-        lb = lines[i]['spans'][0]['bbox']
-        for link in links:
-            rb = link['bbox']
-            intersects = not (rb[2] < lb[0] or rb[0] > lb[2] or rb[3] < lb[1] or rb[1] > lb[3])
-            if intersects:
-                return True
-    return False
+# "閱讀全文" (Read Full Text) buttons: the button graphic AND its text are
+# both already part of the background image now — this just places an
+# invisible clickable overlay over every line whose text is exactly this,
+# at that line's extracted bbox. webapp/scripts/sync-details.mjs finds
+# these by id to build readmore.config.ts; webapp's readmore.client.ts
+# (event delegation on #stage) opens the matching article modal.
+READMORE_TRIGGER_TEXT = '閱讀全文'
 
-def build_justify_widths_from_groups(lines, groups):
-    """Return {line_index: target_width_pt} for lines that should be
-    stretched to their paragraph's widest line via text-align:justify."""
-    widths = {}
-    for group in groups:
-        line_widths = {i: lines[i]['spans'][0]['bbox'][2] - lines[i]['spans'][0]['bbox'][0] for i in group}
-        target = max(line_widths.values())
-        for i in group[:-1]:  # last line of a justified paragraph stays natural width
-            widths[i] = target
-    return widths
+# Page 5 is the table of contents. Unlike every other link in this book it
+# can't come from the PDF: page.get_links() is empty for page 5, and each
+# entry's page number is a literal "PAGE #" the designer left unfilled (see
+# TITLE_BLACKLIST above, which already has to defend against it leaking into
+# a page title). So both the targets and the numbers are resolved here, by
+# matching each entry's text/position against the pages' own titles.
+#
+# Keyed by LINE INDEX (0-based, into that page's data/pages.json 'lines' —
+# stable and independent of any rendering loop, unlike the old scheme of
+# keying this by a generate.py-assigned element id, which no longer exists
+# now that there's no per-line text-emission loop to assign one). Re-derive
+# this table with a quick dump of page 5's 'lines' (text + bbox) if a future
+# PDF revision changes page 5's content — verified once against
+# FiCF 25 Book-Stage1.3.pdf:
+#   0  目錄 (page title, not a TOC entry)
+#   1  鳴謝                                          -> 3
+#   2  成長茁壯                                       -> 30
+#   3  事工一：姊妹事奉 / 4  (Women In Ministries)     -> 32
+#   5  事工二：社會關懷 / 6  (Pleroma Missions...)     -> 38
+#   7  事工三：靈命塑造 / 8  (Spiritual Formation...)  -> 46
+#   9  初熟果子                                       -> 54
+#   10 生命果子呈獻一：跨代師友同行                     -> 56
+#   11 生命果子呈獻二：生命結連轉化                     -> 62
+#   12 生命果子呈獻三：豐榮新知舊雨                     -> 72
+#   13 文化果子呈獻四：男女同盟 同尊同榮                -> 80
+#   14 文化果子呈獻五：福音宣教 抗衝文化                -> 86
+#   18 電子書製作初心 -> 2      19 孕育萌芽 -> 10
+#   22 感恩致謝 -> 6            24 廿五年恩典長河 -> 8
+#   25 參與支持 -> 92
+#   15/16/17/20/21/23/26/27 are literal "PAGE #" placeholders, each paired
+#   by position (same x-column, sitting just above its heading) with one of
+#   the entries above that has no page number displayed in the design
+#   (鳴謝->3, 成長茁壯->30, 初熟果子->54, 電子書製作初心->2, 孕育萌芽->10,
+#   感恩致謝->6, 廿五年恩典長河->8, 參與支持->92).
+TOC_TARGETS = {
+    1: 3, 2: 30, 3: 32, 4: 32, 5: 38, 6: 38, 7: 46, 8: 46, 9: 54,
+    10: 56, 11: 62, 12: 72, 13: 80, 14: 86,
+    18: 2, 19: 10, 22: 6, 24: 8, 25: 92,
+    15: 3, 16: 30, 17: 54, 20: 2, 21: 10, 23: 6, 26: 8, 27: 92,
+}
+# The subset of TOC_TARGETS whose text is the literal "PAGE #" placeholder.
+# These need more than a click overlay: the background image still shows
+# the PDF's unfilled "PAGE #" verbatim (nothing is redacted anymore), so
+# this small, deliberate exception covers just that bbox with an opaque
+# background-colored box and draws real "PAGE <n>" text on top of it — the
+# ONLY body text this pipeline still renders as live HTML, contained to
+# these 8 elements on this one page.
+TOC_PAGE_LABELS = {15, 16, 17, 20, 21, 23, 26, 27}
 
 HEAD = """<!doctype html>
 <html lang="zh-Hant">
@@ -240,7 +194,7 @@ HEAD = """<!doctype html>
 <title>{title}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="page{n}.generated.css">
 <link rel="stylesheet" href="page{n}.css">
@@ -273,11 +227,11 @@ CUSTOM_CSS_STUB = """/* page{n}.css — local overrides for page {n}.
      background-image: url('assets/backgrounds/page{n}.webp');
    }}
 
-   #p{n}-t3 {{
+   #p{n}-photo1 {{
      left: 120px;
      top: 340px;
-     font-size: 18px;
-     color: #333333;
+     width: 200px;
+     height: 150px;
    }}
 */
 """
@@ -306,137 +260,72 @@ for p in data:
         if n in TIMELINE_PAGES else ''
     )
     # The displayed background is always the WebP copy extract.py generates
-    # alongside the original .png/.jpg (kept on disk, unreferenced here, for
-    # a future full-resolution click-to-zoom feature).
+    # alongside the original .png (kept on disk, unreferenced here).
     html = [HEAD.format(title=title, n=n, prev=prev, next=nxt, total=TOTAL, extra_head=extra_head)]
     css_rules = [
         f"#page{n} {{ background-image: url('assets/backgrounds/page{n}.webp'); }}\n"
     ]
 
-    page_links = p.get('links', [])
-    all_groups = [] if n in NO_JUSTIFY_PAGES else group_paragraph_lines(p['lines'])
-    merge_groups = [
-        g for g in all_groups
-        if len(g) >= MIN_MERGE_GROUP_LINES and not group_overlaps_a_link(p['lines'], g, page_links)
-    ]
-    stretch_groups = [g for g in all_groups if g not in merge_groups]
-    justify_widths = build_justify_widths_from_groups(p['lines'], stretch_groups)
+    lines = p.get('lines', [])
 
-    merge_skip = set()
-    merge_start = {}
-    for group in merge_groups:
-        merge_start[group[0]] = group
-        merge_skip.update(group)
-
-    title_line_idx = len(p['lines']) - 1 if n in TITLE_PAGES and p['lines'] else None
-
-    idx = 0
-    for line_idx, line in enumerate(p['lines']):
-        if line_idx == title_line_idx:
-            spans = line['spans']
-            first_s = spans[0]
-            idx += 1
-            el_id = f"p{n}-t{idx}"
-            merged_text = ''.join(s['text'] for s in spans).strip()
-            esc = merged_text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
-            words = esc.split(' ')
-            bolded = ' '.join(
-                f'<b>{w[0]}</b>{w[1:]}' if w else w
-                for w in words
-            )
-            top = min(s['bbox'][1] for s in spans) * sy
-            size = first_s['size'] * sx
-            line_height_px = (first_s['bbox'][3] - first_s['bbox'][1]) * sy
-            fam = font_family(first_s['font'])
-            color = color_hex(first_s['color'])
-            # Right-align to the line directly above (the big Chinese
-            # title) — both sit on the same right margin in the original
-            # PDF design. Anchored with CSS `right` (not `left` + width)
-            # so it stays pinned to that edge regardless of how wide the
-            # bolded/letter-spaced English text renders in the browser.
-            # +TITLE_RIGHT_ALIGN_NUDGE_PX corrects for the browser's
-            # substituted Latin glyphs (Noto Sans TC's Latin metrics, not
-            # the PDF's original font) rendering visually wider/tighter
-            # than the exact bbox math predicts — confirmed by eye against
-            # the rendered page, same correction across all TITLE_PAGES
-            # since they share font/size/word-count-scale.
-            prev_line_right_pt = p['lines'][line_idx - 1]['bbox'][2]
-            right_px = CSS_W - prev_line_right_pt * sx + TITLE_RIGHT_ALIGN_NUDGE_PX
-
-            html.append(f'<div class="t" id="{el_id}">{bolded}</div>\n')
-            css_rules.append(
-                f"#{el_id} {{ right:{right_px:.2f}px; top:{top:.2f}px; "
-                f"font-size:{size:.2f}px; line-height:{line_height_px:.2f}px; "
-                f"color:{color}; font-family:{fam}; font-weight:400; "
-                f"letter-spacing:0.05em; text-align:right; }}\n"
-            )
-            continue
-        if line_idx in merge_start:
-            group = merge_start[line_idx]
-            group_lines = [p['lines'][i] for i in group]
-            group_spans = [gl['spans'][0] for gl in group_lines]
-            idx += 1
-            el_id = f"p{n}-t{idx}"
-            first_s = group_spans[0]
-            merged_text = ''.join(s['text'] for s in group_spans)
-            target_width_pt = max(s['bbox'][2] - s['bbox'][0] for s in group_spans)
-            left = first_s['bbox'][0] * sx
-            top = first_s['bbox'][1] * sy
-            width_px = target_width_pt * sx
-            size = first_s['size'] * sx
-            line_height_px = (first_s['bbox'][3] - first_s['bbox'][1]) * sy
-            fam = font_family(first_s['font'])
-            weight = font_weight(first_s['font'])
-            color = color_hex(first_s['color'])
-            esc = merged_text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
-
-            html.append(f'<div class="t" id="{el_id}">{esc}</div>\n')
-            css_rules.append(
-                f"#{el_id} {{ left:{left:.2f}px; top:{top:.2f}px; "
-                f"font-size:{size:.2f}px; line-height:{line_height_px:.2f}px; "
-                f"color:{color}; font-family:{fam}; font-weight:{weight}; "
-                f"width:{width_px:.2f}px; white-space:normal; text-align:justify; "
-                f"text-align-last:left; text-justify:inter-character; }}\n"
-            )
-            continue
-        if line_idx in merge_skip:
-            continue
-
-        for s in line['spans']:
-            text = s['text']
-            if text.strip() == '':
-                continue
-            idx += 1
-            el_id = f"p{n}-t{idx}"
-            x0, y0, x1, y1 = s['bbox']
-            left = x0 * sx
-            top = y0 * sy
-            height = (y1 - y0) * sy
-            size = s['size'] * sx
-            fam = font_family(s['font'])
-            weight = font_weight(s['font'])
-            color = color_hex(s['color'])
-            esc = (text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;'))
-
-            extra = ''
-            if line_idx in justify_widths and len(line['spans']) == 1:
-                width_px = justify_widths[line_idx] * sx
-                # text-align-last matters here: each .t div's content never
-                # wraps (white-space:pre, and the width is sized to already
-                # fit), so it's always exactly one line — which browsers
-                # treat as a block's "last line", and never justify by
-                # default no matter what text-align says.
-                extra = (
-                    f" width:{width_px:.2f}px; text-align:justify; "
-                    f"text-align-last:justify; text-justify:inter-character;"
+    # Page 5's table of contents — see TOC_TARGETS above for how this table
+    # was derived and what each key means.
+    if n == 5:
+        for line_idx, target in TOC_TARGETS.items():
+            line = lines[line_idx]
+            x0, y0, x1, y1 = line['bbox']
+            left, top = x0 * sx, y0 * sy
+            width, height = (x1 - x0) * sx, (y1 - y0) * sy
+            el_id = f"p5-toc{line_idx}"
+            if line_idx in TOC_PAGE_LABELS:
+                first_s = line['spans'][0]
+                size = first_s['size'] * sx
+                line_height_px = (first_s['bbox'][3] - first_s['bbox'][1]) * sy
+                fam = font_family(first_s['font'])
+                color = color_hex(first_s['color'])
+                html.append(
+                    f'<a class="t toc-page-label" id="{el_id}" href="page{target}.html" '
+                    f'data-goto="{target}">PAGE {target}</a>\n'
+                )
+                css_rules.append(
+                    f"#{el_id} {{ left:{left:.2f}px; top:{top:.2f}px; "
+                    f"width:{width:.2f}px; height:{height:.2f}px; "
+                    f"font-size:{size:.2f}px; line-height:{line_height_px:.2f}px; "
+                    f"color:{color}; font-family:{fam}; font-weight:700; }}\n"
+                )
+            else:
+                # Anchor, not a div — the href is what makes the standalone
+                # pageN.html previews work; the app can't follow it (it'd
+                # navigate out of the SPA) and uses data-goto instead, same
+                # as the page-label case above — see flipbook.client.ts.
+                html.append(
+                    f'<a class="toc-jump" id="{el_id}" href="page{target}.html" '
+                    f'data-goto="{target}"></a>\n'
+                )
+                css_rules.append(
+                    f"#{el_id} {{ left:{left:.2f}px; top:{top:.2f}px; "
+                    f"width:{width:.2f}px; height:{height:.2f}px; }}\n"
                 )
 
-            html.append(f'<div class="t" id="{el_id}">{esc}</div>\n')
-            css_rules.append(
-                f"#{el_id} {{ left:{left:.2f}px; top:{top:.2f}px; "
-                f"font-size:{size:.2f}px; line-height:{height:.2f}px; "
-                f"color:{color}; font-family:{fam}; font-weight:{weight};{extra} }}\n"
-            )
+    # "閱讀全文" readmore triggers — see READMORE_TRIGGER_TEXT above.
+    readmore_idx = 0
+    for line in lines:
+        line_text = ''.join(s['text'] for s in line['spans']).strip()
+        if line_text != READMORE_TRIGGER_TEXT:
+            continue
+        readmore_idx += 1
+        x0, y0, x1, y1 = line['bbox']
+        left, top = x0 * sx, y0 * sy
+        width, height = (x1 - x0) * sx, (y1 - y0) * sy
+        el_id = f"p{n}-readmore{readmore_idx}"
+        html.append(
+            f'<div class="readmore-trigger" id="{el_id}" role="button" tabindex="0" '
+            f'aria-label="閱讀全文"></div>\n'
+        )
+        css_rules.append(
+            f"#{el_id} {{ left:{left:.2f}px; top:{top:.2f}px; "
+            f"width:{width:.2f}px; height:{height:.2f}px; }}\n"
+        )
 
     # PDF hyperlinks -> real <a target="_blank"> overlays positioned over
     # the (already-visible-in-the-background-image) link text/button; a
@@ -458,7 +347,7 @@ for p in data:
                 f'referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe>\n'
             )
         else:
-            uri_esc = link['uri'].replace('&', '&amp;').replace('"', '&quot;')
+            uri_esc = esc_attr(link['uri'])
             html.append(
                 f'<a class="pdf-link" id="{el_id}" href="{uri_esc}" target="_blank" '
                 f'rel="noopener noreferrer" aria-label="開啟連結"></a>\n'
@@ -529,9 +418,6 @@ for p in data:
         height = box_h * sy
         el_id = f"p{n}-album"
 
-        def esc(s):
-            return s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
-
         html.append(f'<div class="photo-album" id="{el_id}" role="group" aria-label="相片幻燈片" tabindex="0">\n')
         for i, photo in enumerate(album_photos):
             hidden_attr = '' if i == 0 else ' hidden'
@@ -539,12 +425,12 @@ for p in data:
             html.append(
                 f'<img class="photo-album-img" src="assets/photos/{photo["file"]}" '
                 f'data-photo-src="assets/photos/{photo["full"]}" '
-                f'alt="" data-caption="{esc(photo["caption"])}"{hidden_attr}{loading_attr}>\n'
+                f'alt="" data-caption="{esc_attr(photo["caption"])}"{hidden_attr}{loading_attr}>\n'
             )
         html.append(
             '<button type="button" class="photo-album-nav photo-album-prev" aria-label="上一張">‹</button>\n'
             '<button type="button" class="photo-album-nav photo-album-next" aria-label="下一張">›</button>\n'
-            f'<div class="photo-album-caption">{esc(album_photos[0]["caption"])}</div>\n'
+            f'<div class="photo-album-caption">{esc_attr(album_photos[0]["caption"])}</div>\n'
             '</div>\n'
         )
         css_rules.append(
@@ -563,10 +449,10 @@ for p in data:
         width = (x1 - x0) * sx
         height = (y1 - y0) * sy
         el_id = f"p{n}-tl{ev_idx}"
-        esc_title = ev['title'].replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
-        esc_desc = ev['desc'].replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
+        esc_title = esc_attr(ev['title'])
+        esc_desc = esc_attr(ev['desc'])
         if ev.get('tag'):
-            esc_tag = ev['tag'].replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
+            esc_tag = esc_attr(ev['tag'])
             esc_title = f'<span class="tt-tag">{esc_tag}</span>{esc_title}'
         html.append(
             f'<div class="event-title event-hotspot" id="{el_id}" tabindex="0" '
@@ -600,7 +486,7 @@ for p in data:
     with open(f'page{n}.html', 'w', encoding='utf-8') as f:
         f.write(''.join(html))
 
-    # Generated CSS is always rewritten (positions/fonts derived from the PDF).
+    # Generated CSS is always rewritten (positions derived from the PDF).
     with open(f'page{n}.generated.css', 'w', encoding='utf-8') as f:
         f.write(''.join(css_rules))
 

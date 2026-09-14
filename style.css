@@ -60,10 +60,70 @@ body {
   flex-shrink: 0;
 }
 
+/* Base positioning for the handful of elements that still draw real text
+   on top of the page image — currently only .toc-page-label below. (Every
+   other page's body text is part of the background image itself now — see
+   generate.py's top-of-file comment — so this class has almost nothing
+   left to do; it's not the book-wide "every text div" class it used to be.) */
 .t {
   position: absolute;
   white-space: pre;
   margin: 0;
+}
+
+/* Page 5's table of contents (generate.py's TOC_TARGETS). The heading text
+   itself is already part of the background image, so this is just an
+   invisible clickable overlay — same hover-highlight affordance as
+   .readmore-trigger/.photo-zoom/.event-hotspot below, not underlined text
+   (there's no text inside anymore to underline). */
+.toc-jump {
+  position: absolute;
+  display: block;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background-color 0.15s ease;
+}
+
+.toc-jump:hover,
+.toc-jump:focus-visible {
+  background-color: rgba(98, 67, 147, 0.14);
+  outline: none;
+}
+
+/* The "PAGE #" placeholder entries (generate.py's TOC_PAGE_LABELS): the
+   PDF's own text is a literal, unfilled "PAGE #" — since nothing is
+   redacted out of the background anymore, this covers just that one small
+   bbox with an opaque page-colored box and draws the real "PAGE <n>" on
+   top. The only body text this pipeline still renders as live HTML,
+   deliberately contained to these 8 elements on this one page. */
+.toc-page-label {
+  background: #ffffff;
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.toc-page-label:hover,
+.toc-page-label:focus-visible {
+  outline: 1px solid rgba(98, 67, 147, 0.35);
+  outline-offset: 1px;
+}
+
+/* Transparent hit-area over the "閱讀全文" button already visible in the
+   background image — click opens the article modal. See webapp's
+   readmore.client.ts. */
+.readmore-trigger {
+  position: absolute;
+  display: block;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.15s ease;
+}
+
+.readmore-trigger:hover,
+.readmore-trigger:focus-visible {
+  background-color: rgba(98, 67, 147, 0.12);
+  outline: none;
 }
 
 /* Transparent hit-area over a PDF hyperlink's already-visible text/button
@@ -202,17 +262,12 @@ body {
 }
 
 .photo-album-caption {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 6px 42px;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.65));
-  color: #ffffff;
-  font-size: 12.5px;
-  line-height: 1.4;
-  text-align: center;
-  pointer-events: none;
+  /* Hidden — captions are just each source filename cleaned up (see
+     extract.py's caption_for()), not curated copy, so they didn't read as
+     useful to a viewer. The element + its live text are left in place
+     (photo-album.client.ts still updates it on prev/next) in case captions
+     come back later; this is the only change needed to toggle them. */
+  display: none;
 }
 
 /* Folio-style page-number badge — left page of a spread gets it in the
