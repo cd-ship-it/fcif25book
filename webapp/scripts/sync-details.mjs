@@ -148,7 +148,11 @@ for (const meta of detailsMeta) {
   }
 
   const triggers = [];
-  const divRe = /<div class="t" id="(p\d+-t\d+)">閱讀全文<\/div>/g;
+  // The "閱讀全文" text itself is part of the background image now (every
+  // page is rendered as a flat, pixel-perfect image of the PDF — see
+  // generate.py) — this is an invisible overlay div, no inner text to
+  // match against, so identify it by class + id shape instead.
+  const divRe = /<div class="readmore-trigger" id="(p\d+-readmore\d+)"/g;
   let m;
   while ((m = divRe.exec(html))) {
     const id = m[1];
@@ -209,10 +213,11 @@ const configSource = `// -------------------------------------------------------
 // for a page with two buttons) into ../details/, then re-running
 // \`node scripts/sync-details.mjs\`.
 //
-// The PDF renders each "閱讀全文" button's outline/arrow graphic into the
-// page's background PNG (see ../../generate.py) — only the button's TEXT is
-// real HTML (one of the absolutely-positioned \`.t\` divs in
-// src/generated/fragments/pageN.html, id \`p{N}-t{X}\`).
+// Every page (including each "閱讀全文" button's text/graphic) is part of
+// the background image now (see ../../generate.py) — the element this
+// points at is an invisible \`.readmore-trigger\` overlay div positioned
+// over it (src/generated/fragments/pageN.html, id \`p{N}-readmoreX\`), not
+// visible text.
 // ---------------------------------------------------------------------------
 
 export interface ReadMoreLink {

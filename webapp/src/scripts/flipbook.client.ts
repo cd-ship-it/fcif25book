@@ -35,7 +35,13 @@ function init(): void {
     }
   }
 
-  const mq = window.matchMedia(`(max-width: ${config.responsive.mobileBreakpointPx}px)`);
+  // Checks height as well as width — a phone in landscape is wide but
+  // short, and without the height half of this it would cross into
+  // desktop's two-page page-flip layout just from rotating, then lose
+  // mobile's plain-scroll page entirely. Must stay in sync with app.css's
+  // own matching media queries (search mobileBreakpointPx there).
+  const bp = config.responsive.mobileBreakpointPx;
+  const mq = window.matchMedia(`(max-width: ${bp}px), (max-height: ${bp}px)`);
   let pageFlip: PageFlip | null = null;
   let bookEl: HTMLElement | null = null;
   let mobileMode = false;
@@ -208,6 +214,32 @@ function init(): void {
     else pageFlip?.flipNext();
   }
 
+  // Page 5's table-of-contents entries (generate.py's TOC_TARGETS) are real
+  // anchors carrying BOTH an href and data-goto: the href is what makes the
+  // standalone pageN.html previews navigate, but following it here would
+  // leave the app entirely, so it's pre-empted and routed through goToPage.
+  //
+  // Delegated on #stage in the CAPTURE phase, same two reasons as
+  // readmore.client.ts: #stage survives the #book teardown/rebuild that a
+  // desktop/mobile breakpoint crossing triggers, and capture runs before
+  // #book's own bubble-phase click-to-flip handler, so stopPropagation here
+  // actually prevents a stray page turn. The TOC drawer's own [data-goto]
+  // thumbnails are unaffected — #toc-drawer is a sibling of #stage, not a
+  // descendant, and keeps its direct listeners further down.
+  stage!.addEventListener(
+    'click',
+    (e) => {
+      const el = (e.target as Element | null)?.closest?.<HTMLElement>('[data-goto]');
+      if (!el) return;
+      const n = parseInt(el.dataset.goto ?? '', 10);
+      if (Number.isNaN(n)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      goToPage(n);
+    },
+    { capture: true }
+  );
+
   // With useMouseEvents:false, page-flip attaches none of its own mouse
   // handling (no hover-curl preview, no drag-follow) — restore click-to-flip
   // ourselves. This used to be one click handler on the whole #book element
@@ -333,16 +365,41 @@ function init(): void {
 
   buildBook(mq.matches);
 
+  // iOS Safari's native pinch-to-zoom (the viewport meta tag deliberately
+  // doesn't disable it — see index.astro) can trigger a `resize` here
+  // mid-gesture on some iOS versions, even though nothing about the actual
+  // page/window size really changed — window.innerWidth/stage.clientWidth
+  // stay the LAYOUT size, but re-running fitMobile()'s scale-to-fit math
+  // while the visual viewport is transiently zoomed would produce a wrong
+  // transform. window.visualViewport.scale reliably reports "actively
+  // pinch-zoomed" (!= 1) vs. a real resize/rotation (== 1), so this skips
+  // re-fitting for the former and lets it settle once the pinch ends. A
+  // staged real-device test confirmed this whole combination (native
+  // pinch-zoom + this guard + a position:fixed #bottom-nav) is stable —
+  // an earlier theory blamed a *different*, unconfirmed mechanism for a
+  // reported touch-shift bug; see app.css's html/body comment for what
+  // that testing actually ruled in and out.
+  function isPinchZoomed(): boolean {
+    return !!window.visualViewport && window.visualViewport.scale !== 1;
+  }
+
   window.addEventListener('resize', () => {
+    if (isPinchZoomed()) return;
     if (mq.matches !== mobileMode) buildBook(mq.matches);
     else applyFit();
   });
   // Some browsers fire this distinctly from (and before) `resize` on rotation.
   window.addEventListener('orientationchange', () => {
     setTimeout(() => {
+      if (isPinchZoomed()) return;
       if (mq.matches !== mobileMode) buildBook(mq.matches);
       else applyFit();
     }, 100);
+  });
+  // Once the user finishes pinch-zooming (scale returns to 1), re-apply the
+  // fit in case a resize was skipped above while they were mid-gesture.
+  window.visualViewport?.addEventListener('resize', () => {
+    if (!isPinchZoomed()) applyFit();
   });
   document.addEventListener('fullscreenchange', () => setTimeout(applyFit, 50));
 
@@ -395,7 +452,15 @@ function init(): void {
     const fsBtn = document.getElementById('btn-fullscreen');
     fsBtn?.addEventListener('click', () => {
       if (!document.fullscreenElement) {
-        stage!.requestFullscreen?.().catch(() => {});
+        // The whole document, not just #stage: the Fullscreen API only
+        // keeps the fullscreened element's OWN descendants rendered/
+        // interactive — every overlay this app opens on top of the book
+        // (#detail-overlay, #photo-lightbox, #toc-drawer, and the
+        // dynamically-created #tooltip) is a sibling of #stage, not a
+        // descendant of it, so fullscreening #stage alone silently broke
+        // all of them (in every browser — this is spec behavior, not a
+        // browser bug) the instant fullscreen was entered.
+        document.documentElement.requestFullscreen?.().catch(() => {});
       } else {
         document.exitFullscreen?.().catch(() => {});
       }

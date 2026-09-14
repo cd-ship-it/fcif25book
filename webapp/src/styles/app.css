@@ -16,21 +16,44 @@
   border: 0;
 }
 
+/* A reported "any touch on mobile shifts the whole viewport, only a reload
+   fixes it" bug got chased across several theories this went through
+   (native pinch-zoom + a position:fixed #bottom-nav, then a nested
+   momentum-scroll #stage, then html/body pinned with position:fixed) — a
+   staged divide-and-conquer test (a bare single page, then +#bottom-nav,
+   then +nested scroll container, then +the real resize/fit JS, each
+   verified on real Safari/Chrome on iOS) showed NONE of those, alone or
+   combined, actually reproduce it. So none of that speculative CSS is kept:
+   html/body/#app.mobile-mode #stage go back to the plain, simple shape —
+   body scrolls the page directly on mobile like an ordinary webpage, with
+   no nested scroll container and no scroll-locking. Desktop is unaffected
+   (still height-constrained so #stage can center a non-scrolling spread —
+   see the media query below and #app.mobile-mode #stage further down). */
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%;
   background: var(--fpBg, #26232b);
   color: var(--fpToolbarText, #f3ede0);
   font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
-  overflow: hidden;
+}
+
+@media (min-width: 701px) and (min-height: 701px) {
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
 }
 
 #app {
-  height: 100vh;
   display: flex;
   flex-direction: column;
   background: var(--fpBgGradient, none), var(--fpBg, #26232b);
+}
+
+@media (min-width: 701px) and (min-height: 701px) {
+  #app {
+    height: 100%;
+  }
 }
 
 /* ---------------- Toolbar ---------------- */
@@ -149,9 +172,12 @@ html, body {
    plain media query (not the JS-added .mobile-mode class) so there's no
    dependency on script timing: .mobile-mode is only added once
    flipbook.client.ts runs, and gating on it here would flash the toolbar
-   hidden-then-shown on mobile before that happens. 701px must stay in sync
-   with config.responsive.mobileBreakpointPx (700) in flipbook.config.ts. */
-@media (min-width: 701px) {
+   hidden-then-shown on mobile before that happens. Checks BOTH width and
+   height (not just width) so a phone in landscape — wide but short —
+   still counts as mobile instead of flashing into the desktop two-page
+   layout; matches flipbook.client.ts's own matchMedia query, which must
+   stay in sync with config.responsive.mobileBreakpointPx (700) here. */
+@media (min-width: 701px) and (min-height: 701px) {
   .toolbar {
     display: none;
     /* Reserve room so the toolbar's own rightmost button never renders
@@ -183,7 +209,12 @@ html, body {
   min-height: 0;
 }
 
-#stage:fullscreen {
+/* The fullscreen target is now the whole document (see flipbook.client.ts),
+   not #stage itself, so this matches :root rather than #stage — kept as a
+   safety net since #app already carries the same background unconditionally
+   (line ~33) and fills the viewport height, so this rule rarely has
+   anything left to do. */
+:fullscreen {
   background: var(--fpBg, #26232b);
 }
 
@@ -198,7 +229,7 @@ html, body {
    backdrop; on mobile the page IS the page (see the mobile section below —
    plain white background, no surrounding stage), so the shadow would just
    look like a stray smudge under it. */
-@media (min-width: 701px) {
+@media (min-width: 701px) and (min-height: 701px) {
   #book-shell {
     filter: drop-shadow(var(--fpPageShadow, 0 20px 60px rgba(0,0,0,0.55)));
   }
@@ -263,11 +294,11 @@ html, body {
 #app.mobile-mode #stage {
   align-items: flex-start;
   justify-content: center;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  /* Must exactly match the dock's own footprint below (12px offset + 8px*2
-     padding + 40px button = 68px) — just enough that the dock never
-     overlaps content, no more. */
+  overflow: visible;
+  /* No scrolling of its own — body scrolls the page directly (see the
+     html/body rule above). Must exactly match the dock's own footprint
+     below (12px offset + 8px*2 padding + 40px button = 68px) — just enough
+     that the dock never overlaps content, no more. */
   padding: 0 0 calc(68px + env(safe-area-inset-bottom));
   background: #ffffff;
 }
@@ -280,9 +311,10 @@ html, body {
 /* No top toolbar at all on mobile — navigation is the bottom dock only.
    Plain media query (not the JS-added .mobile-mode class), same reasoning
    as the desktop toolbar-toggle rule above: no dependency on script timing,
-   so there's no flash of the toolbar before flipbook.client.ts runs. 700px
-   matches config.responsive.mobileBreakpointPx in flipbook.config.ts. */
-@media (max-width: 700px) {
+   so there's no flash of the toolbar before flipbook.client.ts runs. Also
+   matches on height, not just width, so a phone in landscape stays mobile
+   — 700 matches config.responsive.mobileBreakpointPx in flipbook.config.ts. */
+@media (max-width: 700px), (max-height: 700px) {
   .toolbar {
     display: none;
   }
@@ -290,8 +322,12 @@ html, body {
 
 /* Apple-style frosted-glass dock: just the two round arrow buttons, no
    page-count text (that's kept for screen readers only, see .sr-only on
-   #page-indicator-mobile in index.astro) — pinch-zoom already lets someone
-   read a page up close, so the dock stays out of the way. */
+   #page-indicator-mobile in index.astro). Confirmed via staged real-device
+   testing that this being position:fixed isn't what caused the touch-shift
+   bug above — native pinch-zoom stays enabled (see index.astro's viewport
+   meta) and coexists fine with this dock. .photo-zoom's lightbox (enabled
+   on mobile in photo-zoom.client.ts) is just an extra way to see a photo
+   up close, not a workaround for anything this dock breaks. */
 #bottom-nav {
   display: none;
   position: fixed;

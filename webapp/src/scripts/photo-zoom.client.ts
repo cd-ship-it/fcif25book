@@ -1,5 +1,3 @@
-import config from '../config/flipbook.config';
-
 function init(): void {
   const stage = document.getElementById('stage');
   const lightbox = document.getElementById('photo-lightbox');
@@ -7,12 +5,13 @@ function init(): void {
   const closeBtn = document.getElementById('photo-lightbox-close');
   if (!stage || !lightbox || !lightboxImg) return;
 
-  // Disabled on mobile: a lightbox competes with the exact same pinch-to-
-  // zoom gesture mobile now relies on entirely to see a photo up close (see
-  // app.css's mobile section) — the phone's own zoom already does this job.
-  // Checked live (not just at init) since rotating/resizing can cross the
-  // breakpoint without a page reload.
-  const isMobile = () => window.matchMedia(`(max-width: ${config.responsive.mobileBreakpointPx}px)`).matches;
+  // No longer mobile-disabled: this used to defer to the phone's native
+  // pinch-to-zoom instead, but that pinch gesture is what was breaking the
+  // page layout on iOS Safari (position:fixed #bottom-nav desyncing from
+  // the rest of the page mid-gesture, recoverable only by a reload — see
+  // index.astro's viewport meta, which now disables native page pinch-zoom
+  // entirely). This lightbox is the replacement way to see a photo up
+  // close on mobile.
 
   // import.meta.env.BASE_URL reflects astro.config.mjs's `base` (this app
   // deploys under a /fcif25book subpath on GitHub Pages, not the domain
@@ -47,14 +46,12 @@ function init(): void {
   // directly to a trigger wouldn't survive a rebuild. Same reasoning as
   // readmore.client.ts.
   stage.addEventListener('click', (e) => {
-    if (isMobile()) return;
     const src = photoSrcFor(e.target);
     if (!src) return;
     openLightbox(src);
   });
 
   stage.addEventListener('keydown', (e) => {
-    if (isMobile()) return;
     const ke = e as KeyboardEvent;
     if (ke.key !== 'Enter' && ke.key !== ' ') return;
     const src = photoSrcFor(e.target);

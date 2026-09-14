@@ -2,23 +2,11 @@
    Palette vars (--fpPrimary etc.) come from src/config/flipbook.config.ts,
    injected on <html> — see the define:vars block in src/pages/index.astro. */
 
-/* The trigger is one of the page's absolutely-positioned `.t` text divs
-   (see src/generated/fragments/pageN.html) — sized exactly to the "閱讀全文"
-   text. Padding + matching negative margin enlarges the clickable/hoverable
-   box without shifting where the text itself sits. */
-.readmore-trigger {
-  cursor: pointer;
-  padding: 8px 14px;
-  margin: -8px -14px;
-  border-radius: 4px;
-  transition: background-color 0.15s ease;
-}
-
-.readmore-trigger:hover,
-.readmore-trigger:focus-visible {
-  background-color: rgba(98, 67, 147, 0.12);
-  outline: none;
-}
+/* .readmore-trigger's own positioning/affordance styling now lives in
+   ../../../style.css (shared with the standalone pageN.html previews) —
+   it's an invisible overlay sized directly from its extracted bbox now
+   (generate.py), not a `.t` text div anymore, so it needs no page-specific
+   sizing help here. */
 
 #detail-overlay {
   position: fixed;
