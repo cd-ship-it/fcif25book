@@ -295,8 +295,12 @@ html, body {
 
 /* Apple-style frosted-glass dock: just the two round arrow buttons, no
    page-count text (that's kept for screen readers only, see .sr-only on
-   #page-indicator-mobile in index.astro) — pinch-zoom already lets someone
-   read a page up close, so the dock stays out of the way. */
+   #page-indicator-mobile in index.astro). This element being
+   position:fixed and always on-screen is exactly what made native
+   pinch-to-zoom break the page on iOS Safari (see index.astro's viewport
+   meta) — zooming into a photo now goes through .photo-zoom's lightbox
+   instead (re-enabled on mobile in photo-zoom.client.ts), which doesn't
+   fight with a fixed element the way native page zoom did. */
 #bottom-nav {
   display: none;
   position: fixed;

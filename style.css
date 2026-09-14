@@ -171,16 +171,6 @@ body {
   outline: none;
 }
 
-/* Disabled on mobile (see webapp's photo-zoom.client.ts for why) —
-   pointer-events:none so a tap passes straight through to the page/native
-   double-tap-to-zoom instead of hitting this inert overlay. 700px matches
-   config.responsive.mobileBreakpointPx in the webapp's flipbook.config.ts. */
-@media (max-width: 700px) {
-  .photo-zoom {
-    pointer-events: none;
-  }
-}
-
 /* "Photo Slides" pages (generate.py's PHOTO_ALBUM_PAGES) — a prev/next
    carousel of real photos replacing the PDF's reused placeholder graphic.
    Every <img> inside is already letterboxed to this exact box by

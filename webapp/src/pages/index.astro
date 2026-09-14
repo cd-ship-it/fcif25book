@@ -78,7 +78,18 @@ const total = manifest.total as number;
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  {/* maximum-scale=1/user-scalable=no: deliberately disables native
+      pinch-to-zoom on the page. iOS Safari's pinch-zoom is a well-known,
+      long-standing WebKit bug generator when combined with a
+      position:fixed element (here, #bottom-nav's mobile dock) — the fixed
+      element desyncs from the rest of the page mid-gesture and the whole
+      view appears shifted, recoverable only by a full reload. Confirmed
+      reproducing identically on both the old live-text pipeline and the
+      new flat-image one, so it's not specific to either — it's this
+      combination. Photo/text detail on mobile now goes through the app's
+      own .photo-zoom lightbox instead (re-enabled below in app.css), a
+      controlled zoom the fixed dock doesn't fight with. */}
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>基督豐榮：同行25載</title>
   <link rel="icon" href={withBase('favicon.svg')} />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
