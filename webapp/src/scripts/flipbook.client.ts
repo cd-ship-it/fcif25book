@@ -35,7 +35,13 @@ function init(): void {
     }
   }
 
-  const mq = window.matchMedia(`(max-width: ${config.responsive.mobileBreakpointPx}px)`);
+  // Checks height as well as width — a phone in landscape is wide but
+  // short, and without the height half of this it would cross into
+  // desktop's two-page page-flip layout just from rotating, then lose
+  // mobile's plain-scroll page entirely. Must stay in sync with app.css's
+  // own matching media queries (search mobileBreakpointPx there).
+  const bp = config.responsive.mobileBreakpointPx;
+  const mq = window.matchMedia(`(max-width: ${bp}px), (max-height: ${bp}px)`);
   let pageFlip: PageFlip | null = null;
   let bookEl: HTMLElement | null = null;
   let mobileMode = false;
