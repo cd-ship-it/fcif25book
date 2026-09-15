@@ -515,7 +515,11 @@ function init(): void {
 
   if (config.toolbar.showTocButton) {
     const tocBtn = document.getElementById('btn-toc');
+    const tocBtnMobile = document.getElementById('btn-toc-mobile');
     tocBtn?.addEventListener('click', () => {
+      goToPage(config.toolbar.tocJumpPage);
+    });
+    tocBtnMobile?.addEventListener('click', () => {
       goToPage(config.toolbar.tocJumpPage);
     });
   }

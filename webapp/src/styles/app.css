@@ -362,7 +362,7 @@ html, body {
   transform: translateX(-50%);
   z-index: 40;
   align-items: center;
-  gap: 20px;
+  gap: 5px;
   padding: 8px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.55);
@@ -379,8 +379,8 @@ html, body {
 #bottom-nav .dock-btn {
   appearance: none;
   border: none;
-  background: rgba(0, 0, 0, 0.06);
-  color: #262229;
+  background: var(--fpPrimary, #624393);
+  color: #ffffff;
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -394,7 +394,7 @@ html, body {
 }
 
 #bottom-nav .dock-btn:active {
-  background: rgba(0, 0, 0, 0.12);
+  background: var(--fpPrimaryDark, #453168);
 }
 
 #bottom-nav .dock-btn:disabled {
