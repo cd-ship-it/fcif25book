@@ -50,7 +50,7 @@ function init(): void {
     activeEl = el;
     tt.innerHTML =
       `<div class="tt-title"><span class="tt-year">${el.dataset.year ?? ''}</span>${el.dataset.title ?? ''}</div>` +
-      `<div>${el.dataset.desc ?? ''}</div>`;
+      `<div class="tt-desc">${el.dataset.desc ?? ''}</div>`;
     tt.classList.add('open');
     position(el);
     // Re-clamp after layout settles the tooltip's real (content-dependent) height.

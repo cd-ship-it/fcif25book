@@ -121,7 +121,7 @@ function wireTimelineTooltip(container) {
     activeEl = el;
     tooltip.innerHTML =
       `<div class="tt-title"><span class="tt-year">${el.dataset.year}</span>${el.dataset.title}</div>` +
-      `<div>${el.dataset.desc}</div>`;
+      `<div class="tt-desc">${el.dataset.desc}</div>`;
     tooltip.classList.add('open');
     position(el);
     // Re-clamp after layout settles the tooltip's real (content-dependent) height.

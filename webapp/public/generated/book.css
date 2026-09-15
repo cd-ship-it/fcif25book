@@ -148,6 +148,25 @@ body {
   outline: none;
 }
 
+/* Invisible click target over a YouTube video's spot — the PDF's own
+   thumbnail artwork for it is already part of the background image (see
+   generate.py), so this shows that real thumbnail rather than a live
+   iframe's own default one. Swapped for an actual <iframe class="yt-embed">
+   on click by webapp's yt-embed.client.ts. */
+.yt-trigger {
+  position: absolute;
+  display: block;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.15s ease;
+}
+
+.yt-trigger:hover,
+.yt-trigger:focus-visible {
+  background-color: rgba(255, 255, 255, 0.15);
+  outline: none;
+}
+
 .yt-embed {
   position: absolute;
   border: 0;
@@ -308,11 +327,10 @@ body {
   position: fixed;
   z-index: 100;
   max-width: 340px;
-  background: #2b2530;
-  color: #f3ede0;
+  background: #c8dfe4;
+  color: #000000;
   border-radius: 8px;
   padding: 14px 16px;
-  font-size: 19.5px;
   line-height: 1.6;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
   pointer-events: none;
@@ -328,20 +346,26 @@ body {
 
 #tooltip .tt-title {
   font-weight: 700;
-  color: #d7b8ff;
+  color: #624393;
+  font-size: 20px;
   margin-bottom: 4px;
 }
 
 #tooltip .tt-year {
-  color: #c9a227;
+  color: #624393;
   font-weight: 700;
   margin-right: 6px;
 }
 
 #tooltip .tt-tag {
-  color: #8a6bb8;
+  color: #624393;
   font-weight: 700;
   margin-right: 2px;
+}
+
+#tooltip .tt-desc {
+  color: #000000;
+  font-size: 16px;
 }
 
 /* Floating nudge on the timeline spread (pages 8–9). left/right is set per

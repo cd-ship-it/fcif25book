@@ -32,8 +32,9 @@
 html, body {
   margin: 0;
   padding: 0;
-  background: var(--fpBg, #26232b);
-  color: var(--fpToolbarText, #f3ede0);
+  background: var(--fpBg, #e5e5e5);
+  /* Stage/chrome text stays dark on the light grey backdrop; toolbar text is its own palette. */
+  color: #333333;
   font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
 }
 
@@ -47,7 +48,7 @@ html, body {
 #app {
   display: flex;
   flex-direction: column;
-  background: var(--fpBgGradient, none), var(--fpBg, #26232b);
+  background: var(--fpBgGradient, none), var(--fpBg, #e5e5e5);
 }
 
 @media (min-width: 701px) and ((min-height: 701px) or (pointer: fine)) {
@@ -162,6 +163,14 @@ html, body {
   transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
+/* Once open, the button becomes a big "✕" (see flipbook.client.ts) —
+   sized up from the "⋮" glyph's 18px so it actually reads as "close",
+   not just a slightly different dot. */
+#app.toolbar-open #btn-toolbar-toggle {
+  font-size: 22px;
+  font-weight: 700;
+}
+
 #btn-toolbar-toggle:hover {
   background: #ffffff;
   border-color: var(--fpPrimary, #624393);
@@ -215,7 +224,7 @@ html, body {
    (line ~33) and fills the viewport height, so this rule rarely has
    anything left to do. */
 :fullscreen {
-  background: var(--fpBg, #26232b);
+  background: var(--fpBg, #e5e5e5);
 }
 
 #book-shell {
@@ -269,7 +278,7 @@ html, body {
 
 .loading-note {
   position: absolute;
-  color: var(--fpToolbarText, #f3ede0);
+  color: #333333;
   opacity: 0.7;
   font-size: 14px;
   pointer-events: none;

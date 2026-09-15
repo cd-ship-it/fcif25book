@@ -446,6 +446,10 @@ function init(): void {
     toggleBtn?.addEventListener('click', () => {
       const open = app!.classList.toggle('toolbar-open');
       toggleBtn.setAttribute('aria-expanded', String(open));
+      // "⋮" invites opening the toolbar; once it's open, the same button
+      // closes it again, so it becomes a big "✕" instead — same icon
+      // language as the read-more/photo-lightbox close buttons elsewhere.
+      toggleBtn.textContent = open ? '✕' : '⋮';
       // Toolbar showing/hiding changes #stage's available height (it's the
       // flex sibling that grows to fill whatever the toolbar doesn't take),
       // so the book needs to be rescaled to the new space — same as any
