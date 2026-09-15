@@ -69,7 +69,6 @@ function withBase(path: string): string {
 const pages = (manifest.pages as PageMeta[]).map((p) => ({
   ...p,
   html: fragmentFor(p.page),
-  thumb: withBase(`assets/backgrounds/page${p.page}.${p.bgExt || 'png'}`),
 }));
 
 const total = manifest.total as number;
@@ -140,7 +139,7 @@ const total = manifest.total as number;
         {config.toolbar.showFullscreen && (
           <button id="btn-fullscreen" type="button" class="btn">{config.labels.fullscreenEnter}</button>
         )}
-        {config.toolbar.showThumbnails && (
+        {config.toolbar.showTocButton && (
           <button id="btn-toc" type="button" class="btn">{config.labels.tocButton}</button>
         )}
       </div>
@@ -163,24 +162,6 @@ const total = manifest.total as number;
       </nav>
     )}
   </div>
-
-  {config.toolbar.showThumbnails && (
-    <Fragment>
-      <div id="toc-backdrop"></div>
-      <aside id="toc-drawer">
-        <h2>{config.labels.tocTitle}</h2>
-        {pages.map((p) => (
-          <div class="toc-item" data-goto={p.page}>
-            <img src={p.thumb} alt="" loading="lazy" />
-            <span class="toc-label">
-              <span class="toc-num">第 {p.page} 頁</span>
-              {p.title}
-            </span>
-          </div>
-        ))}
-      </aside>
-    </Fragment>
-  )}
 
   {detailPanels.length > 0 && (
     <div id="detail-overlay" aria-hidden="true">

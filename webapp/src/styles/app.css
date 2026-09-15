@@ -66,8 +66,8 @@ html, body {
   align-items: center;
   gap: 10px 12px;
   padding: 10px 20px;
-  background: var(--fpToolbarBg, rgba(20,20,24,0.9));
-  border-bottom: 1px solid var(--fpToolbarBorder, rgba(200,170,60,0.3));
+  background: var(--fpToolbarBg, #eaebef);
+  border-bottom: 1px solid var(--fpToolbarBorder, #000000);
   z-index: 20;
 }
 
@@ -75,7 +75,7 @@ html, body {
   font-weight: 700;
   font-size: 15px;
   letter-spacing: 0.05em;
-  color: var(--fpGold, #c9a227);
+  color: var(--fpPrimary, #624393);
   white-space: nowrap;
 }
 
@@ -90,9 +90,9 @@ html, body {
 .toolbar button,
 .toolbar .btn {
   appearance: none;
-  border: 1px solid var(--fpToolbarBorder, rgba(200,170,60,0.3));
+  border: 1px solid var(--fpToolbarBorder, #000000);
   background: rgba(255,255,255,0.04);
-  color: var(--fpToolbarText, #f3ede0);
+  color: var(--fpToolbarText, #000000);
   border-radius: 6px;
   padding: 7px 14px;
   font-size: 14px;
@@ -116,7 +116,7 @@ html, body {
 
 .toolbar .page-indicator {
   font-size: 13px;
-  color: var(--fpToolbarText, #f3ede0);
+  color: var(--fpToolbarText, #000000);
   min-width: 160px;
   text-align: center;
 }
@@ -128,13 +128,15 @@ html, body {
 }
 
 .toolbar .jump-form input {
-  width: 56px;
-  padding: 6px 8px;
+  width: 69px;
+  padding: 7px 14px;
   border-radius: 6px;
-  border: 1px solid var(--fpToolbarBorder, rgba(200,170,60,0.3));
+  border: 1px solid var(--fpToolbarBorder, #000000);
   background: rgba(255,255,255,0.06);
-  color: var(--fpToolbarText, #f3ede0);
+  color: var(--fpToolbarText, #000000);
   font-size: 14px;
+  font-family: inherit;
+  line-height: inherit;
   text-align: center;
 }
 
@@ -242,6 +244,16 @@ html, body {
   #book-shell {
     filter: drop-shadow(var(--fpPageShadow, 0 20px 60px rgba(0,0,0,0.55)));
   }
+}
+
+/* Mobile: the page sits directly on the same white stage background (see
+   the note above), so without any shadow the page's bottom edge — where
+   its content actually ends — is invisible while scrolling. A downward-only
+   shadow (negative spread pulls it in from the sides/top) marks that edge
+   without adding the "floating prop" look drop-shadow gives the desktop
+   book, which would look wrong against mobile's plain white backdrop. */
+#app.mobile-mode #book-shell {
+  box-shadow: 0 16px 24px -12px rgba(0, 0, 0, 0.35);
 }
 
 #book .page {
@@ -390,81 +402,6 @@ html, body {
   cursor: default;
 }
 
-/* ---------------- TOC drawer ---------------- */
-
-#toc-drawer {
-  position: fixed;
-  top: 0;
-  right: 0;
-  height: 100%;
-  width: 260px;
-  transform: translateX(100%);
-  transition: transform 0.25s ease;
-  background: var(--fpToolbarBg, rgba(20,20,24,0.96));
-  border-left: 1px solid var(--fpToolbarBorder, rgba(200,170,60,0.3));
-  z-index: 30;
-  display: flex;
-  flex-direction: column;
-  padding: 16px;
-  overflow-y: auto;
-}
-
-#toc-drawer.open {
-  transform: translateX(0);
-}
-
-#toc-drawer h2 {
-  font-size: 16px;
-  margin: 0 0 12px;
-  color: var(--fpGold, #c9a227);
-}
-
-#toc-drawer .toc-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 6px;
-  border-radius: 6px;
-  cursor: pointer;
-  color: var(--fpToolbarText, #f3ede0);
-}
-
-#toc-drawer .toc-item:hover {
-  background: rgba(255,255,255,0.08);
-}
-
-#toc-drawer .toc-item img {
-  width: 44px;
-  height: 57px;
-  object-fit: cover;
-  border-radius: 3px;
-  border: 1px solid rgba(255,255,255,0.15);
-  flex: 0 0 auto;
-  background: #fff;
-}
-
-#toc-drawer .toc-item .toc-label {
-  font-size: 13px;
-  line-height: 1.3;
-}
-
-#toc-drawer .toc-item .toc-num {
-  display: block;
-  font-size: 11px;
-  opacity: 0.6;
-}
-
-#toc-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  z-index: 25;
-  display: none;
-}
-
-#toc-backdrop.open { display: block; }
-
 @media (max-width: 900px) {
   .toolbar .brand { display: none; }
-  #toc-drawer { width: 80vw; }
 }

@@ -54,8 +54,10 @@ export interface FlipbookConfig {
   };
 
   toolbar: {
-    /** Slide-out drawer with page thumbnails for jumping to any spread. */
-    showThumbnails: boolean;
+    /** Show a 「目錄」 toolbar button that jumps straight to `tocJumpPage`. */
+    showTocButton: boolean;
+    /** 1-indexed page the 「目錄」 button jumps to. */
+    tocJumpPage: number;
     /** Fullscreen toggle button (uses the Fullscreen API on the book container). */
     showFullscreen: boolean;
     /** "Jump to page number" input + button. */
@@ -74,7 +76,6 @@ export interface FlipbookConfig {
   };
 
   labels: {
-    tocTitle: string;
     tocButton: string;
     prev: string;
     next: string;
@@ -130,7 +131,8 @@ const config: FlipbookConfig = {
   },
 
   toolbar: {
-    showThumbnails: true,
+    showTocButton: true,
+    tocJumpPage: 5,
     showFullscreen: true,
     showPageJump: true,
     showKeyboardNav: true,
@@ -139,7 +141,6 @@ const config: FlipbookConfig = {
   },
 
   labels: {
-    tocTitle: '目錄',
     tocButton: '目錄',
     prev: '上一頁',
     next: '下一頁',
@@ -168,9 +169,9 @@ const config: FlipbookConfig = {
     accentGreen: '#8fbfa0',
     background: '#e5e5e5',
     backgroundGradient: 'none',
-    toolbarBg: 'rgba(24, 21, 28, 0.92)',
-    toolbarText: '#f3ede0',
-    toolbarBorder: 'rgba(201, 162, 39, 0.35)',
+    toolbarBg: '#eaebef',
+    toolbarText: '#000000',
+    toolbarBorder: '#000000',
     pageShadow: '0 20px 60px rgba(0,0,0,0.55)',
   },
 

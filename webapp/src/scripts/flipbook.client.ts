@@ -229,9 +229,7 @@ function init(): void {
   // readmore.client.ts: #stage survives the #book teardown/rebuild that a
   // desktop/mobile breakpoint crossing triggers, and capture runs before
   // #book's own bubble-phase click-to-flip handler, so stopPropagation here
-  // actually prevents a stray page turn. The TOC drawer's own [data-goto]
-  // thumbnails are unaffected — #toc-drawer is a sibling of #stage, not a
-  // descendant, and keeps its direct listeners further down.
+  // actually prevents a stray page turn.
   stage!.addEventListener(
     'click',
     (e) => {
@@ -343,10 +341,41 @@ function init(): void {
     pageFlip.loadFromHTML(pageEls);
     loadingNote?.remove();
 
-    pageFlip.on('flip', refreshUI);
+    pageFlip.on('flip', () => {
+      refreshUI();
+      stopStrayYoutubeEmbeds();
+    });
     pageFlip.on('changeOrientation', refreshUI);
     refreshUI();
     applyFit();
+  }
+
+  // Page 63's YouTube trigger (see yt-embed.client.ts) swaps to a live,
+  // autoplaying <iframe> on click. Desktop's page-flip instance keeps every
+  // page's DOM node alive across flips (it's not destroyed/recreated per
+  // flip the way mobile's single page is — see renderMobilePage, where
+  // navigating away removes the old page, and removing an iframe from the
+  // DOM is what actually stops it), so without this, flipping away from
+  // page 63 would leave the video silently playing off-screen. Called after
+  // every 'flip' event: find any live .yt-embed iframe still in the book,
+  // and if the page it's on isn't part of the current view, revert it back
+  // to its pristine (never-clicked) trigger div — cloned fresh from
+  // templatePages, so a later return to that page starts clean, not with a
+  // stale/blank iframe. Mobile needs no equivalent: its page (and any live
+  // iframe on it) is fully removed from the DOM on every navigation already.
+  function stopStrayYoutubeEmbeds(): void {
+    if (!bookEl) return;
+    const iframe = bookEl.querySelector<HTMLIFrameElement>('iframe.yt-embed');
+    if (!iframe) return;
+    const pageEl = iframe.closest<HTMLElement>('.page');
+    const pageNum = pageEl ? parseInt(pageEl.id.replace('page', ''), 10) : NaN;
+    if (Number.isFinite(pageNum) && currentPagesDisplay().includes(pageNum)) return;
+    const pristineTrigger =
+      pageNum >= 1 && pageNum <= total
+        ? templatePages[pageNum - 1].querySelector<HTMLElement>(`#${CSS.escape(iframe.id)}`)
+        : null;
+    if (pristineTrigger) iframe.replaceWith(pristineTrigger.cloneNode(true) as HTMLElement);
+    else iframe.remove(); // no matching template found — still stop playback
   }
 
   function buildMobileBook(resumeIndex: number): void {
@@ -465,7 +494,7 @@ function init(): void {
         // The whole document, not just #stage: the Fullscreen API only
         // keeps the fullscreened element's OWN descendants rendered/
         // interactive — every overlay this app opens on top of the book
-        // (#detail-overlay, #photo-lightbox, #toc-drawer, and the
+        // (#detail-overlay, #photo-lightbox, and the
         // dynamically-created #tooltip) is a sibling of #stage, not a
         // descendant of it, so fullscreening #stage alone silently broke
         // all of them (in every browser — this is spec behavior, not a
@@ -484,28 +513,10 @@ function init(): void {
     });
   }
 
-  if (config.toolbar.showThumbnails) {
+  if (config.toolbar.showTocButton) {
     const tocBtn = document.getElementById('btn-toc');
-    const drawer = document.getElementById('toc-drawer');
-    const backdrop = document.getElementById('toc-backdrop');
-
-    const closeToc = () => {
-      drawer?.classList.remove('open');
-      backdrop?.classList.remove('open');
-    };
-
     tocBtn?.addEventListener('click', () => {
-      drawer?.classList.toggle('open');
-      backdrop?.classList.toggle('open');
-    });
-    backdrop?.addEventListener('click', closeToc);
-
-    drawer?.querySelectorAll<HTMLElement>('[data-goto]').forEach((el) => {
-      el.addEventListener('click', () => {
-        const n = parseInt(el.dataset.goto ?? '1', 10);
-        goToPage(n);
-        closeToc();
-      });
+      goToPage(config.toolbar.tocJumpPage);
     });
   }
 }

@@ -585,9 +585,9 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 6 ---- */
 #page6 { background-image: url('../assets/backgrounds/page6.webp'); }
-#p6-readmore1 { left:432.20px; top:495.11px; width:62.64px; height:19.73px; }
 #p6-photo1 { left:53.32px; top:530.21px; width:304.35px; height:228.41px; }
 #p6-photo2 { left:363.48px; top:604.31px; width:263.77px; height:198.15px; }
+#p6-readmore1 { left:432.20px; top:495.11px; width:62.64px; height:19.73px; }
 #p6-pagenum { left:24px; }
 
 /* page6.css — local overrides for page 6.
@@ -612,9 +612,9 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 7 ---- */
 #page7 { background-image: url('../assets/backgrounds/page7.webp'); }
-#p7-readmore1 { left:432.20px; top:822.64px; width:62.64px; height:19.73px; }
 #p7-photo1 { left:65.94px; top:236.98px; width:395.54px; height:172.03px; }
 #p7-photo2 { left:365.49px; top:370.93px; width:259.90px; height:206.66px; }
+#p7-readmore1 { left:432.20px; top:822.64px; width:62.64px; height:19.73px; }
 #p7-pagenum { right:24px; }
 
 /* page7.css — local overrides for page 7.
@@ -1467,8 +1467,8 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 34 ---- */
 #page34 { background-image: url('../assets/backgrounds/page34.webp'); }
-#p34-readmore1 { left:432.20px; top:507.09px; width:62.64px; height:19.73px; }
 #p34-photo1 { left:54.21px; top:555.76px; width:437.13px; height:245.03px; }
+#p34-readmore1 { left:432.20px; top:507.09px; width:62.64px; height:19.73px; }
 #p34-pagenum { left:24px; }
 
 /* page34.css — local overrides for page 34.
@@ -1500,8 +1500,8 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 35 ---- */
 #page35 { background-image: url('../assets/backgrounds/page35.webp'); }
-#p35-readmore1 { left:545.80px; top:764.60px; width:62.64px; height:19.73px; }
 #p35-photo1 { left:183.10px; top:228.79px; width:406.52px; height:264.17px; }
+#p35-readmore1 { left:545.80px; top:764.60px; width:62.64px; height:19.73px; }
 #p35-pagenum { right:24px; }
 
 /* page35.css — local overrides for page 35.
@@ -1526,8 +1526,8 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 36 ---- */
 #page36 { background-image: url('../assets/backgrounds/page36.webp'); }
-#p36-readmore1 { left:432.20px; top:425.96px; width:62.64px; height:19.73px; }
 #p36-photo1 { left:69.50px; top:385.67px; width:406.52px; height:542.71px; }
+#p36-readmore1 { left:432.20px; top:425.96px; width:62.64px; height:19.73px; }
 #p36-pagenum { left:24px; }
 
 /* page36.css — local overrides for page 36.
@@ -1648,8 +1648,8 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 40 ---- */
 #page40 { background-image: url('../assets/backgrounds/page40.webp'); }
-#p40-readmore1 { left:432.20px; top:425.96px; width:62.64px; height:19.73px; }
 #p40-photo1 { left:69.50px; top:467.89px; width:453.39px; height:301.50px; }
+#p40-readmore1 { left:432.20px; top:425.96px; width:62.64px; height:19.73px; }
 #p40-pagenum { left:24px; }
 
 /* page40.css — local overrides for page 40.
@@ -1690,8 +1690,8 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 41 ---- */
 #page41 { background-image: url('../assets/backgrounds/page41.webp'); }
-#p41-readmore1 { left:534.73px; top:791.87px; width:62.64px; height:19.73px; }
 #p41-photo1 { left:218.81px; top:232.20px; width:406.52px; height:270.87px; }
+#p41-readmore1 { left:534.73px; top:791.87px; width:62.64px; height:19.73px; }
 #p41-pagenum { right:24px; }
 
 /* page41.css — local overrides for page 41.
@@ -1716,8 +1716,8 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 42 ---- */
 #page42 { background-image: url('../assets/backgrounds/page42.webp'); }
-#p42-readmore1 { left:432.20px; top:455.80px; width:62.64px; height:19.73px; }
 #p42-photo1 { left:69.50px; top:515.88px; width:406.65px; height:304.92px; }
+#p42-readmore1 { left:432.20px; top:455.80px; width:62.64px; height:19.73px; }
 #p42-pagenum { left:24px; }
 
 /* page42.css — local overrides for page 42.
@@ -1750,8 +1750,8 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 43 ---- */
 #page43 { background-image: url('../assets/backgrounds/page43.webp'); }
-#p43-readmore1 { left:545.80px; top:823.51px; width:62.64px; height:19.73px; }
 #p43-photo1 { left:248.46px; top:193.46px; width:376.89px; height:283.07px; }
+#p43-readmore1 { left:545.80px; top:823.51px; width:62.64px; height:19.73px; }
 #p43-pagenum { right:24px; }
 
 /* page43.css — local overrides for page 43.
@@ -1901,8 +1901,8 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 48 ---- */
 #page48 { background-image: url('../assets/backgrounds/page48.webp'); }
-#p48-readmore1 { left:432.20px; top:475.66px; width:62.64px; height:19.73px; }
 #p48-photo1 { left:-54.81px; top:484.47px; width:581.57px; height:273.75px; }
+#p48-readmore1 { left:432.20px; top:475.66px; width:62.64px; height:19.73px; }
 #p48-pagenum { left:24px; }
 
 /* page48.css — local overrides for page 48.
@@ -1927,8 +1927,8 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 49 ---- */
 #page49 { background-image: url('../assets/backgrounds/page49.webp'); }
-#p49-readmore1 { left:534.73px; top:826.81px; width:62.64px; height:19.73px; }
 #p49-photo1 { left:173.27px; top:239.31px; width:452.44px; height:253.65px; }
+#p49-readmore1 { left:534.73px; top:826.81px; width:62.64px; height:19.73px; }
 #p49-pagenum { right:24px; }
 
 /* page49.css — local overrides for page 49.
@@ -1953,8 +1953,8 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 50 ---- */
 #page50 { background-image: url('../assets/backgrounds/page50.webp'); }
-#p50-readmore1 { left:432.20px; top:456.23px; width:62.64px; height:19.73px; }
 #p50-photo1 { left:69.50px; top:499.52px; width:318.30px; height:337.60px; }
+#p50-readmore1 { left:432.20px; top:456.23px; width:62.64px; height:19.73px; }
 #p50-pagenum { left:24px; }
 
 /* page50.css — local overrides for page 50.
@@ -1979,9 +1979,9 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 51 ---- */
 #page51 { background-image: url('../assets/backgrounds/page51.webp'); }
-#p51-readmore1 { left:549.27px; top:807.33px; width:62.64px; height:19.73px; }
 #p51-photo1 { left:332.83px; top:239.86px; width:292.62px; height:220.02px; }
 #p51-photo2 { left:69.50px; top:351.70px; width:245.15px; height:184.12px; }
+#p51-readmore1 { left:549.27px; top:807.33px; width:62.64px; height:19.73px; }
 #p51-pagenum { right:24px; }
 
 /* page51.css — local overrides for page 51.
@@ -2140,8 +2140,8 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 57 ---- */
 #page57 { background-image: url('../assets/backgrounds/page57.webp'); }
-#p57-readmore1 { left:435.60px; top:803.78px; width:62.64px; height:19.73px; }
 #p57-photo1 { left:69.50px; top:247.49px; width:324.26px; height:435.50px; }
+#p57-readmore1 { left:435.60px; top:803.78px; width:62.64px; height:19.73px; }
 #p57-pagenum { right:24px; }
 
 /* page57.css — local overrides for page 57.
@@ -2166,8 +2166,8 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 58 ---- */
 #page58 { background-image: url('../assets/backgrounds/page58.webp'); }
-#p58-readmore1 { left:432.20px; top:803.78px; width:62.64px; height:19.73px; }
 #p58-photo1 { left:69.50px; top:268.40px; width:324.26px; height:410.62px; }
+#p58-readmore1 { left:432.20px; top:803.78px; width:62.64px; height:19.73px; }
 #p58-pagenum { left:24px; }
 
 /* page58.css — local overrides for page 58.
@@ -2192,8 +2192,8 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 59 ---- */
 #page59 { background-image: url('../assets/backgrounds/page59.webp'); }
-#p59-readmore1 { left:432.20px; top:776.51px; width:62.64px; height:19.73px; }
 #p59-photo1 { left:69.50px; top:182.46px; width:324.26px; height:431.68px; }
+#p59-readmore1 { left:432.20px; top:776.51px; width:62.64px; height:19.73px; }
 #p59-pagenum { right:24px; }
 
 /* page59.css — local overrides for page 59.
@@ -2218,8 +2218,8 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 60 ---- */
 #page60 { background-image: url('../assets/backgrounds/page60.webp'); }
-#p60-readmore1 { left:432.20px; top:803.78px; width:62.64px; height:19.73px; }
 #p60-photo1 { left:69.50px; top:264.05px; width:324.26px; height:348.40px; }
+#p60-readmore1 { left:432.20px; top:803.78px; width:62.64px; height:19.73px; }
 #p60-pagenum { left:24px; }
 
 /* page60.css — local overrides for page 60.
@@ -2244,8 +2244,8 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 61 ---- */
 #page61 { background-image: url('../assets/backgrounds/page61.webp'); }
-#p61-readmore1 { left:432.20px; top:803.78px; width:62.64px; height:19.73px; }
 #p61-photo1 { left:69.50px; top:240.69px; width:324.26px; height:280.45px; }
+#p61-readmore1 { left:432.20px; top:803.78px; width:62.64px; height:19.73px; }
 #p61-pagenum { right:24px; }
 
 /* page61.css — local overrides for page 61.
@@ -2301,9 +2301,9 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 63 ---- */
 #page63 { background-image: url('../assets/backgrounds/page63.webp'); }
-#p63-readmore1 { left:545.80px; top:423.33px; width:62.64px; height:19.73px; }
 #p63-link1 { left:280.86px; top:511.13px; width:270.85px; height:268.47px; }
 #p63-photo2 { left:86.84px; top:206.42px; width:291.60px; height:218.84px; }
+#p63-readmore1 { left:545.80px; top:423.33px; width:62.64px; height:19.73px; }
 #p63-pagenum { right:24px; }
 
 /* page63.css — local overrides for page 63.
@@ -2328,9 +2328,9 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 64 ---- */
 #page64 { background-image: url('../assets/backgrounds/page64.webp'); }
+#p64-photo1 { left:69.50px; top:149.96px; width:445.33px; height:249.77px; }
 #p64-readmore1 { left:238.75px; top:801.84px; width:62.64px; height:19.73px; }
 #p64-readmore2 { left:547.64px; top:801.84px; width:62.64px; height:19.73px; }
-#p64-photo1 { left:69.50px; top:149.96px; width:445.33px; height:249.77px; }
 #p64-pagenum { left:24px; }
 
 /* page64.css — local overrides for page 64.
@@ -2362,10 +2362,10 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 65 ---- */
 #page65 { background-image: url('../assets/backgrounds/page65.webp'); }
-#p65-readmore1 { left:238.75px; top:801.84px; width:62.64px; height:19.73px; }
-#p65-readmore2 { left:547.64px; top:801.84px; width:62.64px; height:19.73px; }
 #p65-photo1 { left:58.74px; top:309.15px; width:270.21px; height:202.99px; }
 #p65-photo2 { left:354.80px; top:324.68px; width:296.36px; height:202.99px; }
+#p65-readmore1 { left:238.75px; top:801.84px; width:62.64px; height:19.73px; }
+#p65-readmore2 { left:547.64px; top:801.84px; width:62.64px; height:19.73px; }
 #p65-pagenum { right:24px; }
 
 /* page65.css — local overrides for page 65.
@@ -2390,8 +2390,8 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 66 ---- */
 #page66 { background-image: url('../assets/backgrounds/page66.webp'); }
-#p66-readmore1 { left:545.80px; top:632.52px; width:62.64px; height:19.73px; }
 #p66-photo1 { left:70.64px; top:312.23px; width:248.81px; height:332.23px; }
+#p66-readmore1 { left:545.80px; top:632.52px; width:62.64px; height:19.73px; }
 #p66-pagenum { left:24px; }
 
 /* page66.css — local overrides for page 66.
@@ -2416,8 +2416,8 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 67 ---- */
 #page67 { background-image: url('../assets/backgrounds/page67.webp'); }
-#p67-readmore1 { left:545.80px; top:632.52px; width:62.64px; height:19.73px; }
 #p67-photo1 { left:69.50px; top:308.16px; width:261.49px; height:348.88px; }
+#p67-readmore1 { left:545.80px; top:632.52px; width:62.64px; height:19.73px; }
 #p67-pagenum { right:24px; }
 
 /* page67.css — local overrides for page 67.
@@ -2442,10 +2442,10 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 68 ---- */
 #page68 { background-image: url('../assets/backgrounds/page68.webp'); }
-#p68-readmore1 { left:238.75px; top:801.84px; width:62.64px; height:19.73px; }
-#p68-readmore2 { left:547.64px; top:801.84px; width:62.64px; height:19.73px; }
 #p68-photo1 { left:55.65px; top:264.42px; width:298.73px; height:223.60px; }
 #p68-photo2 { left:367.63px; top:297.55px; width:308.24px; height:230.74px; }
+#p68-readmore1 { left:238.75px; top:801.84px; width:62.64px; height:19.73px; }
+#p68-readmore2 { left:547.64px; top:801.84px; width:62.64px; height:19.73px; }
 #p68-pagenum { left:24px; }
 
 /* page68.css — local overrides for page 68.
@@ -2470,10 +2470,10 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 69 ---- */
 #page69 { background-image: url('../assets/backgrounds/page69.webp'); }
-#p69-readmore1 { left:238.75px; top:801.84px; width:62.64px; height:19.73px; }
-#p69-readmore2 { left:547.64px; top:801.84px; width:62.64px; height:19.73px; }
 #p69-photo1 { left:376.55px; top:319.43px; width:163.61px; height:225.75px; }
 #p69-photo2 { left:62.57px; top:283.81px; width:317.95px; height:149.35px; }
+#p69-readmore1 { left:238.75px; top:801.84px; width:62.64px; height:19.73px; }
+#p69-readmore2 { left:547.64px; top:801.84px; width:62.64px; height:19.73px; }
 #p69-pagenum { right:24px; }
 
 /* page69.css — local overrides for page 69.
@@ -2504,10 +2504,10 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 70 ---- */
 #page70 { background-image: url('../assets/backgrounds/page70.webp'); }
-#p70-readmore1 { left:238.75px; top:801.84px; width:62.64px; height:19.73px; }
-#p70-readmore2 { left:547.64px; top:801.84px; width:62.64px; height:19.73px; }
 #p70-photo1 { left:59.12px; top:285.19px; width:298.50px; height:146.49px; }
 #p70-photo2 { left:356.54px; top:250.32px; width:391.71px; height:184.25px; }
+#p70-readmore1 { left:238.75px; top:801.84px; width:62.64px; height:19.73px; }
+#p70-readmore2 { left:547.64px; top:801.84px; width:62.64px; height:19.73px; }
 #p70-pagenum { left:24px; }
 
 /* page70.css — local overrides for page 70.
@@ -2532,10 +2532,10 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 71 ---- */
 #page71 { background-image: url('../assets/backgrounds/page71.webp'); }
-#p71-readmore1 { left:238.75px; top:801.84px; width:62.64px; height:19.73px; }
-#p71-readmore2 { left:545.80px; top:801.84px; width:62.64px; height:19.73px; }
 #p71-photo1 { left:58.74px; top:284.89px; width:270.21px; height:202.99px; }
 #p71-photo2 { left:376.55px; top:313.33px; width:248.81px; height:246.60px; }
+#p71-readmore1 { left:238.75px; top:801.84px; width:62.64px; height:19.73px; }
+#p71-readmore2 { left:545.80px; top:801.84px; width:62.64px; height:19.73px; }
 #p71-pagenum { right:24px; }
 
 /* page71.css — local overrides for page 71.
@@ -2584,10 +2584,10 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 73 ---- */
 #page73 { background-image: url('../assets/backgrounds/page73.webp'); }
-#p73-readmore1 { left:83.36px; top:386.62px; width:62.64px; height:19.73px; }
-#p73-readmore2 { left:83.36px; top:792.62px; width:62.64px; height:19.73px; }
 #p73-photo1 { left:338.21px; top:278.07px; width:302.83px; height:169.75px; }
 #p73-photo2 { left:240.43px; top:633.60px; width:390.30px; height:169.75px; }
+#p73-readmore1 { left:83.36px; top:386.62px; width:62.64px; height:19.73px; }
+#p73-readmore2 { left:83.36px; top:792.62px; width:62.64px; height:19.73px; }
 #p73-pagenum { right:24px; }
 
 /* page73.css — local overrides for page 73.
@@ -2612,10 +2612,10 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 74 ---- */
 #page74 { background-image: url('../assets/backgrounds/page74.webp'); }
-#p74-readmore1 { left:83.36px; top:386.62px; width:62.64px; height:19.73px; }
-#p74-readmore2 { left:83.36px; top:792.62px; width:62.64px; height:19.73px; }
 #p74-photo1 { left:356.11px; top:261.86px; width:269.70px; height:202.24px; }
 #p74-photo2 { left:245.33px; top:629.73px; width:380.22px; height:138.89px; }
+#p74-readmore1 { left:83.36px; top:386.62px; width:62.64px; height:19.73px; }
+#p74-readmore2 { left:83.36px; top:792.62px; width:62.64px; height:19.73px; }
 #p74-pagenum { left:24px; }
 
 /* page74.css — local overrides for page 74.
@@ -2640,10 +2640,10 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 75 ---- */
 #page75 { background-image: url('../assets/backgrounds/page75.webp'); }
-#p75-readmore1 { left:83.36px; top:386.62px; width:62.64px; height:19.73px; }
-#p75-readmore2 { left:83.36px; top:749.12px; width:62.64px; height:19.73px; }
 #p75-photo1 { left:315.46px; top:221.00px; width:323.77px; height:249.24px; }
 #p75-photo2 { left:447.72px; top:533.94px; width:177.21px; height:236.21px; }
+#p75-readmore1 { left:83.36px; top:386.62px; width:62.64px; height:19.73px; }
+#p75-readmore2 { left:83.36px; top:749.12px; width:62.64px; height:19.73px; }
 #p75-pagenum { right:24px; }
 
 /* page75.css — local overrides for page 75.
@@ -2675,10 +2675,10 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 76 ---- */
 #page76 { background-image: url('../assets/backgrounds/page76.webp'); }
-#p76-readmore1 { left:83.36px; top:469.56px; width:62.64px; height:19.73px; }
-#p76-readmore2 { left:83.36px; top:738.08px; width:62.64px; height:19.73px; }
 #p76-photo1 { left:302.69px; top:544.43px; width:354.51px; height:265.89px; }
 #p76-photo2 { left:245.33px; top:272.03px; width:380.36px; height:182.35px; }
+#p76-readmore1 { left:83.36px; top:469.56px; width:62.64px; height:19.73px; }
+#p76-readmore2 { left:83.36px; top:738.08px; width:62.64px; height:19.73px; }
 #p76-pagenum { left:24px; }
 
 /* page76.css — local overrides for page 76.
@@ -2703,10 +2703,10 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 77 ---- */
 #page77 { background-image: url('../assets/backgrounds/page77.webp'); }
-#p77-readmore1 { left:83.36px; top:412.09px; width:62.64px; height:19.73px; }
-#p77-readmore2 { left:83.36px; top:739.22px; width:62.64px; height:19.73px; }
 #p77-photo1 { left:356.11px; top:615.50px; width:269.70px; height:202.24px; }
 #p77-photo2 { left:245.33px; top:271.57px; width:380.36px; height:183.67px; }
+#p77-readmore1 { left:83.36px; top:412.09px; width:62.64px; height:19.73px; }
+#p77-readmore2 { left:83.36px; top:739.22px; width:62.64px; height:19.73px; }
 #p77-pagenum { right:24px; }
 
 /* page77.css — local overrides for page 77.
@@ -2731,10 +2731,10 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 78 ---- */
 #page78 { background-image: url('../assets/backgrounds/page78.webp'); }
-#p78-readmore1 { left:83.36px; top:439.36px; width:62.64px; height:19.73px; }
-#p78-readmore2 { left:83.36px; top:738.08px; width:62.64px; height:19.73px; }
 #p78-photo1 { left:312.90px; top:631.72px; width:326.02px; height:169.75px; }
 #p78-photo2 { left:245.33px; top:277.99px; width:380.24px; height:151.26px; }
+#p78-readmore1 { left:83.36px; top:439.36px; width:62.64px; height:19.73px; }
+#p78-readmore2 { left:83.36px; top:738.08px; width:62.64px; height:19.73px; }
 #p78-pagenum { left:24px; }
 
 /* page78.css — local overrides for page 78.
@@ -2759,9 +2759,9 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 79 ---- */
 #page79 { background-image: url('../assets/backgrounds/page79.webp'); }
+#p79-photo1 { left:355.10px; top:278.46px; width:292.23px; height:182.35px; }
 #p79-readmore1 { left:83.36px; top:384.82px; width:62.64px; height:19.73px; }
 #p79-readmore2 { left:83.36px; top:738.08px; width:62.64px; height:19.73px; }
-#p79-photo1 { left:355.10px; top:278.46px; width:292.23px; height:182.35px; }
 #p79-pagenum { right:24px; }
 
 /* page79.css — local overrides for page 79.
@@ -2810,9 +2810,9 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 81 ---- */
 #page81 { background-image: url('../assets/backgrounds/page81.webp'); }
-#p81-readmore1 { left:527.61px; top:452.18px; width:62.64px; height:19.73px; }
 #p81-link1 { left:70.74px; top:761.93px; width:73.25px; height:26.42px; }
 #p81-photo1 { left:220.15px; top:487.63px; width:386.86px; height:257.76px; }
+#p81-readmore1 { left:527.61px; top:452.18px; width:62.64px; height:19.73px; }
 #p81-pagenum { right:24px; }
 
 /* page81.css — local overrides for page 81.
@@ -2847,8 +2847,8 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 82 ---- */
 #page82 { background-image: url('../assets/backgrounds/page82.webp'); }
-#p82-readmore1 { left:545.80px; top:452.18px; width:62.64px; height:19.73px; }
 #p82-photo1 { left:61.76px; top:562.27px; width:377.87px; height:219.50px; }
+#p82-readmore1 { left:545.80px; top:452.18px; width:62.64px; height:19.73px; }
 #p82-pagenum { left:24px; }
 
 /* page82.css — local overrides for page 82.
@@ -2873,8 +2873,8 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 83 ---- */
 #page83 { background-image: url('../assets/backgrounds/page83.webp'); }
-#p83-readmore1 { left:545.80px; top:479.45px; width:62.64px; height:19.73px; }
 #p83-photo1 { left:262.79px; top:552.87px; width:414.71px; height:232.36px; }
+#p83-readmore1 { left:545.80px; top:479.45px; width:62.64px; height:19.73px; }
 #p83-pagenum { right:24px; }
 
 /* page83.css — local overrides for page 83.
@@ -2899,8 +2899,8 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 84 ---- */
 #page84 { background-image: url('../assets/backgrounds/page84.webp'); }
-#p84-readmore1 { left:545.80px; top:506.72px; width:62.64px; height:19.73px; }
 #p84-photo1 { left:58.90px; top:560.25px; width:255.28px; height:244.09px; }
+#p84-readmore1 { left:545.80px; top:506.72px; width:62.64px; height:19.73px; }
 #p84-pagenum { left:24px; }
 
 /* page84.css — local overrides for page 84.
@@ -2925,8 +2925,8 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 85 ---- */
 #page85 { background-image: url('../assets/backgrounds/page85.webp'); }
-#p85-readmore1 { left:545.80px; top:504.72px; width:62.64px; height:19.73px; }
 #p85-photo1 { left:200.50px; top:481.15px; width:434.41px; height:325.32px; }
+#p85-readmore1 { left:545.80px; top:504.72px; width:62.64px; height:19.73px; }
 #p85-pagenum { right:24px; }
 
 /* page85.css — local overrides for page 85.
@@ -2982,8 +2982,8 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 87 ---- */
 #page87 { background-image: url('../assets/backgrounds/page87.webp'); }
-#p87-readmore1 { left:440.96px; top:461.05px; width:62.64px; height:19.73px; }
 #p87-photo1 { left:70.74px; top:507.62px; width:362.90px; height:277.82px; }
+#p87-readmore1 { left:440.96px; top:461.05px; width:62.64px; height:19.73px; }
 #p87-pagenum { right:24px; }
 
 /* page87.css — local overrides for page 87.
@@ -3008,8 +3008,8 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 88 ---- */
 #page88 { background-image: url('../assets/backgrounds/page88.webp'); }
-#p88-readmore1 { left:545.80px; top:490.24px; width:62.64px; height:19.73px; }
 #p88-photo1 { left:262.79px; top:513.07px; width:362.41px; height:272.47px; }
+#p88-readmore1 { left:545.80px; top:490.24px; width:62.64px; height:19.73px; }
 #p88-pagenum { left:24px; }
 
 /* page88.css — local overrides for page 88.
@@ -3034,8 +3034,8 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 89 ---- */
 #page89 { background-image: url('../assets/backgrounds/page89.webp'); }
-#p89-readmore1 { left:440.96px; top:461.26px; width:62.64px; height:19.73px; }
 #p89-photo1 { left:70.74px; top:525.96px; width:362.41px; height:270.53px; }
+#p89-readmore1 { left:440.96px; top:461.26px; width:62.64px; height:19.73px; }
 #p89-pagenum { right:24px; }
 
 /* page89.css — local overrides for page 89.
@@ -3067,8 +3067,8 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 90 ---- */
 #page90 { background-image: url('../assets/backgrounds/page90.webp'); }
-#p90-readmore1 { left:545.80px; top:508.86px; width:62.64px; height:19.73px; }
 #p90-photo1 { left:70.74px; top:482.58px; width:328.61px; height:298.05px; }
+#p90-readmore1 { left:545.80px; top:508.86px; width:62.64px; height:19.73px; }
 #p90-pagenum { left:24px; }
 
 /* page90.css — local overrides for page 90.

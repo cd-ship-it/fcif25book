@@ -316,26 +316,6 @@ for p in data:
                     f"width:{width:.2f}px; height:{height:.2f}px; }}\n"
                 )
 
-    # "閱讀全文" readmore triggers — see READMORE_TRIGGER_TEXT above.
-    readmore_idx = 0
-    for line in lines:
-        line_text = ''.join(s['text'] for s in line['spans']).strip()
-        if line_text != READMORE_TRIGGER_TEXT:
-            continue
-        readmore_idx += 1
-        x0, y0, x1, y1 = line['bbox']
-        left, top = x0 * sx, y0 * sy
-        width, height = (x1 - x0) * sx, (y1 - y0) * sy
-        el_id = f"p{n}-readmore{readmore_idx}"
-        html.append(
-            f'<div class="readmore-trigger" id="{el_id}" role="button" tabindex="0" '
-            f'aria-label="閱讀全文"></div>\n'
-        )
-        css_rules.append(
-            f"#{el_id} {{ left:{left:.2f}px; top:{top:.2f}px; "
-            f"width:{width:.2f}px; height:{height:.2f}px; }}\n"
-        )
-
     # PDF hyperlinks -> real <a target="_blank"> overlays positioned over
     # the (already-visible-in-the-background-image) link text/button; a
     # YouTube link becomes a live <iframe> embed in the same spot instead.
@@ -405,6 +385,35 @@ for p in data:
         html.append(
             f'<div class="photo-zoom" id="{el_id}" data-photo-src="../assets/photos/{photo["file"]}" '
             f'role="button" tabindex="0" aria-label="放大照片"></div>\n'
+        )
+        css_rules.append(
+            f"#{el_id} {{ left:{left:.2f}px; top:{top:.2f}px; "
+            f"width:{width:.2f}px; height:{height:.2f}px; }}\n"
+        )
+
+    # "閱讀全文" readmore triggers — see READMORE_TRIGGER_TEXT above. Emitted
+    # AFTER the photo-zoom loop (not before, its earlier position) on
+    # purpose: on pages like 48 and 85, the article's own photo bbox
+    # vertically overlaps the small "閱讀全文" line sitting inside/under it
+    # (real layouts, not a data bug), and with same-stacking-context
+    # position:absolute overlays, the LATER element in DOM order paints on
+    # top and wins hit-testing. Readmore used to lose that fight to
+    # photo-zoom silently; being last now means it always wins its own
+    # (tiny) box while photo-zoom still owns the rest of the photo, mirroring
+    # the link-vs-photo precedent above.
+    readmore_idx = 0
+    for line in lines:
+        line_text = ''.join(s['text'] for s in line['spans']).strip()
+        if line_text != READMORE_TRIGGER_TEXT:
+            continue
+        readmore_idx += 1
+        x0, y0, x1, y1 = line['bbox']
+        left, top = x0 * sx, y0 * sy
+        width, height = (x1 - x0) * sx, (y1 - y0) * sy
+        el_id = f"p{n}-readmore{readmore_idx}"
+        html.append(
+            f'<div class="readmore-trigger" id="{el_id}" role="button" tabindex="0" '
+            f'aria-label="閱讀全文"></div>\n'
         )
         css_rules.append(
             f"#{el_id} {{ left:{left:.2f}px; top:{top:.2f}px; "

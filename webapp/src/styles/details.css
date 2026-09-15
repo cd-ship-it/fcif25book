@@ -31,7 +31,7 @@
   background: #fdfcfa;
   color: #262229;
   border-radius: 10px;
-  border: 1px solid var(--fpToolbarBorder, rgba(201, 162, 39, 0.35));
+  border: 1px solid var(--fpToolbarBorder, #000000);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
   padding: 36px 40px 40px;
 }
