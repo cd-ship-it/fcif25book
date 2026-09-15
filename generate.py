@@ -349,11 +349,15 @@ for p in data:
         embed_url = youtube_embed_url(link['uri'])
 
         if embed_url:
+            # Invisible click target, not a live iframe: the PDF's own
+            # thumbnail artwork for this spot is already part of the
+            # (unredacted) background image, so leaving it as a plain
+            # overlay shows that real thumbnail instead of YouTube's own
+            # default one. webapp's yt-embed.client.ts swaps this div for
+            # an actual <iframe> (with autoplay) only once it's clicked.
             html.append(
-                f'<iframe class="yt-embed" id="{el_id}" src="{embed_url}" '
-                f'title="YouTube video player" frameborder="0" '
-                f'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" '
-                f'referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe>\n'
+                f'<div class="yt-trigger" id="{el_id}" data-yt-embed="{embed_url}" '
+                f'role="button" tabindex="0" aria-label="播放影片"></div>\n'
             )
         else:
             uri_esc = esc_attr(link['uri'])
