@@ -201,8 +201,10 @@ function init(): void {
   // need their own mobile/desktop branch.
   function goToPage(n: number): void {
     if (mobileMode) {
-      mobileCurrentPage = Math.max(1, Math.min(total, n));
-      renderMobilePage();
+      const target = Math.max(1, Math.min(total, n));
+      const direction = target === mobileCurrentPage ? null : target > mobileCurrentPage ? 'next' : 'prev';
+      mobileCurrentPage = target;
+      renderMobilePage(direction);
     } else {
       // turnToPage (not flip) — flip()/flipToPage() only steps one spread at
       // a time regardless of distance, so it's wrong for arbitrary jumps.
@@ -282,6 +284,66 @@ function init(): void {
     createTurnZone('next');
   }
 
+  // Swipe left/right to flip pages on mobile. Desktop's equivalent
+  // (createTurnZone above) deliberately only covers narrow edge strips so it
+  // never fights a click/link in the middle of the page; mobile's plain
+  // single page (no page-flip drag, no click-to-flip already living on it —
+  // see the comment above createTurnZone) has nothing competing for a
+  // page-wide gesture, so a single listener on #stage is safe. Guards, in
+  // the order they're checked:
+  //   - multi-touch (a pinch starting) is ignored outright at touchstart, so
+  //     this never fights the native pinch-zoom index.astro's viewport meta
+  //     deliberately leaves enabled.
+  //   - isPinchZoomed() (defined below, hoisted — these are function
+  //     declarations) is re-checked at touchend too: panning around an
+  //     already-zoomed-in page is a horizontal drag that must NOT be read as
+  //     "next page".
+  //   - vertical drift beyond SWIPE_MAX_OFF_AXIS_PX rules out an ordinary
+  //     vertical scroll (mobile's page can be taller than the viewport, see
+  //     fitMobile) being misread as a swipe.
+  //   - taking longer than SWIPE_MAX_DURATION_MS rules out a slow press-drag
+  //     text selection.
+  // Both listeners are passive (never call preventDefault) so native scroll
+  // and pinch-zoom are untouched either way — this only ever reads the
+  // gesture after the fact, on touchend.
+  const SWIPE_MIN_DISTANCE_PX = 50;
+  const SWIPE_MAX_OFF_AXIS_PX = 60;
+  const SWIPE_MAX_DURATION_MS = 600;
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchStartAt = 0;
+  let touchTracking = false;
+
+  stage!.addEventListener(
+    'touchstart',
+    (e) => {
+      touchTracking = mobileMode && e.touches.length === 1 && !isPinchZoomed();
+      if (!touchTracking) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      touchStartAt = Date.now();
+    },
+    { passive: true }
+  );
+
+  stage!.addEventListener(
+    'touchend',
+    (e) => {
+      if (!touchTracking) return;
+      touchTracking = false;
+      if (isPinchZoomed()) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - touchStartX;
+      const dy = t.clientY - touchStartY;
+      if (Date.now() - touchStartAt > SWIPE_MAX_DURATION_MS) return;
+      if (Math.abs(dy) > SWIPE_MAX_OFF_AXIS_PX) return;
+      if (Math.abs(dx) < SWIPE_MIN_DISTANCE_PX) return;
+      if (dx < 0) flipNext();
+      else flipPrev();
+    },
+    { passive: true }
+  );
+
   // Removes whatever the OTHER mode left behind in #book-shell, so buildBook
   // always starts from a clean slate regardless of which mode ran last.
   function teardownDesktop(): void {
@@ -303,12 +365,80 @@ function init(): void {
     mobilePageEl = null;
   }
 
-  function renderMobilePage(): void {
-    mobilePageEl?.remove();
-    mobilePageEl = templatePages[mobileCurrentPage - 1].cloneNode(true) as HTMLElement;
-    bookShell!.appendChild(mobilePageEl);
+  // One-shot slide when a navigation has already been decided (swipe,
+  // dock/toolbar buttons, TOC jump, page-jump form) — NOT a finger-following
+  // drag: nothing here tracks touchmove or can be interrupted/reversed
+  // mid-gesture, it's a fixed-duration CSS transition that always plays to
+  // completion once triggered. Deliberately kept this simple: a live
+  // drag-follow would need to coordinate with the vertical scroll already
+  // happening on these pages, and this codebase has a documented history of
+  // exactly that kind of iOS touch-gesture interaction going wrong (see the
+  // pinch-zoom/position:fixed comments elsewhere in this file and app.css).
+  // direction is omitted (no animation, instant swap) for the initial
+  // load/rebuild case — see buildMobileBook, which always calls this right
+  // after teardownMobile() has already cleared mobilePageEl to null.
+  const MOBILE_SLIDE_MS = 220;
+
+  function renderMobilePage(direction: 'next' | 'prev' | null = null): void {
+    const oldPageEl = mobilePageEl;
+    const newPageEl = templatePages[mobileCurrentPage - 1].cloneNode(true) as HTMLElement;
+
+    if (!direction || !oldPageEl) {
+      oldPageEl?.remove();
+      mobilePageEl = newPageEl;
+      bookShell!.appendChild(mobilePageEl);
+      fitMobile();
+      refreshUI();
+      return;
+    }
+
+    // Both pages sit stacked, absolutely positioned within #book-shell
+    // (which already clips via overflow:hidden — see app.css), rather than
+    // .page's own normal position:relative flow, only for the duration of
+    // this transition; the new page becomes the normal-flow mobilePageEl
+    // once it's done.
+    const enterFrom = direction === 'next' ? '100%' : '-100%';
+    const exitTo = direction === 'next' ? '-100%' : '100%';
+
+    for (const el of [oldPageEl, newPageEl]) {
+      el.style.position = 'absolute';
+      el.style.top = '0';
+      el.style.left = '0';
+    }
+    newPageEl.style.transform = `translateX(${enterFrom})`;
+    bookShell!.appendChild(newPageEl);
+
+    mobilePageEl = newPageEl;
     fitMobile();
     refreshUI();
+
+    // Force layout so the starting transform above is committed as its own
+    // paint before the transition-triggering change below — otherwise the
+    // browser can coalesce both into one paint and skip the animation.
+    void newPageEl.offsetHeight;
+    oldPageEl.style.transition = `transform ${MOBILE_SLIDE_MS}ms ease-out`;
+    newPageEl.style.transition = `transform ${MOBILE_SLIDE_MS}ms ease-out`;
+    requestAnimationFrame(() => {
+      oldPageEl.style.transform = `translateX(${exitTo})`;
+      newPageEl.style.transform = 'translateX(0)';
+    });
+
+    // Guarantees the settled end state (new page normal-flow, fully visible)
+    // no matter what happened to the rAF-driven animation above — e.g. a tab
+    // backgrounded mid-transition suspends requestAnimationFrame entirely
+    // (confirmed via manual testing: an automated/hidden tab never fires it
+    // at all), which would otherwise leave the new page permanently stuck
+    // off-screen at its enterFrom position with no error and no recovery.
+    // setTimeout keeps firing even when rAF doesn't, so this is the one
+    // place this function can rely on to actually run.
+    window.setTimeout(() => {
+      oldPageEl.remove();
+      newPageEl.style.transform = '';
+      newPageEl.style.transition = '';
+      newPageEl.style.position = '';
+      newPageEl.style.top = '';
+      newPageEl.style.left = '';
+    }, MOBILE_SLIDE_MS + 30);
   }
 
   function buildDesktopBook(resumeIndex: number): void {

@@ -397,6 +397,16 @@ html, body {
   background: var(--fpPrimaryDark, #453168);
 }
 
+/* The ‹/› glyphs sit low in their own line box (unused descender space below
+   them isn't visually part of the character), so flex-centering the button
+   centers that whole line box rather than the glyph's visible ink — nudge
+   up a few px to compensate. The TOC icon is a plain SVG (no such built-in
+   offset), so this is scoped to just the arrow buttons. */
+#btn-prev-mobile,
+#btn-next-mobile {
+  padding-bottom: 3px;
+}
+
 #bottom-nav .dock-btn:disabled {
   opacity: 0.3;
   cursor: default;
