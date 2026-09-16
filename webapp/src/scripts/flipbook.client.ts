@@ -559,16 +559,53 @@ function init(): void {
   // specifically while every other, non-refitted element on the page
   // rendered bigger as normal. Unlike pinch-zoom, there's no
   // visualViewport.scale signal for this (it stays 1 — the whole layout
-  // viewport zooms uniformly, it's not a transient visual-only overlay), but
-  // window.devicePixelRatio DOES change with it (e.g. 1 -> 1.1 at 110%)
-  // while staying constant across a real window resize/monitor-drag at a
-  // fixed zoom level — that's the distinguishing signal used here to skip
-  // re-fitting for the same reason isPinchZoomed() does: let the browser's
-  // own zoom render the already-fitted book bigger, in place, like it does
-  // everything else, instead of JS fighting it back to "fit".
+  // viewport zooms uniformly, it's not a transient visual-only overlay).
+  //
+  // Two independent signals are combined here because no single one holds
+  // across every browser this shipped to (reported broken in both Chrome
+  // AND Safari, so a Chrome-only signal alone isn't enough):
+  //  - window.devicePixelRatio changes with the zoom level in Chrome/
+  //    Chromium (e.g. 1 -> 1.1 at 110%) but is NOT tied to page zoom in
+  //    WebKit/Safari (or Firefox) — there it only reflects the screen's own
+  //    backing scale factor, so it stays constant through a Safari zoom and
+  //    this signal alone is a no-op there (the likely reason the first pass
+  //    at this fix, which only checked devicePixelRatio, didn't hold up in
+  //    Safari).
+  //  - window.outerWidth/outerHeight (the OS window's own frame, in CSS px)
+  //    stay fixed for a pure zoom-level change in every desktop browser —
+  //    only the CONTENT viewport (innerWidth/innerHeight, and so
+  //    stage.clientWidth/clientHeight) shrinks or grows — whereas an actual
+  //    window resize/monitor drag moves outerWidth/outerHeight too. That
+  //    holds regardless of whether a given engine ties zoom to
+  //    devicePixelRatio, which is what makes it the cross-browser fallback.
+  //    (Trade-off: docking a browser DevTools panel also leaves
+  //    outerWidth/outerHeight untouched while shrinking the content
+  //    viewport, so this reads that as "zoom" too and skips a re-fit there
+  //    — an acceptable trade for a reader-facing app with no developer
+  //    audience of its own.)
   let lastDevicePixelRatio = window.devicePixelRatio;
+  let lastOuterWidth = window.outerWidth;
+  let lastOuterHeight = window.outerHeight;
   function isBrowserZoomChange(): boolean {
-    return window.devicePixelRatio !== lastDevicePixelRatio;
+    const dprChanged = window.devicePixelRatio !== lastDevicePixelRatio;
+    // Guarded on outerWidth/outerHeight actually being meaningful (> 0):
+    // some non-ordinary-tab contexts (an embedding iframe, an automated
+    // browser tab, certain webviews) always report these as 0, which would
+    // otherwise make "unchanged" trivially true on every single resize —
+    // permanently gluing the book to whatever size it first loaded at
+    // instead of just skipping the zoom case. Falling back to "not a zoom"
+    // there means a real resize is (correctly) never mistaken for one, at
+    // the cost of not catching a genuine Safari/Firefox zoom in that
+    // specific degenerate context — the right trade-off, since a stuck
+    // book would be a much more visible, permanent regression than a zoom
+    // that occasionally re-fits away in a context this app doesn't
+    // normally run in anyway.
+    const outerFrameUnchanged =
+      lastOuterWidth > 0 &&
+      lastOuterHeight > 0 &&
+      window.outerWidth === lastOuterWidth &&
+      window.outerHeight === lastOuterHeight;
+    return dprChanged || outerFrameUnchanged;
   }
 
   // `resize`, `visualViewport`'s own `resize`, and `orientationchange` can
@@ -576,10 +613,10 @@ function init(): void {
   // of the first two, often in the same tick) — routing every one of them
   // through this single, debounced evaluator means the isBrowserZoomChange()
   // check above always runs exactly once per real-world event, reading (and
-  // then committing) window.devicePixelRatio in one place. Checking it
-  // separately inside each raw listener would race: whichever listener
-  // happened to run first would "consume" the change (updating the
-  // remembered ratio) before the second one read it, so the second would
+  // then committing) devicePixelRatio/outerWidth/outerHeight in one place.
+  // Checking it separately inside each raw listener would race: whichever
+  // listener happened to run first would "consume" the change (updating the
+  // remembered values) before the second one read it, so the second would
   // wrongly see no change and re-fit anyway — silently undoing this fix for
   // some zoom actions but not others.
   let refitCheckScheduled = false;
@@ -590,6 +627,8 @@ function init(): void {
       refitCheckScheduled = false;
       const zoomChanged = isBrowserZoomChange();
       lastDevicePixelRatio = window.devicePixelRatio;
+      lastOuterWidth = window.outerWidth;
+      lastOuterHeight = window.outerHeight;
       if (isPinchZoomed() || zoomChanged) return;
       if (mq.matches !== mobileMode) buildBook(mq.matches);
       else applyFit();
