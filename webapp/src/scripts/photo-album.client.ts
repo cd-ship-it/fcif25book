@@ -2,9 +2,16 @@ function init(): void {
   const stage = document.getElementById('stage');
   if (!stage) return;
 
+  // A click can come from either the small icon buttons overlaid on the
+  // image itself (descendants of .photo-album) or the labeled 相片集：
+  // 上一張/下一張 row below it (a sibling of .photo-album, inside the same
+  // .photo-album-wrap — see generate.py) — resolve either back to the one
+  // .photo-album they both control.
   function albumFor(target: EventTarget | null): HTMLElement | null {
     if (!(target instanceof Element)) return null;
-    return target.closest<HTMLElement>('.photo-album');
+    const direct = target.closest<HTMLElement>('.photo-album');
+    if (direct) return direct;
+    return target.closest('.photo-album-wrap')?.querySelector<HTMLElement>('.photo-album') ?? null;
   }
 
   function currentIndex(imgs: HTMLImageElement[]): number {

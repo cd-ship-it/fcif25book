@@ -74,11 +74,12 @@ body {
 /* Page 5's table of contents (generate.py's TOC_TARGETS). The heading text
    itself is already part of the background image, so this is just an
    invisible clickable overlay — same hover-highlight affordance as
-   .readmore-trigger/.photo-zoom/.event-hotspot below, not underlined text
+   .readmore-trigger/.photo-zoom/.tooltip-hotspot below, not underlined text
    (there's no text inside anymore to underline). */
 .toc-jump {
   position: absolute;
-  display: block;
+  display: flex;
+  align-items: center;
   cursor: pointer;
   border-radius: 3px;
   transition: background-color 0.15s ease;
@@ -97,6 +98,8 @@ body {
    top. The only body text this pipeline still renders as live HTML,
    deliberately contained to these 8 elements on this one page. */
 .toc-page-label {
+  display: flex;
+  align-items: center;
   background: #ffffff;
   text-decoration: none;
   cursor: pointer;
@@ -107,6 +110,18 @@ body {
 .toc-page-label:focus-visible {
   outline: 1px solid rgba(98, 67, 147, 0.35);
   outline-offset: 1px;
+}
+
+/* Small persistent "this is clickable" affordance appended to every TOC
+   entry (generate.py's TOC_ICON_SVG) — unlike the hover-only highlight
+   above, this stays visible at rest, since the entries otherwise give no
+   visual hint of being links (toc-jump is a fully invisible overlay;
+   toc-page-label is plain black PDF-style text). margin-left:auto pushes it
+   to the end of the entry's own (icon-space-widened) box regardless of
+   whether there's preceding text content. */
+.toc-jump-icon {
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 /* Transparent hit-area over the "閱讀全文" button already visible in the
@@ -196,9 +211,16 @@ body {
    extract.py (resized + black bars baked in), so it's just stacked
    <img>s with all but one `hidden`; webapp's photo-album.client.ts (or
    this same pattern ported for the standalone preview pages) toggles
-   which one and updates the caption. */
-.photo-album {
+   which one and updates the caption.
+   .photo-album-wrap carries the page position; .photo-album itself is
+   just sized (position:relative, not absolute), so .photo-album-controls
+   below can sit in normal flow right under it, inside the same wrapper. */
+.photo-album-wrap {
   position: absolute;
+}
+
+.photo-album {
+  position: relative;
   overflow: hidden;
   background: #000000;
   border-radius: 4px;
@@ -279,6 +301,41 @@ body {
   display: none;
 }
 
+/* Labeled prev/next row below the image (as opposed to .photo-album-nav's
+   small icon buttons overlaid on the image corners above) — a second,
+   more discoverable way to step through the same album. Normal document
+   flow under .photo-album within their shared .photo-album-wrap. */
+.photo-album-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #624393;
+}
+
+.photo-album-controls-label {
+  font-weight: 700;
+}
+
+.photo-album-controls-btn {
+  appearance: none;
+  border: 1px solid rgba(98, 67, 147, 0.35);
+  border-radius: 4px;
+  background: rgba(98, 67, 147, 0.08);
+  color: #624393;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 3px 10px;
+  cursor: pointer;
+}
+
+.photo-album-controls-btn:hover,
+.photo-album-controls-btn:focus-visible {
+  background: rgba(98, 67, 147, 0.18);
+  outline: none;
+}
+
 /* Folio-style page-number badge — left page of a spread gets it in the
    bottom-left corner, right page in the bottom-right, mirroring how a
    printed book's page numbers sit toward the outer edge of each leaf.
@@ -302,14 +359,15 @@ body {
   pointer-events: none;
 }
 
-/* Timeline spread (pages 8-9, generate.py's TIMELINE_PAGES) — invisible
-   hover hit-area over an event title that's already part of the
-   background image (a real designed PDF, not a placeholder — see
-   TIMELINE-ALGORITHM.md). Wired to the #tooltip popup below by
-   timeline.js's wireTimelineTooltip (standalone previews) or the webapp's
-   timeline-tooltip.client.ts (same logic, ported to TS for event
-   delegation across desktop/mobile rebuilds). */
-.event-hotspot {
+/* Reusable hover/tap tooltip hotspot (generate.py's emit_tooltip_hotspot) —
+   invisible hit-area over content that's already part of the background
+   image (a real designed PDF, not a placeholder — see TIMELINE-ALGORITHM.md
+   for the original timeline-spread use, pages 8-9; the mechanism itself
+   isn't timeline-specific). Wired to the #tooltip popup below by
+   timeline.js's wireTooltipHotspots (standalone previews) or the webapp's
+   tooltip-hotspot.client.ts (same logic, ported to TS for event delegation
+   across desktop/mobile rebuilds). */
+.tooltip-hotspot {
   position: absolute;
   display: block;
   cursor: pointer;
@@ -317,8 +375,8 @@ body {
   background: transparent;
 }
 
-.event-hotspot:hover,
-.event-hotspot.is-active {
+.tooltip-hotspot:hover,
+.tooltip-hotspot.is-active {
   background: rgba(98, 67, 147, 0.14);
   outline: 1px solid rgba(98, 67, 147, 0.35);
 }
@@ -368,10 +426,17 @@ body {
   font-size: 16px;
 }
 
-/* Floating nudge on the timeline spread (pages 8–9). left/right is set per
-   page in pageN.generated.css (generate.py) — near the spine on each page,
-   not a fixed side, since the two pages need opposite sides. */
-.timeline-hint {
+/* Reusable dismissible hint callout (generate.py's emit_hint_bubble) — a
+   small floating pill with a close button, pointing at whatever it's
+   labeling. Originally timeline-only (pages 8-9); position (left/right/etc)
+   is set per instance in pageN.generated.css since there's no one generic
+   anchor point that suits every caller. Dismissing one hides only that
+   instance (.dismissed, added by the close button's own click handler —
+   see tooltip-hotspot.client.ts/timeline.js's wireHintBubbles) — NOT a
+   page/body-wide flag, so multiple independent hint bubbles across
+   different pages never cross-dismiss each other. Not persisted anywhere,
+   so a refresh always shows it again. */
+.hint-bubble {
   position: absolute;
   bottom: 72px;
   z-index: 6;
@@ -379,8 +444,8 @@ body {
   align-items: center;
   gap: 10px;
   max-width: calc(100% - 48px);
-  padding: 8px 10px 8px 14px;
-  border-radius: 10px;
+  padding: 8px 10px 8px 16px;
+  border-radius: 999px;
   background: #e2e2e2;
   color: #624393;
   font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
@@ -389,21 +454,21 @@ body {
   letter-spacing: 0.02em;
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
   pointer-events: auto;
-  animation: timeline-hint-float 2.6s ease-in-out infinite;
+  animation: hint-bubble-float 2.6s ease-in-out infinite;
 }
 
-.timeline-hint-text {
+.hint-bubble-text {
   flex: 1;
   min-width: 0;
 }
 
-.timeline-hint-close {
+.hint-bubble-close {
   flex: 0 0 auto;
   width: 22px;
   height: 22px;
   padding: 0;
   border: 1px solid rgba(98, 67, 147, 0.35);
-  border-radius: 4px;
+  border-radius: 50%;
   background: rgba(98, 67, 147, 0.08);
   color: #624393;
   font-size: 16px;
@@ -414,17 +479,17 @@ body {
   justify-content: center;
 }
 
-.timeline-hint-close:hover,
-.timeline-hint-close:focus-visible {
+.hint-bubble-close:hover,
+.hint-bubble-close:focus-visible {
   background: rgba(98, 67, 147, 0.18);
   outline: none;
 }
 
-body.timeline-hint-dismissed .timeline-hint {
+.hint-bubble.dismissed {
   display: none;
 }
 
-@keyframes timeline-hint-float {
+@keyframes hint-bubble-float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-7px); }
 }

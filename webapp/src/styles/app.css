@@ -67,7 +67,6 @@ html, body {
   gap: 10px 12px;
   padding: 10px 20px;
   background: var(--fpToolbarBg, #eaebef);
-  border-bottom: 1px solid var(--fpToolbarBorder, #000000);
   z-index: 20;
 }
 
@@ -87,31 +86,41 @@ html, body {
   gap: 8px;
 }
 
+/* Same liquid/pill look as the mobile bottom-nav's .dock-btn circles
+   (app.css, #bottom-nav section) — solid purple, white text/icon, fully
+   rounded — just stretched into a pill shape instead of a 40px circle
+   since these carry text, not a single glyph. */
 .toolbar button,
 .toolbar .btn {
   appearance: none;
-  border: 1px solid var(--fpToolbarBorder, #000000);
-  background: rgba(255,255,255,0.04);
-  color: var(--fpToolbarText, #000000);
-  border-radius: 6px;
-  padding: 7px 14px;
+  border: none;
+  border-radius: 999px;
+  background:#ffffff;
+  color: var(--fpPrimary, #624393);
+  padding: 9px 20px;
   font-size: 14px;
   font-family: inherit;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition: background 0.15s ease, transform 0.1s ease;
   white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .toolbar button:hover,
 .toolbar .btn:hover {
-  background: var(--fpPrimary, #624393);
-  border-color: var(--fpPrimary, #624393);
+  background: var(--fpPrimaryDark, #453168);
+  color: #ffffff;
+}
+
+.toolbar button:active,
+.toolbar .btn:active {
+  transform: scale(0.96);
 }
 
 .toolbar button:disabled {
   opacity: 0.35;
   cursor: default;
-  background: transparent;
+  transform: none;
 }
 
 .toolbar .page-indicator {
@@ -127,17 +136,70 @@ html, body {
   gap: 6px;
 }
 
+/* Positioning context for .jump-form-go, embedded inside the input's own
+   box (search-bar style) rather than sitting beside it as a separate
+   button — see index.astro. */
+.toolbar .jump-form-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
 .toolbar .jump-form input {
-  width: 69px;
-  padding: 7px 14px;
-  border-radius: 6px;
-  border: 1px solid var(--fpToolbarBorder, #000000);
-  background: rgba(255,255,255,0.06);
-  color: var(--fpToolbarText, #000000);
+  width: 82px;
+  /* Right padding clears the embedded button (26px wide + 4px inset from
+     the edge + a little breathing room) so typed digits never run under
+     it. */
+  padding: 9px 34px 9px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(98, 67, 147, 0.35);
+  background: rgba(255, 255, 255, 0.7);
+  color: #333333;
   font-size: 14px;
   font-family: inherit;
   line-height: inherit;
   text-align: center;
+  /* type="number"'s native up/down spinner isn't needed — jumping to a
+     specific page is a typed/pasted number, not something anyone
+     increments one click at a time. */
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.toolbar .jump-form input::-webkit-outer-spin-button,
+.toolbar .jump-form input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* The "go" action, embedded in the input's own right edge instead of a
+   separate button beside it (replaces the old standalone 跳至 button). */
+.toolbar .jump-form-go {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #d9d9d9;
+  color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.toolbar .jump-form-go:hover {
+  background: var(--fpPrimary, #624393);
+  color: #ffffff;
+}
+
+.toolbar .jump-form-go:active {
+  transform: translateY(-50%) scale(0.92);
 }
 
 /* ---------------- Toolbar toggle (desktop only) ----------------
@@ -146,19 +208,24 @@ html, body {
    toolbar back. Desktop only for now — mobile keeps its own always-visible
    #bottom-nav, untouched (see #app.mobile-mode rule below). */
 
+/* top/height tuned to match the toolbar pill buttons' own actual rendered
+   size (measured: 38px tall, top:11px) exactly — this button lives outside
+   the toolbar's flexbox (position:fixed, so it can stay put while the
+   toolbar itself hides/shows), so it can't just inherit their alignment
+   for free the way a flex sibling would; it has to be pinned by hand. */
 #btn-toolbar-toggle {
   display: none;
   position: fixed;
-  top: 10px;
+  top: 11px;
   right: 16px;
   z-index: 21;
   appearance: none;
   border: 1px solid var(--fpPrimary, #624393);
   background: var(--fpPrimary, #624393);
   color: #ffffff;
-  border-radius: 6px;
-  width: 34px;
-  height: 34px;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
   font-size: 18px;
   line-height: 1;
   cursor: pointer;

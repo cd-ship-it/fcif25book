@@ -104,10 +104,10 @@ function renderTimeline(container, points) {
     container.appendChild(titleWrap);
   });
 
-  wireTimelineTooltip(container);
+  wireTooltipHotspots(container);
 }
 
-function wireTimelineTooltip(container) {
+function wireTooltipHotspots(container) {
   let tooltip = document.getElementById('tooltip');
   if (!tooltip) {
     tooltip = document.createElement('div');
@@ -184,24 +184,34 @@ function wireTimelineTooltip(container) {
   });
 }
 
-// Dismissible floating hint on pages 8–9. Closing one dismisses both for
-// the rest of THIS view only (a body class CSS uses to hide every
-// .timeline-hint) — deliberately not persisted anywhere, so a refresh
-// always shows it again.
-function dismissTimelineHint() {
-  document.body.classList.add('timeline-hint-dismissed');
-}
-
-function wireTimelineHint() {
-  if (wireTimelineHint._wired) return;
-  wireTimelineHint._wired = true;
+// Dismissible floating hint bubble (generate.py's emit_hint_bubble) —
+// closing one hides every bubble sharing its data-hint-group (entries
+// reusing the same `id` in hints_config.json), not just the one instance
+// clicked, so a duplicated tip (e.g. the same text on two pages) closes
+// everywhere at once while unrelated tips (different group) never
+// cross-dismiss each other. No MutationObserver needed here the way the
+// webapp's tooltip-hotspot.client.ts has one — each standalone pageN.html
+// preview only ever shows this one static page, nothing gets cloned in
+// later. Deliberately not persisted anywhere, so a refresh always shows it
+// again.
+function wireHintBubbles() {
+  if (wireHintBubbles._wired) return;
+  wireHintBubbles._wired = true;
 
   document.addEventListener('click', (e) => {
-    const btn = e.target.closest('.timeline-hint-close');
+    const btn = e.target.closest('.hint-bubble-close');
     if (!btn) return;
     e.preventDefault();
     e.stopPropagation();
-    dismissTimelineHint();
+    const bubble = btn.closest('.hint-bubble');
+    const group = bubble?.dataset.hintGroup;
+    if (group) {
+      document.querySelectorAll(`.hint-bubble[data-hint-group="${CSS.escape(group)}"]`).forEach((el) => {
+        el.classList.add('dismissed');
+      });
+    } else {
+      bubble?.classList.add('dismissed');
+    }
   });
 }
 
@@ -245,7 +255,7 @@ function renderTimelineOverlay(container, points, opts) {
     container.appendChild(titleWrap);
   });
 
-  wireTimelineTooltip(container);
+  wireTooltipHotspots(container);
 }
 
 // renderTimelineSplitOverlay(config) — the two-page ("spread") version of

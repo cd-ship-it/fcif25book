@@ -1,0 +1,37 @@
+[
+  {
+    "page": 5,
+    "id": "toc-hint",
+    "text": "點擊有＞的項目跳至該頁",
+    "left": 69.60,
+    "bottom": 233.36
+  },
+  {
+    "page": 7,
+    "id": "photo-zoom-hint",
+    "text": "點擊相片放大",
+    "left": 69.50,
+    "bottom": 361.49
+  },
+  {
+    "page": 8,
+    "id": "timeline-hint",
+    "text": "移動滑鼠到大事紀查看詳情",
+    "right": 24,
+    "bottom": 72
+  },
+  {
+    "page": 9,
+    "id": "timeline-hint",
+    "text": "移動滑鼠到大事紀查看詳情",
+    "left": 24,
+    "bottom": 72
+  },
+  {
+    "page": 11,
+    "id": "photo-zoom-hint",
+    "text": "點擊相片放大",
+    "left": 69.50,
+    "bottom": 90
+  }
+]

@@ -125,15 +125,21 @@ const total = manifest.total as number;
       <div class="group">
         {config.toolbar.showPageJump && (
           <form id="jump-form" class="jump-form">
-            <input
-              id="jump-input"
-              type="number"
-              min="1"
-              max={total}
-              placeholder={config.labels.jumpPlaceholder}
-              aria-label={config.labels.jumpPlaceholder}
-            />
-            <button type="submit" class="btn">{config.labels.jumpButton}</button>
+            <div class="jump-form-field">
+              <input
+                id="jump-input"
+                type="number"
+                min="1"
+                max={total}
+                placeholder={config.labels.jumpPlaceholder}
+                aria-label={config.labels.jumpPlaceholder}
+              />
+              <button type="submit" class="jump-form-go" aria-label={config.labels.jumpButton}>
+                <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                  <path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+            </div>
           </form>
         )}
         {config.toolbar.showFullscreen && (
@@ -201,7 +207,7 @@ const total = manifest.total as number;
     import '../scripts/readmore.client.ts';
     import '../scripts/photo-zoom.client.ts';
     import '../scripts/photo-album.client.ts';
-    import '../scripts/timeline-tooltip.client.ts';
+    import '../scripts/tooltip-hotspot.client.ts';
     import '../scripts/yt-embed.client.ts';
   </script>
 </body>

@@ -74,11 +74,12 @@ body {
 /* Page 5's table of contents (generate.py's TOC_TARGETS). The heading text
    itself is already part of the background image, so this is just an
    invisible clickable overlay — same hover-highlight affordance as
-   .readmore-trigger/.photo-zoom/.event-hotspot below, not underlined text
+   .readmore-trigger/.photo-zoom/.tooltip-hotspot below, not underlined text
    (there's no text inside anymore to underline). */
 .toc-jump {
   position: absolute;
-  display: block;
+  display: flex;
+  align-items: center;
   cursor: pointer;
   border-radius: 3px;
   transition: background-color 0.15s ease;
@@ -97,6 +98,8 @@ body {
    top. The only body text this pipeline still renders as live HTML,
    deliberately contained to these 8 elements on this one page. */
 .toc-page-label {
+  display: flex;
+  align-items: center;
   background: #ffffff;
   text-decoration: none;
   cursor: pointer;
@@ -107,6 +110,18 @@ body {
 .toc-page-label:focus-visible {
   outline: 1px solid rgba(98, 67, 147, 0.35);
   outline-offset: 1px;
+}
+
+/* Small persistent "this is clickable" affordance appended to every TOC
+   entry (generate.py's TOC_ICON_SVG) — unlike the hover-only highlight
+   above, this stays visible at rest, since the entries otherwise give no
+   visual hint of being links (toc-jump is a fully invisible overlay;
+   toc-page-label is plain black PDF-style text). margin-left:auto pushes it
+   to the end of the entry's own (icon-space-widened) box regardless of
+   whether there's preceding text content. */
+.toc-jump-icon {
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 /* Transparent hit-area over the "閱讀全文" button already visible in the
@@ -196,9 +211,16 @@ body {
    extract.py (resized + black bars baked in), so it's just stacked
    <img>s with all but one `hidden`; webapp's photo-album.client.ts (or
    this same pattern ported for the standalone preview pages) toggles
-   which one and updates the caption. */
-.photo-album {
+   which one and updates the caption.
+   .photo-album-wrap carries the page position; .photo-album itself is
+   just sized (position:relative, not absolute), so .photo-album-controls
+   below can sit in normal flow right under it, inside the same wrapper. */
+.photo-album-wrap {
   position: absolute;
+}
+
+.photo-album {
+  position: relative;
   overflow: hidden;
   background: #000000;
   border-radius: 4px;
@@ -279,6 +301,41 @@ body {
   display: none;
 }
 
+/* Labeled prev/next row below the image (as opposed to .photo-album-nav's
+   small icon buttons overlaid on the image corners above) — a second,
+   more discoverable way to step through the same album. Normal document
+   flow under .photo-album within their shared .photo-album-wrap. */
+.photo-album-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #624393;
+}
+
+.photo-album-controls-label {
+  font-weight: 700;
+}
+
+.photo-album-controls-btn {
+  appearance: none;
+  border: 1px solid rgba(98, 67, 147, 0.35);
+  border-radius: 4px;
+  background: rgba(98, 67, 147, 0.08);
+  color: #624393;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 3px 10px;
+  cursor: pointer;
+}
+
+.photo-album-controls-btn:hover,
+.photo-album-controls-btn:focus-visible {
+  background: rgba(98, 67, 147, 0.18);
+  outline: none;
+}
+
 /* Folio-style page-number badge — left page of a spread gets it in the
    bottom-left corner, right page in the bottom-right, mirroring how a
    printed book's page numbers sit toward the outer edge of each leaf.
@@ -302,14 +359,15 @@ body {
   pointer-events: none;
 }
 
-/* Timeline spread (pages 8-9, generate.py's TIMELINE_PAGES) — invisible
-   hover hit-area over an event title that's already part of the
-   background image (a real designed PDF, not a placeholder — see
-   TIMELINE-ALGORITHM.md). Wired to the #tooltip popup below by
-   timeline.js's wireTimelineTooltip (standalone previews) or the webapp's
-   timeline-tooltip.client.ts (same logic, ported to TS for event
-   delegation across desktop/mobile rebuilds). */
-.event-hotspot {
+/* Reusable hover/tap tooltip hotspot (generate.py's emit_tooltip_hotspot) —
+   invisible hit-area over content that's already part of the background
+   image (a real designed PDF, not a placeholder — see TIMELINE-ALGORITHM.md
+   for the original timeline-spread use, pages 8-9; the mechanism itself
+   isn't timeline-specific). Wired to the #tooltip popup below by
+   timeline.js's wireTooltipHotspots (standalone previews) or the webapp's
+   tooltip-hotspot.client.ts (same logic, ported to TS for event delegation
+   across desktop/mobile rebuilds). */
+.tooltip-hotspot {
   position: absolute;
   display: block;
   cursor: pointer;
@@ -317,8 +375,8 @@ body {
   background: transparent;
 }
 
-.event-hotspot:hover,
-.event-hotspot.is-active {
+.tooltip-hotspot:hover,
+.tooltip-hotspot.is-active {
   background: rgba(98, 67, 147, 0.14);
   outline: 1px solid rgba(98, 67, 147, 0.35);
 }
@@ -368,10 +426,17 @@ body {
   font-size: 16px;
 }
 
-/* Floating nudge on the timeline spread (pages 8–9). left/right is set per
-   page in pageN.generated.css (generate.py) — near the spine on each page,
-   not a fixed side, since the two pages need opposite sides. */
-.timeline-hint {
+/* Reusable dismissible hint callout (generate.py's emit_hint_bubble) — a
+   small floating pill with a close button, pointing at whatever it's
+   labeling. Originally timeline-only (pages 8-9); position (left/right/etc)
+   is set per instance in pageN.generated.css since there's no one generic
+   anchor point that suits every caller. Dismissing one hides only that
+   instance (.dismissed, added by the close button's own click handler —
+   see tooltip-hotspot.client.ts/timeline.js's wireHintBubbles) — NOT a
+   page/body-wide flag, so multiple independent hint bubbles across
+   different pages never cross-dismiss each other. Not persisted anywhere,
+   so a refresh always shows it again. */
+.hint-bubble {
   position: absolute;
   bottom: 72px;
   z-index: 6;
@@ -379,8 +444,8 @@ body {
   align-items: center;
   gap: 10px;
   max-width: calc(100% - 48px);
-  padding: 8px 10px 8px 14px;
-  border-radius: 10px;
+  padding: 8px 10px 8px 16px;
+  border-radius: 999px;
   background: #e2e2e2;
   color: #624393;
   font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
@@ -389,21 +454,21 @@ body {
   letter-spacing: 0.02em;
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
   pointer-events: auto;
-  animation: timeline-hint-float 2.6s ease-in-out infinite;
+  animation: hint-bubble-float 2.6s ease-in-out infinite;
 }
 
-.timeline-hint-text {
+.hint-bubble-text {
   flex: 1;
   min-width: 0;
 }
 
-.timeline-hint-close {
+.hint-bubble-close {
   flex: 0 0 auto;
   width: 22px;
   height: 22px;
   padding: 0;
   border: 1px solid rgba(98, 67, 147, 0.35);
-  border-radius: 4px;
+  border-radius: 50%;
   background: rgba(98, 67, 147, 0.08);
   color: #624393;
   font-size: 16px;
@@ -414,17 +479,17 @@ body {
   justify-content: center;
 }
 
-.timeline-hint-close:hover,
-.timeline-hint-close:focus-visible {
+.hint-bubble-close:hover,
+.hint-bubble-close:focus-visible {
   background: rgba(98, 67, 147, 0.18);
   outline: none;
 }
 
-body.timeline-hint-dismissed .timeline-hint {
+.hint-bubble.dismissed {
   display: none;
 }
 
-@keyframes timeline-hint-float {
+@keyframes hint-bubble-float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-7px); }
 }
@@ -534,25 +599,25 @@ body.timeline-hint-dismissed .timeline-hint {
 
 /* ---- page 5 ---- */
 #page5 { background-image: url('../assets/backgrounds/page5.webp'); }
-#p5-toc1 { left:69.60px; top:212.89px; width:34.07px; height:24.68px; }
-#p5-toc2 { left:313.93px; top:212.74px; width:67.10px; height:24.32px; }
-#p5-toc3 { left:342.45px; top:259.30px; width:137.95px; height:24.32px; }
+#p5-toc1 { left:69.60px; top:212.89px; width:54.07px; height:24.68px; }
+#p5-toc2 { left:313.93px; top:212.74px; width:87.10px; height:24.32px; }
+#p5-toc3 { left:342.45px; top:259.30px; width:157.95px; height:24.32px; }
 #p5-toc4 { left:313.93px; top:282.17px; width:129.58px; height:14.45px; }
-#p5-toc5 { left:342.45px; top:309.18px; width:137.95px; height:24.32px; }
+#p5-toc5 { left:342.45px; top:309.18px; width:157.95px; height:24.32px; }
 #p5-toc6 { left:313.93px; top:332.05px; width:178.31px; height:14.45px; }
-#p5-toc7 { left:342.45px; top:359.06px; width:137.95px; height:24.32px; }
+#p5-toc7 { left:342.45px; top:359.06px; width:157.95px; height:24.32px; }
 #p5-toc8 { left:313.93px; top:381.94px; width:165.84px; height:14.45px; }
-#p5-toc9 { left:313.93px; top:473.36px; width:68.14px; height:24.68px; }
-#p5-toc10 { left:342.89px; top:521.09px; width:242.30px; height:24.68px; }
-#p5-toc11 { left:342.89px; top:568.81px; width:242.30px; height:24.68px; }
-#p5-toc12 { left:342.89px; top:616.54px; width:242.30px; height:24.68px; }
-#p5-toc13 { left:342.89px; top:664.27px; width:280.18px; height:24.68px; }
-#p5-toc14 { left:342.89px; top:711.99px; width:280.18px; height:24.68px; }
-#p5-toc18 { left:69.60px; top:117.12px; width:119.24px; height:24.68px; }
-#p5-toc19 { left:313.93px; top:117.12px; width:68.14px; height:24.68px; }
-#p5-toc22 { left:69.60px; top:308.66px; width:68.14px; height:24.68px; }
-#p5-toc24 { left:69.60px; top:404.42px; width:119.24px; height:24.68px; }
-#p5-toc25 { left:313.93px; top:807.27px; width:68.14px; height:24.68px; }
+#p5-toc9 { left:313.93px; top:473.36px; width:88.14px; height:24.68px; }
+#p5-toc10 { left:342.89px; top:521.09px; width:262.30px; height:24.68px; }
+#p5-toc11 { left:342.89px; top:568.81px; width:262.30px; height:24.68px; }
+#p5-toc12 { left:342.89px; top:616.54px; width:262.30px; height:24.68px; }
+#p5-toc13 { left:342.89px; top:664.27px; width:300.18px; height:24.68px; }
+#p5-toc14 { left:342.89px; top:711.99px; width:300.18px; height:24.68px; }
+#p5-toc18 { left:69.60px; top:117.12px; width:139.24px; height:24.68px; }
+#p5-toc19 { left:313.93px; top:117.12px; width:88.14px; height:24.68px; }
+#p5-toc22 { left:69.60px; top:308.66px; width:88.14px; height:24.68px; }
+#p5-toc24 { left:69.60px; top:404.42px; width:139.24px; height:24.68px; }
+#p5-toc25 { left:313.93px; top:807.27px; width:88.14px; height:24.68px; }
 #p5-toc15 { left:69.60px; top:188.64px; width:49.39px; height:13.32px; font-size:13.31px; line-height:13.32px; color:#624393; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:700; }
 #p5-toc16 { left:313.93px; top:188.64px; width:49.39px; height:13.32px; font-size:13.31px; line-height:13.32px; color:#624393; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:700; }
 #p5-toc17 { left:313.93px; top:449.11px; width:49.39px; height:13.32px; font-size:13.31px; line-height:13.32px; color:#624393; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:700; }
@@ -562,6 +627,7 @@ body.timeline-hint-dismissed .timeline-hint {
 #p5-toc26 { left:69.60px; top:380.18px; width:49.39px; height:13.32px; font-size:13.31px; line-height:13.32px; color:#624393; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:700; }
 #p5-toc27 { left:313.93px; top:783.02px; width:49.39px; height:13.32px; font-size:13.31px; line-height:13.32px; color:#624393; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:700; }
 #p5-pagenum { right:24px; }
+#p5-toc-hint { left:69.6px; bottom:233.36px; }
 
 /* page5.css — local overrides for page 5.
    This file is created once and is NEVER overwritten by generate.py,
@@ -616,6 +682,7 @@ body.timeline-hint-dismissed .timeline-hint {
 #p7-photo2 { left:365.49px; top:370.93px; width:259.90px; height:206.66px; }
 #p7-readmore1 { left:432.20px; top:822.64px; width:62.64px; height:19.73px; }
 #p7-pagenum { right:24px; }
+#p7-photo-zoom-hint { left:69.5px; bottom:361.49px; }
 
 /* page7.css — local overrides for page 7.
    This file is created once and is NEVER overwritten by generate.py,
@@ -651,7 +718,7 @@ body.timeline-hint-dismissed .timeline-hint {
 #p8-tl10 { left:295.56px; top:192.01px; width:68.09px; height:24.67px; }
 #p8-tl11 { left:529.84px; top:251.04px; width:170.22px; height:24.67px; }
 #p8-pagenum { left:24px; }
-#p8-timeline-hint { right:24px; }
+#p8-timeline-hint { right:24px; bottom:72px; }
 
 /* page8.css — local overrides for page 8.
    This file is created once and is NEVER overwritten by generate.py,
@@ -690,7 +757,7 @@ body.timeline-hint-dismissed .timeline-hint {
 #p9-tl13 { left:509.50px; top:156.86px; width:102.13px; height:24.67px; }
 #p9-tl14 { left:509.50px; top:179.87px; width:73.77px; height:24.67px; }
 #p9-pagenum { right:24px; }
-#p9-timeline-hint { left:24px; }
+#p9-timeline-hint { left:24px; bottom:72px; }
 
 /* page9.css — local overrides for page 9.
    This file is created once and is NEVER overwritten by generate.py,
@@ -744,6 +811,7 @@ body.timeline-hint-dismissed .timeline-hint {
 #p11-photo1 { left:314.25px; top:124.62px; width:311.12px; height:415.10px; }
 #p11-photo2 { left:291.64px; top:537.58px; width:356.49px; height:237.20px; }
 #p11-pagenum { right:24px; }
+#p11-photo-zoom-hint { left:69.5px; bottom:90px; }
 
 /* page11.css — local overrides for page 11.
    This file is created once and is NEVER overwritten by generate.py,
@@ -1556,7 +1624,8 @@ body.timeline-hint-dismissed .timeline-hint {
 #p37-link2 { left:100.16px; top:722.39px; width:91.99px; height:26.42px; }
 #p37-link3 { left:100.16px; top:748.81px; width:238.48px; height:26.42px; }
 #p37-link4 { left:198.11px; top:801.65px; width:73.25px; height:26.42px; }
-#p37-album { left:69.50px; top:244.50px; width:555.00px; height:357.00px; }
+#p37-album-wrap { left:69.50px; top:244.50px; width:555.00px; }
+#p37-album { width:555.00px; height:357.00px; }
 #p37-pagenum { right:24px; }
 
 /* page37.css — local overrides for page 37.
@@ -1813,7 +1882,8 @@ body.timeline-hint-dismissed .timeline-hint {
 #p45-link2 { left:100.16px; top:701.08px; width:434.37px; height:26.42px; }
 #p45-link3 { left:100.16px; top:753.92px; width:437.78px; height:26.42px; }
 #p45-link4 { left:326.72px; top:806.76px; width:73.25px; height:26.42px; }
-#p45-album { left:69.50px; top:244.50px; width:555.00px; height:357.00px; }
+#p45-album-wrap { left:69.50px; top:244.50px; width:555.00px; }
+#p45-album { width:555.00px; height:357.00px; }
 #p45-pagenum { right:24px; }
 
 /* page45.css — local overrides for page 45.
@@ -2035,7 +2105,8 @@ body.timeline-hint-dismissed .timeline-hint {
 #p53-link2 { left:100.16px; top:724.09px; width:330.47px; height:26.42px; }
 #p53-link3 { left:100.16px; top:751.36px; width:165.23px; height:26.42px; }
 #p53-link4 { left:198.11px; top:805.91px; width:73.25px; height:26.42px; }
-#p53-album { left:69.50px; top:244.50px; width:555.00px; height:357.00px; }
+#p53-album-wrap { left:69.50px; top:244.50px; width:555.00px; }
+#p53-album { width:555.00px; height:357.00px; }
 #p53-pagenum { right:24px; }
 
 /* page53.css — local overrides for page 53.

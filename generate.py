@@ -22,6 +22,21 @@ try:
 except FileNotFoundError:
     outline = []
 
+# Dismissible hint-bubble placements (see emit_hint_bubble below) — edit
+# this file to add/move/reword one, then re-run this script to see it.
+# Each entry: {"page": N, "id": "...", "text": "...",
+#   plus any of "left"/"right"/"top"/"bottom" (px, from that edge of the
+#   695x900 page canvas) to position it}. `id` sets both this instance's
+#   own DOM id (f"p{page}-{id}", so it only needs to be unique within its
+#   own page) AND its dismiss-group (shared with every other entry using
+#   the SAME id string, on any page) — closing one closes every entry in
+#   that group, now and on any later page view. Give a tip a fresh, unused
+#   id if it should NOT be linked to anything else.
+try:
+    HINTS_CONFIG = json.load(open('hints_config.json', encoding='utf-8'))
+except FileNotFoundError:
+    HINTS_CONFIG = []
+
 def font_family(font):
     if 'TANAngleton' in font:
         return "'TANAngleton', 'Noto Sans TC', sans-serif"
@@ -54,6 +69,73 @@ def bbox_overlap_area(a, b):
     ox0, oy0 = max(ax0, bx0), max(ay0, by0)
     ox1, oy1 = min(ax1, bx1), min(ay1, by1)
     return max(0.0, ox1 - ox0) * max(0.0, oy1 - oy0)
+
+# Reusable hover/tap tooltip hotspot — an invisible hit-area over content
+# that's already part of the background image (same "overlay on real
+# artwork" pattern as .readmore-trigger/.photo-zoom elsewhere in this file),
+# wired to the shared #tooltip popup by pages/style.css's .event-title rules
+# and webapp/src/scripts/tooltip-hotspot.client.ts (or timeline.js's
+# wireTooltipHotspots for the standalone pageN.html previews — keep both in
+# sync if either changes). Originally timeline-only (pages 8-9's
+# TIMELINE_PAGES below); pulled out into its own function so any other
+# page can add one too — just call this with that page's own bbox/title/desc,
+# no need to be added to any timeline-specific set.
+def emit_tooltip_hotspot(html, css_rules, el_id, bbox, sx, sy, title, desc, year=None, tag=None):
+    x0, y0, x1, y1 = bbox
+    left, top = x0 * sx, y0 * sy
+    width, height = (x1 - x0) * sx, (y1 - y0) * sy
+    esc_title = esc_attr(title)
+    esc_desc = esc_attr(desc)
+    if tag:
+        esc_title = f'<span class="tt-tag">{esc_attr(tag)}</span>{esc_title}'
+    year_attr = f' data-year="{esc_attr(str(year))}"' if year else ''
+    html.append(
+        f'<div class="event-title tooltip-hotspot" id="{el_id}" tabindex="0"'
+        f"{year_attr} data-title='{esc_title}' data-desc=\"{esc_desc}\"></div>\n"
+    )
+    css_rules.append(
+        f"#{el_id} {{ left:{left:.2f}px; top:{top:.2f}px; "
+        f"width:{width:.2f}px; height:{height:.2f}px; }}\n"
+    )
+
+# Reusable dismissible hint callout (a small pill with a close button,
+# floating near whatever it's pointing at) — same generalization as
+# emit_tooltip_hotspot above, pulled out of the TIMELINE_PAGES-only block it
+# used to live in. `side` is a CSS property:value pair for positioning
+# (e.g. "right:24px"). Not normally called directly — every hint bubble in
+# the actual book is placed via hints_config.json + emit_configured_hints
+# below, which builds `side` from that file's left/right/top/bottom keys;
+# this function is the one place that config maps to real markup.
+def emit_hint_bubble(html, css_rules, el_id, side, text, group=None):
+    group_attr = f' data-hint-group="{esc_attr(group)}"' if group else ''
+    html.append(
+        f'<div class="hint-bubble" id="{el_id}"{group_attr} role="status">'
+        f'<span class="hint-bubble-text">{esc_attr(text)}</span>'
+        '<button type="button" class="hint-bubble-close" aria-label="關閉提示">×</button>'
+        '</div>\n'
+    )
+    css_rules.append(f"#{el_id} {{ {side}; }}\n")
+
+# Emits every HINTS_CONFIG entry for page n (0, 1, or many — nothing wrong
+# with a page having several). Builds each one's `side` CSS from whichever
+# of left/right/top/bottom keys are present in its config entry.
+#
+# A config entry's `id` does double duty: p{n}-{id} is this instance's own
+# (page-scoped, always-unique) DOM id, but the bare `id` value is ALSO
+# written out as data-hint-group — the webapp/timeline.js dismiss logic
+# groups by THAT, not by DOM id, so any two entries sharing the same `id`
+# (like pages 8 and 9's "timeline-hint" pair) are treated as the same tip:
+# closing one closes both, on both current and future page views, even
+# though they're separate elements on separate pages. Give a tip its own
+# never-reused id if it should dismiss independently of everything else.
+def emit_configured_hints(html, css_rules, n):
+    for hint in HINTS_CONFIG:
+        if hint.get('page') != n:
+            continue
+        side = '; '.join(
+            f"{prop}:{hint[prop]}px" for prop in ('left', 'right', 'top', 'bottom') if prop in hint
+        )
+        emit_hint_bubble(html, css_rules, f"p{n}-{hint['id']}", side, hint['text'], group=hint['id'])
 
 # Hand-curated titles for pages we've actually looked at. Takes priority
 # over the outline-derived guess below for any page listed here.
@@ -194,6 +276,34 @@ TOC_TARGETS = {
 # these 8 elements on this one page.
 TOC_PAGE_LABELS = {15, 16, 17, 20, 21, 23, 26, 27}
 
+# The three 事工一/二/三 entries are each a Chinese heading line immediately
+# followed by its own English-subtitle line, both targeting the same page
+# (TOC_TARGETS' (3,4)->32, (5,6)->38, (7,8)->46 pairs) — both are still
+# clickable, but only the Chinese line gets the jump-icon affordance; a
+# second icon on the English line right below it would just be a redundant
+# repeat of the same "click to jump" cue rather than a second one.
+TOC_ICON_SKIP = {4, 6, 8}
+
+# Small purple-circle/white-arrow badge appended to every TOC entry (below)
+# to signal "this is clickable" — the entries themselves are otherwise
+# either fully invisible overlays (toc-jump) or plain black PDF text
+# (toc-page-label), neither of which reads as interactive without it. Same
+# purple-circle-white-glyph style as the mobile bottom-nav's dock buttons.
+# Colors are baked directly into the SVG (fill/stroke), not currentColor, so
+# it looks the same regardless of the surrounding text's own color.
+# TOC_ICON_SPACE is flat CSS px (not run through sx like the rest of a
+# line's geometry, since it's new UI chrome, not PDF content) added to each
+# entry's own width so the icon has room to sit just past the original text
+# without overlapping the next column — page 5's two TOC columns have well
+# over 100px of clearance between them, far more than this needs.
+TOC_ICON_SPACE = 20
+TOC_ICON_SVG = (
+    '<svg class="toc-jump-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">'
+    '<circle cx="12" cy="12" r="11" fill="#624393"/>'
+    '<path d="M10 7l5 5-5 5" fill="none" stroke="#ffffff" stroke-width="2.4" '
+    'stroke-linecap="round" stroke-linejoin="round"/></svg>'
+)
+
 HEAD = """<!doctype html>
 <html lang="zh-Hant">
 <head>
@@ -257,7 +367,7 @@ for p in data:
     # source.mjs extracts exactly the `.page` div's own contents for the
     # webapp, so anything placed inside it would leak into the app too,
     # where timeline.js doesn't exist and this would duplicate the app's
-    # own webapp/src/scripts/timeline-tooltip.client.ts (event-delegated on
+    # own webapp/src/scripts/tooltip-hotspot.client.ts (event-delegated on
     # #stage instead, since #book's content is destroyed/recreated on
     # desktop/mobile rebuilds — a direct call like this wouldn't survive
     # that). DOMContentLoaded-wrapped since <head> runs before the .page
@@ -265,7 +375,7 @@ for p in data:
     extra_head = (
         f'<script src="../timeline.js"></script>\n'
         f'<script>document.addEventListener("DOMContentLoaded", '
-        f'() => {{ wireTimelineTooltip(document.getElementById("page{n}")); wireTimelineHint(); }});</script>\n'
+        f'() => {{ wireTooltipHotspots(document.getElementById("page{n}")); wireHintBubbles(); }});</script>\n'
         if n in TIMELINE_PAGES else ''
     )
     # The displayed background is always the WebP copy extract.py generates
@@ -292,6 +402,10 @@ for p in data:
                 line_height_px = (first_s['bbox'][3] - first_s['bbox'][1]) * sy
                 fam = font_family(first_s['font'])
                 color = color_hex(first_s['color'])
+                # No icon here — every "PAGE N" label sits directly above its
+                # own Chinese title line (same target page), which already
+                # carries the icon; same reasoning as TOC_ICON_SKIP above,
+                # just for this whole branch instead of specific line_idxs.
                 html.append(
                     f'<a class="t toc-page-label" id="{el_id}" href="page{target}.html" '
                     f'data-goto="{target}">PAGE {target}</a>\n'
@@ -307,13 +421,17 @@ for p in data:
                 # pageN.html previews work; the app can't follow it (it'd
                 # navigate out of the SPA) and uses data-goto instead, same
                 # as the page-label case above — see flipbook.client.ts.
+                # See TOC_ICON_SKIP above: still clickable either way, just
+                # no icon (and no reserved icon space) on a skipped line.
+                icon = '' if line_idx in TOC_ICON_SKIP else TOC_ICON_SVG
+                icon_space = 0 if line_idx in TOC_ICON_SKIP else TOC_ICON_SPACE
                 html.append(
                     f'<a class="toc-jump" id="{el_id}" href="page{target}.html" '
-                    f'data-goto="{target}"></a>\n'
+                    f'data-goto="{target}">{icon}</a>\n'
                 )
                 css_rules.append(
                     f"#{el_id} {{ left:{left:.2f}px; top:{top:.2f}px; "
-                    f"width:{width:.2f}px; height:{height:.2f}px; }}\n"
+                    f"width:{width + icon_space:.2f}px; height:{height:.2f}px; }}\n"
                 )
 
     # PDF hyperlinks -> real <a target="_blank"> overlays positioned over
@@ -438,8 +556,17 @@ for p in data:
         top = box_top * sy
         width = box_w * sx
         height = box_h * sy
+        wrap_id = f"p{n}-album-wrap"
         el_id = f"p{n}-album"
 
+        # .photo-album-wrap carries the page position (left/top/width) below
+        # via generate.py's own per-page CSS; .photo-album itself is sized
+        # but no longer absolutely positioned (see pages/style.css) so the
+        # new below-image controls row can sit in normal flow right under
+        # it, inside the same wrapper — position:absolute + overflow:hidden
+        # on .photo-album (needed to clip/place the letterboxed photos)
+        # would otherwise clip anything appended after them too.
+        html.append(f'<div class="photo-album-wrap" id="{wrap_id}">\n')
         html.append(f'<div class="photo-album" id="{el_id}" role="group" aria-label="相片幻燈片" tabindex="0">\n')
         for i, photo in enumerate(album_photos):
             hidden_attr = '' if i == 0 else ' hidden'
@@ -455,34 +582,32 @@ for p in data:
             f'<div class="photo-album-caption">{esc_attr(album_photos[0]["caption"])}</div>\n'
             '</div>\n'
         )
+        # Below-image control row — the same prev/next step, just as a
+        # visible labeled button pair instead of the small icon buttons
+        # overlaid on the image corners above. Same .photo-album-prev/-next
+        # classes, so webapp's photo-album.client.ts click delegation (and
+        # timeline.js's copy of it for the standalone previews) picks these
+        # up with no extra wiring — see albumFor() there for how it
+        # resolves a click in EITHER control set back to this one album.
+        html.append(
+            '<div class="photo-album-controls">'
+            '<span class="photo-album-controls-label">相片集：</span>'
+            '<button type="button" class="photo-album-prev photo-album-controls-btn">上一張</button>'
+            '<button type="button" class="photo-album-next photo-album-controls-btn">下一張</button>'
+            '</div>\n'
+        )
+        html.append('</div>\n')
         css_rules.append(
-            f"#{el_id} {{ left:{left:.2f}px; top:{top:.2f}px; "
-            f"width:{width:.2f}px; height:{height:.2f}px; }}\n"
+            f"#{wrap_id} {{ left:{left:.2f}px; top:{top:.2f}px; width:{width:.2f}px; }}\n"
+            f"#{el_id} {{ width:{width:.2f}px; height:{height:.2f}px; }}\n"
         )
 
-    # Timeline spread hover hotspots (extract.py's 'timeline_events') — the
-    # title/tag text is already part of the background image (see
-    # TIMELINE_PAGES above), so this is just an invisible hit-area over it,
-    # wired to a popup by the shared timeline tooltip script.
+    # Timeline spread hover hotspots (extract.py's 'timeline_events') — see
+    # emit_tooltip_hotspot above.
     for ev_idx, ev in enumerate(p.get('timeline_events', []), start=1):
-        x0, y0, x1, y1 = ev['bbox']
-        left = x0 * sx
-        top = y0 * sy
-        width = (x1 - x0) * sx
-        height = (y1 - y0) * sy
-        el_id = f"p{n}-tl{ev_idx}"
-        esc_title = esc_attr(ev['title'])
-        esc_desc = esc_attr(ev['desc'])
-        if ev.get('tag'):
-            esc_tag = esc_attr(ev['tag'])
-            esc_title = f'<span class="tt-tag">{esc_tag}</span>{esc_title}'
-        html.append(
-            f'<div class="event-title event-hotspot" id="{el_id}" tabindex="0" '
-            f"data-year=\"{ev['year']}\" data-title='{esc_title}' data-desc=\"{esc_desc}\"></div>\n"
-        )
-        css_rules.append(
-            f"#{el_id} {{ left:{left:.2f}px; top:{top:.2f}px; "
-            f"width:{width:.2f}px; height:{height:.2f}px; }}\n"
+        emit_tooltip_hotspot(
+            html, css_rules, f"p{n}-tl{ev_idx}", ev['bbox'], sx, sy,
+            ev['title'], ev['desc'], year=ev['year'], tag=ev.get('tag'),
         )
 
     # Folio-style page-number badge — skipped on page 1 (the cover has no
@@ -495,20 +620,9 @@ for p in data:
         side = 'left' if n % 2 == 0 else 'right'
         css_rules.append(f"#{el_id} {{ {side}:24px; }}\n")
 
-    if n in TIMELINE_PAGES:
-        # Sits at the INNER edge of each page — near the spine, page 8 (the
-        # left/even page of the spread) on its right, page 9 (right/odd) on
-        # its left — the mirror image of the page-num badge above, which
-        # sits at each page's OUTER edge instead.
-        hint_id = f"p{n}-timeline-hint"
-        hint_side = 'right' if n % 2 == 0 else 'left'
-        html.append(
-            f'<div class="timeline-hint" id="{hint_id}" role="status">'
-            '<span class="timeline-hint-text">移動滑鼠到大事紀查看詳情</span>'
-            '<button type="button" class="timeline-hint-close" aria-label="關閉提示">×</button>'
-            '</div>\n'
-        )
-        css_rules.append(f"#{hint_id} {{ {hint_side}:24px; }}\n")
+    # Dismissible hint bubbles — see hints_config.json to add/move/reword
+    # one for any page, no code change needed.
+    emit_configured_hints(html, css_rules, n)
 
     html.append(FOOT)
 

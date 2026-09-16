@@ -148,7 +148,7 @@ const config: FlipbookConfig = {
     fullscreenExit: '離開全螢幕',
     soundOn: '開啟音效',
     soundOff: '關閉音效',
-    jumpPlaceholder: '頁碼',
+    jumpPlaceholder: '頁',
     jumpButton: '跳至',
     loading: '書本載入中…',
     toolbarToggle: '顯示／隱藏工具列',

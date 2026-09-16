@@ -1,23 +1,23 @@
 #page5 { background-image: url('../assets/backgrounds/page5.webp'); }
-#p5-toc1 { left:69.60px; top:212.89px; width:34.07px; height:24.68px; }
-#p5-toc2 { left:313.93px; top:212.74px; width:67.10px; height:24.32px; }
-#p5-toc3 { left:342.45px; top:259.30px; width:137.95px; height:24.32px; }
+#p5-toc1 { left:69.60px; top:212.89px; width:54.07px; height:24.68px; }
+#p5-toc2 { left:313.93px; top:212.74px; width:87.10px; height:24.32px; }
+#p5-toc3 { left:342.45px; top:259.30px; width:157.95px; height:24.32px; }
 #p5-toc4 { left:313.93px; top:282.17px; width:129.58px; height:14.45px; }
-#p5-toc5 { left:342.45px; top:309.18px; width:137.95px; height:24.32px; }
+#p5-toc5 { left:342.45px; top:309.18px; width:157.95px; height:24.32px; }
 #p5-toc6 { left:313.93px; top:332.05px; width:178.31px; height:14.45px; }
-#p5-toc7 { left:342.45px; top:359.06px; width:137.95px; height:24.32px; }
+#p5-toc7 { left:342.45px; top:359.06px; width:157.95px; height:24.32px; }
 #p5-toc8 { left:313.93px; top:381.94px; width:165.84px; height:14.45px; }
-#p5-toc9 { left:313.93px; top:473.36px; width:68.14px; height:24.68px; }
-#p5-toc10 { left:342.89px; top:521.09px; width:242.30px; height:24.68px; }
-#p5-toc11 { left:342.89px; top:568.81px; width:242.30px; height:24.68px; }
-#p5-toc12 { left:342.89px; top:616.54px; width:242.30px; height:24.68px; }
-#p5-toc13 { left:342.89px; top:664.27px; width:280.18px; height:24.68px; }
-#p5-toc14 { left:342.89px; top:711.99px; width:280.18px; height:24.68px; }
-#p5-toc18 { left:69.60px; top:117.12px; width:119.24px; height:24.68px; }
-#p5-toc19 { left:313.93px; top:117.12px; width:68.14px; height:24.68px; }
-#p5-toc22 { left:69.60px; top:308.66px; width:68.14px; height:24.68px; }
-#p5-toc24 { left:69.60px; top:404.42px; width:119.24px; height:24.68px; }
-#p5-toc25 { left:313.93px; top:807.27px; width:68.14px; height:24.68px; }
+#p5-toc9 { left:313.93px; top:473.36px; width:88.14px; height:24.68px; }
+#p5-toc10 { left:342.89px; top:521.09px; width:262.30px; height:24.68px; }
+#p5-toc11 { left:342.89px; top:568.81px; width:262.30px; height:24.68px; }
+#p5-toc12 { left:342.89px; top:616.54px; width:262.30px; height:24.68px; }
+#p5-toc13 { left:342.89px; top:664.27px; width:300.18px; height:24.68px; }
+#p5-toc14 { left:342.89px; top:711.99px; width:300.18px; height:24.68px; }
+#p5-toc18 { left:69.60px; top:117.12px; width:139.24px; height:24.68px; }
+#p5-toc19 { left:313.93px; top:117.12px; width:88.14px; height:24.68px; }
+#p5-toc22 { left:69.60px; top:308.66px; width:88.14px; height:24.68px; }
+#p5-toc24 { left:69.60px; top:404.42px; width:139.24px; height:24.68px; }
+#p5-toc25 { left:313.93px; top:807.27px; width:88.14px; height:24.68px; }
 #p5-toc15 { left:69.60px; top:188.64px; width:49.39px; height:13.32px; font-size:13.31px; line-height:13.32px; color:#624393; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:700; }
 #p5-toc16 { left:313.93px; top:188.64px; width:49.39px; height:13.32px; font-size:13.31px; line-height:13.32px; color:#624393; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:700; }
 #p5-toc17 { left:313.93px; top:449.11px; width:49.39px; height:13.32px; font-size:13.31px; line-height:13.32px; color:#624393; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:700; }
@@ -27,3 +27,4 @@
 #p5-toc26 { left:69.60px; top:380.18px; width:49.39px; height:13.32px; font-size:13.31px; line-height:13.32px; color:#624393; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:700; }
 #p5-toc27 { left:313.93px; top:783.02px; width:49.39px; height:13.32px; font-size:13.31px; line-height:13.32px; color:#624393; font-family:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; font-weight:700; }
 #p5-pagenum { right:24px; }
+#p5-toc-hint { left:69.6px; bottom:233.36px; }
