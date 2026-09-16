@@ -102,15 +102,15 @@ const total = manifest.total as number;
      (--fpPrimary etc.) on <html> so every stylesheet on the page can use them. */
 </style>
 <body>
-  <div id="app">
+  <div id="app" class={config.toolbar.hideOnDesktopUntilToggled ? 'toolbar-open' : undefined}>
     {config.toolbar.hideOnDesktopUntilToggled && (
       <button
         id="btn-toolbar-toggle"
         type="button"
         aria-label={config.labels.toolbarToggle}
-        aria-expanded="false"
+        aria-expanded="true"
       >
-        ⋮
+        ✕
       </button>
     )}
     <header class="toolbar">

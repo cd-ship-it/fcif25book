@@ -203,16 +203,23 @@ html, body {
 }
 
 /* ---------------- Toolbar toggle (desktop only) ----------------
-   A small "⋮" button fixed in the top-right corner, independent of the
-   toolbar's own display state so it's always reachable to bring the
-   toolbar back. Desktop only for now — mobile keeps its own always-visible
-   #bottom-nav, untouched (see #app.mobile-mode rule below). */
+   A small round button fixed in the top-right corner, independent of the
+   toolbar's own display state so it's always reachable. The toolbar now
+   defaults to OPEN (#app starts with the toolbar-open class — see
+   index.astro), so on load this reads as a "✕" close affordance rather
+   than the "⋮" open one; clicking it still toggles both ways. Desktop
+   only for now — mobile keeps its own always-visible #bottom-nav,
+   untouched (see #app.mobile-mode rule below). */
 
 /* top/height tuned to match the toolbar pill buttons' own actual rendered
    size (measured: 38px tall, top:11px) exactly — this button lives outside
    the toolbar's flexbox (position:fixed, so it can stay put while the
    toolbar itself hides/shows), so it can't just inherit their alignment
-   for free the way a flex sibling would; it has to be pinned by hand. */
+   for free the way a flex sibling would; it has to be pinned by hand.
+   Same white-bg/purple-text look + dark-purple-bg/white-text hover as the
+   toolbar's own buttons (.toolbar button/.toolbar .btn above) — this is
+   effectively one of those buttons, just pinned outside the toolbar's own
+   flexbox so it stays put while the toolbar hides/shows. */
 #btn-toolbar-toggle {
   display: none;
   position: fixed;
@@ -220,16 +227,17 @@ html, body {
   right: 16px;
   z-index: 21;
   appearance: none;
-  border: 1px solid var(--fpPrimary, #624393);
-  background: var(--fpPrimary, #624393);
-  color: #ffffff;
+  border: none;
+  background: #ffffff;
+  color: var(--fpPrimary, #624393);
   border-radius: 50%;
   width: 38px;
   height: 38px;
   font-size: 18px;
   line-height: 1;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 /* Once open, the button becomes a big "✕" (see flipbook.client.ts) —
@@ -241,9 +249,8 @@ html, body {
 }
 
 #btn-toolbar-toggle:hover {
-  background: #ffffff;
-  border-color: var(--fpPrimary, #624393);
-  color: var(--fpPrimary, #624393);
+  background: var(--fpPrimaryDark, #453168);
+  color: #ffffff;
 }
 
 /* Hidden by default until the toggle is clicked — desktop only. Uses a

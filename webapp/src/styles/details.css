@@ -36,6 +36,13 @@
   padding: 36px 40px 40px;
 }
 
+/* Explicit equal width/height + flex-centered content, not padding-based
+   sizing around the "×" glyph — Safari's intrinsic button-sizing metrics
+   for that glyph aren't perfectly square the way Chrome's are, so padding
+   alone (the old approach here) rendered as a visible oval there. Same
+   fixed-box-plus-flex-center pattern already used for every other round
+   button in this app (.dock-btn, #btn-toolbar-toggle, .hint-bubble-close,
+   .jump-form-go). */
 #detail-close {
   position: sticky;
   float: right;
@@ -48,7 +55,12 @@
   font-size: 19px;
   line-height: 1;
   cursor: pointer;
-  padding: 10.5px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 50%;
 }
 
