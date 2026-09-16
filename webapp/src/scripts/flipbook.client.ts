@@ -548,24 +548,62 @@ function init(): void {
     return !!window.visualViewport && window.visualViewport.scale !== 1;
   }
 
-  window.addEventListener('resize', () => {
-    if (isPinchZoomed()) return;
-    if (mq.matches !== mobileMode) buildBook(mq.matches);
-    else applyFit();
-  });
-  // Some browsers fire this distinctly from (and before) `resize` on rotation.
-  window.addEventListener('orientationchange', () => {
+  // Desktop keyboard/menu zoom (cmd/ctrl +/-, or the browser's zoom menu) —
+  // reported bug: the toolbar (plain flowing text) visibly grew with it, but
+  // the book stayed exactly the same size, because that zoom level change
+  // ALSO changes stage.clientWidth/clientHeight (in CSS px, same as any
+  // resize) and fires a plain `resize` (and, on desktop, typically a
+  // visualViewport `resize` too), so fitDesktop() below was reflexively
+  // recomputing `transform: scale()` to keep the book exactly filling the
+  // (now smaller-in-CSS-px) stage — undoing the zoom for the book
+  // specifically while every other, non-refitted element on the page
+  // rendered bigger as normal. Unlike pinch-zoom, there's no
+  // visualViewport.scale signal for this (it stays 1 — the whole layout
+  // viewport zooms uniformly, it's not a transient visual-only overlay), but
+  // window.devicePixelRatio DOES change with it (e.g. 1 -> 1.1 at 110%)
+  // while staying constant across a real window resize/monitor-drag at a
+  // fixed zoom level — that's the distinguishing signal used here to skip
+  // re-fitting for the same reason isPinchZoomed() does: let the browser's
+  // own zoom render the already-fitted book bigger, in place, like it does
+  // everything else, instead of JS fighting it back to "fit".
+  let lastDevicePixelRatio = window.devicePixelRatio;
+  function isBrowserZoomChange(): boolean {
+    return window.devicePixelRatio !== lastDevicePixelRatio;
+  }
+
+  // `resize`, `visualViewport`'s own `resize`, and `orientationchange` can
+  // all fire for the same underlying event (a zoom-level change fires both
+  // of the first two, often in the same tick) — routing every one of them
+  // through this single, debounced evaluator means the isBrowserZoomChange()
+  // check above always runs exactly once per real-world event, reading (and
+  // then committing) window.devicePixelRatio in one place. Checking it
+  // separately inside each raw listener would race: whichever listener
+  // happened to run first would "consume" the change (updating the
+  // remembered ratio) before the second one read it, so the second would
+  // wrongly see no change and re-fit anyway — silently undoing this fix for
+  // some zoom actions but not others.
+  let refitCheckScheduled = false;
+  function scheduleRefitCheck(): void {
+    if (refitCheckScheduled) return;
+    refitCheckScheduled = true;
     setTimeout(() => {
-      if (isPinchZoomed()) return;
+      refitCheckScheduled = false;
+      const zoomChanged = isBrowserZoomChange();
+      lastDevicePixelRatio = window.devicePixelRatio;
+      if (isPinchZoomed() || zoomChanged) return;
       if (mq.matches !== mobileMode) buildBook(mq.matches);
       else applyFit();
-    }, 100);
-  });
-  // Once the user finishes pinch-zooming (scale returns to 1), re-apply the
-  // fit in case a resize was skipped above while they were mid-gesture.
-  window.visualViewport?.addEventListener('resize', () => {
-    if (!isPinchZoomed()) applyFit();
-  });
+    }, 0);
+  }
+
+  window.addEventListener('resize', scheduleRefitCheck);
+  // Some browsers fire this distinctly from (and before) `resize` on rotation.
+  window.addEventListener('orientationchange', () => setTimeout(scheduleRefitCheck, 100));
+  // Also covers "once the user finishes pinch-zooming (scale returns to 1),
+  // re-apply the fit in case a resize was skipped above while they were
+  // mid-gesture" — isPinchZoomed() inside the scheduled check above is false
+  // by the time that settles, so it falls through to a normal re-fit.
+  window.visualViewport?.addEventListener('resize', scheduleRefitCheck);
   document.addEventListener('fullscreenchange', () => setTimeout(applyFit, 50));
 
   // --- Controls below are static (rendered once by index.astro) and call
