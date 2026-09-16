@@ -137,6 +137,178 @@ def emit_configured_hints(html, css_rules, n):
         )
         emit_hint_bubble(html, css_rules, f"p{n}-{hint['id']}", side, hint['text'], group=hint['id'])
 
+# "Click a text block to zoom in" — desktop-only in the app (see
+# webapp/src/scripts/flipbook.client.ts's own mobileMode check; the .zoom-
+# block divs below are emitted unconditionally into the shared page markup
+# either way, same as every other overlay, and simply never get wired up or
+# made interactive on mobile — see .zoom-block's pointer-events rule in
+# pages/style.css). One invisible hit-area per eligible paragraph, using
+# extract.py's own 'lines' data — same data every other overlay in this
+# file already draws on, just read differently here: grouped into
+# paragraph-shaped blocks instead of matched against exact trigger text.
+#
+# "Eligible" deliberately excludes anything that isn't flowing body prose,
+# proven against a 5-spread hand-checked sample (pages 6,7,14-18,48,49,
+# 70,90,92 among them) before being turned loose on all 93 pages:
+#   - the eyebrow/category heading (EYEBROW_COLOR, any size)
+#   - the title (the largest non-eyebrow size on the page, when clearly
+#     bigger than body text)
+#   - a subtitle (a remaining size strictly between body and title)
+#   - the byline/author line (matches AUTHOR_TEXT_MARKERS)
+#   - a genuine PHOTO caption (caption-sized text spatially matching one of
+#     the page's own `photos` entries — NOT every small-print line: pages
+#     33/39/47 are a "ministry milestones" infographic (year labels +
+#     13pt descriptions, zero photos on the page) where that small print
+#     IS the entire readable content; a blanket "exclude anything caption-
+#     sized" rule dropped every single block on those 3 pages)
+EYEBROW_COLOR = 0x624393  # brand purple used for every category/eyebrow heading, any size
+ZOOM_BODY_SIZE = 16.0
+ZOOM_CAPTION_SIZE_LO, ZOOM_CAPTION_SIZE_HI = 11.0, 14.5
+ZOOM_AUTHOR_TEXT_MARKERS = ('｜', '夫婦：', '夫婦:')
+ZOOM_GAP_MULT = 0.6
+ZOOM_X_JUMP_THRESH = 60
+# Page 5 (table of contents) is excluded outright: every "body-sized" line
+# on it is a TOC entry already wired to .toc-jump navigation — a zoom-block
+# on top of the exact same area would fight that click instead of adding a
+# reading aid. Pages 8/9 (timeline) have no 'lines' at all and so never
+# produce a block anyway; listed here for clarity, not because they need
+# special-casing.
+ZOOM_EXCLUDED_PAGES = {5, 8, 9}
+
+def zoom_line_text(line):
+    return ''.join(s['text'] for s in line['spans']).strip()
+
+def zoom_is_author_text(text):
+    return any(marker in text for marker in ZOOM_AUTHOR_TEXT_MARKERS) or text.startswith('夫婦')
+
+def zoom_cluster_columns(entries):
+    """entries: list of (text, bbox, size, color). Splits into columns by
+    x0 proximity — sort by x0, start a new column whenever the gap to the
+    previous (x0-sorted) entry's x0 exceeds ZOOM_X_JUMP_THRESH. Real column
+    x0s in this book cluster tightly (a handful of discrete values, not a
+    continuum), so this single-linkage gap cut is reliable.
+
+    Needed because a single global sort-by-Y-then-X pass interleaves two
+    side-by-side columns whenever their lines land at close to the same Y —
+    e.g. page 70's two parallel testimonial columns, same rows throughout —
+    which fragmented each column's own paragraph into one block PER LINE
+    (every column transition in sort order looked like a "column change").
+    Clustering by X first, then grouping each column's lines by Y
+    independently (zoom_group_lines below), fixes that while still keeping
+    pages 14-17's genuinely separate (non-row-aligned) poem-stanza columns
+    apart."""
+    by_x = sorted(entries, key=lambda e: e[1][0])
+    columns, current, prev_x0 = [], [], None
+    for entry in by_x:
+        x0 = entry[1][0]
+        if prev_x0 is not None and abs(x0 - prev_x0) > ZOOM_X_JUMP_THRESH:
+            columns.append(current)
+            current = []
+        current.append(entry)
+        prev_x0 = x0
+    if current:
+        columns.append(current)
+    return columns
+
+def zoom_group_lines(entries):
+    """entries: list of (text, bbox, size, color) all from ONE column (see
+    zoom_cluster_columns above). Sorts by Y and groups into contiguous
+    blocks by vertical gap + style continuity."""
+    ordered = sorted(entries, key=lambda e: e[1][1])
+    blocks, current, prev = [], [], None
+    for entry in ordered:
+        text, bbox, size, color = entry
+        if prev is not None:
+            gap = bbox[1] - prev[1][3]
+            same_style = abs(size - prev[2]) < 0.5 and color == prev[3]
+            if not same_style or gap > size * ZOOM_GAP_MULT:
+                blocks.append(current)
+                current = []
+        current.append(entry)
+        prev = entry
+    if current:
+        blocks.append(current)
+    return blocks
+
+def zoom_is_photo_caption_group(group, photos):
+    """True if every line in the group is caption-sized AND spatially
+    matches one of this page's real photos (same test the earlier fbstyle
+    extraction's match_captions() used: sits within 30% of a photo's own
+    width horizontally, starts 0-45px below its bottom edge) — a group must
+    clear BOTH bars, so small-print body text on a page with no photos
+    never gets excluded just for being small (see pages 33/39/47 above)."""
+    if not all(ZOOM_CAPTION_SIZE_LO <= e[2] <= ZOOM_CAPTION_SIZE_HI for e in group):
+        return False
+    if not photos:
+        return False
+    cx0 = min(e[1][0] for e in group)
+    cy0 = min(e[1][1] for e in group)
+    cx1 = max(e[1][2] for e in group)
+    for photo in photos:
+        px0, py0, px1, py1 = photo['bbox']
+        x_overlap = min(px1, cx1) - max(px0, cx0)
+        if x_overlap < (px1 - px0) * 0.3:
+            continue
+        if -5 <= cy0 - py1 <= 45:
+            return True
+    return False
+
+def compute_zoom_blocks(p):
+    n = p['page']
+    if n in ZOOM_EXCLUDED_PAGES:
+        return []
+    entries = []
+    for line in p.get('lines', []):
+        text = zoom_line_text(line)
+        if not text or text == READMORE_TRIGGER_TEXT:
+            continue
+        first_s = line['spans'][0]
+        entries.append((text, line['bbox'], first_s['size'], first_s['color']))
+    if not entries:
+        return []
+
+    non_eyebrow = [e for e in entries if e[3] != EYEBROW_COLOR]
+    if not non_eyebrow:
+        return []
+
+    max_size = max(e[2] for e in non_eyebrow)
+    body_pool = list(non_eyebrow)
+    if max_size > ZOOM_BODY_SIZE + 1:
+        body_pool = [e for e in body_pool if abs(e[2] - max_size) >= 0.5]
+    mid_sizes = sorted(
+        {e[2] for e in body_pool if ZOOM_BODY_SIZE + 1 < e[2] < max_size - 1}, reverse=True
+    )
+    if mid_sizes:
+        body_pool = [e for e in body_pool if abs(e[2] - mid_sizes[0]) >= 0.5]
+    if not body_pool:
+        return []
+
+    groups = [g for col in zoom_cluster_columns(body_pool) for g in zoom_group_lines(col)]
+    photos = p.get('photos', [])
+    out = []
+    for g in groups:
+        joined = ''.join(e[0] for e in g)
+        if zoom_is_author_text(joined) or zoom_is_photo_caption_group(g, photos):
+            continue
+        x0 = min(e[1][0] for e in g)
+        y0 = min(e[1][1] for e in g)
+        x1 = max(e[1][2] for e in g)
+        y1 = max(e[1][3] for e in g)
+        out.append((x0, y0, x1, y1))
+    return out
+
+def emit_zoom_blocks(html, css_rules, n, p):
+    for i, bbox in enumerate(compute_zoom_blocks(p), start=1):
+        x0, y0, x1, y1 = bbox
+        left, top = x0 * sx, y0 * sy
+        width, height = (x1 - x0) * sx, (y1 - y0) * sy
+        el_id = f"p{n}-zoom{i}"
+        html.append(f'<div class="zoom-block" id="{el_id}"></div>\n')
+        css_rules.append(
+            f"#{el_id} {{ left:{left:.2f}px; top:{top:.2f}px; "
+            f"width:{width:.2f}px; height:{height:.2f}px; }}\n"
+        )
+
 # Hand-curated titles for pages we've actually looked at. Takes priority
 # over the outline-derived guess below for any page listed here.
 PAGE_TITLES = {
@@ -609,6 +781,9 @@ for p in data:
             html, css_rules, f"p{n}-tl{ev_idx}", ev['bbox'], sx, sy,
             ev['title'], ev['desc'], year=ev['year'], tag=ev.get('tag'),
         )
+
+    # "Click a text block to zoom in" hit-areas — see emit_zoom_blocks above.
+    emit_zoom_blocks(html, css_rules, n, p)
 
     # Folio-style page-number badge — skipped on page 1 (the cover has no
     # folio). Even page numbers sit on the LEFT side of a spread, odd on the

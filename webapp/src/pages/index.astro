@@ -80,6 +80,15 @@ const total = manifest.total as number;
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>基督豐榮：同行25載</title>
   <link rel="icon" href={withBase('favicon.svg')} />
+  <!-- All 93 pages' backgrounds start loading together once #book exists
+       (see flipbook.client.ts's own cover-first-loading comment) — without
+       this, the browser schedules the cover's fetch as just one of 93,
+       with no guarantee it's among the first to resolve. This explicitly
+       tells it the cover matters most, so the "wait for the cover, then
+       reveal" logic in flipbook.client.ts isn't waiting on a request the
+       browser deprioritized behind 92 others sharing the same connection
+       pool. -->
+  <link rel="preload" as="image" href={withBase('assets/backgrounds/page1.webp')} fetchpriority="high" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet" />
@@ -103,6 +112,18 @@ const total = manifest.total as number;
 </style>
 <body>
   <div id="app" class={config.toolbar.hideOnDesktopUntilToggled ? 'toolbar-open' : undefined}>
+    <!-- Covers the ENTIRE app (fixed, full-viewport, high z-index — see
+         app.css) until the cover page's own background image has actually
+         loaded, not just until the page-flip DOM/JS is wired up (that part
+         is near-instant; the 93 full-resolution background images are the
+         real wait — see flipbook.client.ts's waitForCoverImage). Blocks
+         every click/tap underneath for that whole window (pointer-events),
+         so nothing — toolbar buttons included — is clickable before
+         there's anything real to click. -->
+    <div class="loading-overlay" id="loading-note">
+      <div class="loading-spinner" aria-hidden="true"></div>
+      <p class="loading-text">{config.labels.loading}</p>
+    </div>
     {config.toolbar.hideOnDesktopUntilToggled && (
       <button
         id="btn-toolbar-toggle"
@@ -152,7 +173,6 @@ const total = manifest.total as number;
     </header>
 
     <div id="stage">
-      <div class="loading-note" id="loading-note">{config.labels.loading}</div>
       <div id="book-shell">
         <div id="book">
           {pages.map((p) => <Fragment set:html={p.html} />)}

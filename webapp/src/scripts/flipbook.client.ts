@@ -52,6 +52,16 @@ function init(): void {
   let bookEl: HTMLElement | null = null;
   let mobileMode = false;
 
+  // "Click a text block to zoom in" state — desktop only (see the click
+  // delegation and CSS gating further below). currentBookScale mirrors
+  // whatever scale #book-shell's transform currently has applied (fitDesktop
+  // records it, zoomBookToNatural below records it too) so a block's
+  // on-screen rect can be converted back to the book's own natural
+  // (unscaled) coordinate space without needing to know anything about
+  // page-flip's internal DOM layout — see zoomToBlockEl.
+  let currentBookScale = 1;
+  let zoomedBlock: HTMLElement | null = null;
+
   // Mobile has no page-flip instance at all (see buildMobileBook) — just one
   // plain page in normal document flow at a time, tracked here.
   let mobilePageEl: HTMLElement | null = null;
@@ -149,6 +159,17 @@ function init(): void {
   // visible at once.
   function fitDesktop(): void {
     if (!bookEl) return;
+    // fitDesktop is the one low-level place that resets #book-shell back to
+    // "whole spread, fitted to the stage" — routing every exit-zoom path
+    // through here (rather than clearing zoomedBlock at each individual
+    // call site: TOC jump, prev/next, toolbar toggle, mode rebuild, ...)
+    // means none of them need their own awareness of the zoom feature at
+    // all; this is the only place that has to know.
+    if (zoomedBlock) {
+      zoomedBlock.classList.remove('is-zoomed');
+      zoomedBlock = null;
+      app!.classList.remove('zoomed');
+    }
     const NATURAL_W = config.book.pageWidth * 2;
     const NATURAL_H = config.book.pageHeight;
     const PADDING_X = 32;
@@ -165,6 +186,7 @@ function init(): void {
     const scale = Math.min(availW / NATURAL_W, availH / NATURAL_H, 1);
     bookShell!.style.transformOrigin = 'center center';
     bookShell!.style.transform = `scale(${Math.max(scale, 0.1)})`;
+    currentBookScale = Math.max(scale, 0.1);
   }
 
   // Mobile: scale a single page to fit the viewport WIDTH only (never
@@ -194,6 +216,104 @@ function init(): void {
     else fitDesktop();
   }
 
+  // "Click a text block to zoom in" — desktop only. The .zoom-block hit-
+  // areas themselves come from generate.py (one per eligible paragraph,
+  // synced into every page's markup regardless of mode — see
+  // pages/style.css's own comment on why they're inert on mobile via CSS
+  // pointer-events, not by being absent from the DOM); everything below is
+  // just the zoom/pan behavior once one is clicked.
+  //
+  // #book-shell already gets scaled via fitDesktop() above (transform-
+  // origin: center center, plain scale(), no translate — #stage's own
+  // flexbox centering handles positioning, so fitDesktop never needs a
+  // translate term). Zooming into a block needs to ALSO pan, which means
+  // adding a translate — derived here algebraically rather than guessed:
+  // for transform-origin:center center with transform:translate(tx,ty)
+  // scale(s), a point P in book-shell's own natural (unscaled) coordinate
+  // space renders on screen at (stageCenter + translate + s*(P - natural
+  // center)). Setting that equal to stageCenter for the target block's own
+  // center point (bx,by) and solving gives tx = s*(natW/2 - bx),
+  // ty = s*(natH/2 - by) — and plugging in P = the book's own center
+  // (natW/2, natH/2) gives tx=ty=0, confirming this is the same formula
+  // fitDesktop()'s plain scale() already is, just its s=fitScale,
+  // (bx,by)=center special case. Verified against the live PageFlip DOM
+  // (page elements are position:absolute; left:0/695px within book-shell,
+  // transform:none, zero offset from every intermediate wrapper) before
+  // relying on this.
+  function zoomBookToNatural(scale: number, natX: number, natY: number): void {
+    const NATURAL_W = config.book.pageWidth * 2;
+    const NATURAL_H = config.book.pageHeight;
+    const tx = scale * (NATURAL_W / 2 - natX);
+    const ty = scale * (NATURAL_H / 2 - natY);
+    bookShell!.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+    currentBookScale = scale;
+  }
+
+  // Converts a currently-on-screen element's rect into book-shell's own
+  // natural coordinate space, using currentBookScale (whatever scale
+  // book-shell's transform has applied RIGHT NOW) rather than assuming
+  // anything about which two of the 93 pages page-flip currently has as
+  // the visible spread, or where it's positioned them — getBoundingClientRect()
+  // already reflects the live, current-flip-state truth regardless.
+  function naturalRectOf(el: HTMLElement): { x0: number; y0: number; x1: number; y1: number } {
+    const r = el.getBoundingClientRect();
+    const shellR = bookShell!.getBoundingClientRect();
+    const s = currentBookScale;
+    return {
+      x0: (r.left - shellR.left) / s,
+      y0: (r.top - shellR.top) / s,
+      x1: (r.right - shellR.left) / s,
+      y1: (r.bottom - shellR.top) / s,
+    };
+  }
+
+  function zoomToBlockEl(el: HTMLElement): void {
+    const { padPx, maxZoom } = config.zoomToBlock;
+    const { x0, y0, x1, y1 } = naturalRectOf(el);
+    const bw = x1 - x0 + padPx * 2;
+    const bh = y1 - y0 + padPx * 2;
+    const scale = Math.min(stage!.clientWidth / bw, stage!.clientHeight / bh, maxZoom);
+    zoomBookToNatural(scale, (x0 + x1) / 2, (y0 + y1) / 2);
+
+    if (zoomedBlock) zoomedBlock.classList.remove('is-zoomed');
+    zoomedBlock = el;
+    zoomedBlock.classList.add('is-zoomed');
+    app!.classList.add('zoomed');
+  }
+
+  // Re-applies the zoom to whatever block is currently zoomed, recomputed
+  // for the stage's CURRENT size — used when the window genuinely resizes
+  // (not a browser zoom-level change, see scheduleRefitCheck below) while
+  // zoomed, so the reader's reading position survives the resize instead
+  // of always snapping back out to the whole spread.
+  function reapplyZoomIfAny(): boolean {
+    if (!zoomedBlock) return false;
+    zoomToBlockEl(zoomedBlock);
+    return true;
+  }
+
+  // The smooth eased zoom (matches zoom-poc.html's own #spread transition,
+  // proven there first) is applied around ONLY the two deliberate zoom
+  // actions below (click a block / click-or-Esc out of one) — not as a
+  // blanket transition on #book-shell's own CSS, which every OTHER caller
+  // of fitDesktop()/applyFit() also runs through (a live window resize
+  // drag, a page flip, the toolbar opening/closing, a desktop<->mobile
+  // crossing). Those all need to stay instant: a resize drag fires many
+  // times a second, and each would restart a fresh 450ms transition,
+  // fighting the previous one and reading as laggy/rubbery rather than
+  // responsive. Scoping the transition to just these two call sites (set
+  // right before the transform change, cleared again once the animation's
+  // had time to finish) keeps every other caller exactly as instant as it
+  // already was.
+  const ZOOM_TRANSITION = 'transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1)';
+  function withZoomTransition(fn: () => void): void {
+    bookShell!.style.transition = ZOOM_TRANSITION;
+    fn();
+    window.setTimeout(() => {
+      bookShell!.style.transition = '';
+    }, 480);
+  }
+
   // Unified prev/next/jump — desktop drives page-flip, mobile just swaps
   // which single cloned page is shown. Every static control (dock buttons,
   // toolbar buttons, keyboard, TOC drawer, page-jump form) goes through
@@ -206,6 +326,11 @@ function init(): void {
       mobileCurrentPage = target;
       renderMobilePage(direction);
     } else {
+      // Exit a text-block zoom before navigating — otherwise the page-flip
+      // animation would play out underneath a view still zoomed/panned onto
+      // wherever the OLD spread's block was, landing the reader on the new
+      // page still zoomed into an unrelated position.
+      if (zoomedBlock) fitDesktop();
       // turnToPage (not flip) — flip()/flipToPage() only steps one spread at
       // a time regardless of distance, so it's wrong for arbitrary jumps.
       pageFlip?.turnToPage(n - 1);
@@ -214,12 +339,18 @@ function init(): void {
 
   function flipPrev(): void {
     if (mobileMode) goToPage(mobileCurrentPage - 1);
-    else pageFlip?.flipPrev();
+    else {
+      if (zoomedBlock) fitDesktop(); // see goToPage's own comment on why
+      pageFlip?.flipPrev();
+    }
   }
 
   function flipNext(): void {
     if (mobileMode) goToPage(mobileCurrentPage + 1);
-    else pageFlip?.flipNext();
+    else {
+      if (zoomedBlock) fitDesktop(); // see goToPage's own comment on why
+      pageFlip?.flipNext();
+    }
   }
 
   // Page 5's table-of-contents entries (generate.py's TOC_TARGETS) are real
@@ -242,6 +373,38 @@ function init(): void {
       e.preventDefault();
       e.stopPropagation();
       goToPage(n);
+    },
+    { capture: true }
+  );
+
+  // "Click a text block to zoom in" (see zoomToBlockEl above) — desktop
+  // only. mobileMode is checked here too even though pages/style.css's own
+  // pointer-events:none default already keeps .zoom-block un-clickable on
+  // mobile — belt-and-suspenders the same way isPinchZoomed() etc. are
+  // elsewhere in this file, so a CSS regression alone couldn't turn this on
+  // for mobile taps.
+  //
+  // Any click while already zoomed — on the currently-zoomed block, a
+  // DIFFERENT block, or the page background outside any block — just zooms
+  // back out; only a click on a block from the whole-spread (not zoomed)
+  // view zooms in. Jumping straight from one zoomed block to another read
+  // as "messed up" when this was still a standalone proof of concept (see
+  // zoom-poc.html's own history) — one click always means "zoom out" once
+  // zoomed, full stop; zooming into a different block is then a fresh,
+  // deliberate second click from the whole-spread view.
+  stage!.addEventListener(
+    'click',
+    (e) => {
+      if (mobileMode || !config.zoomToBlock.enabled) return;
+      if (zoomedBlock) {
+        e.stopPropagation();
+        withZoomTransition(() => fitDesktop());
+        return;
+      }
+      const el = (e.target as Element | null)?.closest?.<HTMLElement>('.zoom-block');
+      if (!el) return;
+      e.stopPropagation();
+      withZoomTransition(() => zoomToBlockEl(el));
     },
     { capture: true }
   );
@@ -441,6 +604,67 @@ function init(): void {
     }, MOBILE_SLIDE_MS + 30);
   }
 
+  // Cover-first loading. The near-instant part of startup is wiring up
+  // page-flip's own DOM (loadFromHTML/renderMobilePage below) — that used
+  // to be the ENTIRE signal for "done loading" (a bare loadingNote?.remove()
+  // right after it), which is why the loading note was reported as
+  // effectively never visible: it disappeared before the actual wait users
+  // see even began to resolve. The real wait is the book's 93 full-
+  // resolution background images, all starting to load together the
+  // moment their .page elements exist. Blocking on every one of them would
+  // mean waiting for the SLOWEST of 93 requests just to show page 1 — this
+  // instead waits only for the cover's own image, then removes the
+  // blocking overlay; the other 92 keep loading at the browser's own pace
+  // in the background, same as before, simply appearing normally as the
+  // reader reaches them (a fast flip ahead of one still loading briefly
+  // shows a blank page, same trade-off most progressively-loaded photo/
+  // book apps make).
+  let initialLoadHandled = false;
+
+  function coverImageUrl(): string {
+    const page1 = document.getElementById('page1');
+    if (!page1) return '';
+    // Reads back the browser's own already-resolved absolute URL (however
+    // this deployment's base path works out) rather than re-deriving that
+    // path logic here.
+    const match = getComputedStyle(page1).backgroundImage.match(/url\(["']?(.*?)["']?\)/);
+    return match ? match[1] : '';
+  }
+
+  function waitForCoverImage(timeoutMs = 8000): Promise<void> {
+    return new Promise((resolve) => {
+      const url = coverImageUrl();
+      if (!url) {
+        resolve();
+        return;
+      }
+      const img = new Image();
+      let settled = false;
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        resolve();
+      };
+      img.onload = finish;
+      img.onerror = finish; // a failed image must never leave the app stuck "loading"
+      img.src = url;
+      if (img.complete) finish(); // already in the browser cache
+      setTimeout(finish, timeoutMs); // absolute safety net
+    });
+  }
+
+  // Guarded so a later rebuild (a desktop<->mobile crossing, say) never
+  // re-triggers this — only the very first build waits on anything; by
+  // then loadingNote is already gone and every later buildDesktopBook/
+  // buildMobileBook call is instant, as it always was.
+  function revealAfterInitialLoad(): void {
+    if (initialLoadHandled) return;
+    initialLoadHandled = true;
+    waitForCoverImage().then(() => {
+      loadingNote?.remove();
+    });
+  }
+
   function buildDesktopBook(resumeIndex: number): void {
     teardownDesktop();
     teardownMobile();
@@ -469,7 +693,7 @@ function init(): void {
 
     const pageEls = bookEl.querySelectorAll<HTMLElement>(':scope > .page');
     pageFlip.loadFromHTML(pageEls);
-    loadingNote?.remove();
+    revealAfterInitialLoad();
 
     pageFlip.on('flip', () => {
       refreshUI();
@@ -513,10 +737,21 @@ function init(): void {
     teardownMobile();
     mobileCurrentPage = Math.max(1, Math.min(total, resumeIndex + 1));
     renderMobilePage();
-    loadingNote?.remove();
+    revealAfterInitialLoad();
   }
 
   function buildBook(mobile: boolean): void {
+    // A desktop<->mobile crossing while zoomed into a text block (resizing
+    // the window past the breakpoint, say) would otherwise leave zoomedBlock
+    // pointing at a DOM node buildDesktopBook/buildMobileBook are about to
+    // tear down below, and #app.zoomed lingering with nothing to clear it —
+    // fitDesktop() (desktop's own path back to a normal fit) already clears
+    // this, but that path isn't reached at all here on desktop->mobile.
+    if (zoomedBlock) {
+      zoomedBlock.classList.remove('is-zoomed');
+      zoomedBlock = null;
+      app!.classList.remove('zoomed');
+    }
     mobileMode = mobile;
     app!.classList.toggle('mobile-mode', mobile);
 
@@ -631,7 +866,12 @@ function init(): void {
       lastOuterHeight = window.outerHeight;
       if (isPinchZoomed() || zoomChanged) return;
       if (mq.matches !== mobileMode) buildBook(mq.matches);
-      else applyFit();
+      // A genuine resize (not a browser zoom-level change, not pinch, not a
+      // mode crossing) while zoomed into a text block re-applies that same
+      // zoom at the new stage size instead of snapping back out to the
+      // whole spread — reapplyZoomIfAny() is a no-op (returns false) when
+      // nothing is zoomed, falling through to the normal applyFit().
+      else if (!reapplyZoomIfAny()) applyFit();
     }, 0);
   }
 
@@ -664,6 +904,13 @@ function init(): void {
       if (e.key === 'ArrowRight') flipNext();
     });
   }
+
+  // Esc exits a text-block zoom — independent of showKeyboardNav (this
+  // isn't page navigation, it's the same "Esc closes/undoes the current
+  // overlay" convention the photo lightbox and detail modal already use).
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && zoomedBlock) withZoomTransition(() => fitDesktop());
+  });
 
   if (config.toolbar.showPageJump) {
     const form = document.getElementById('jump-form') as HTMLFormElement | null;

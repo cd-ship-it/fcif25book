@@ -124,6 +124,77 @@ body {
   margin-left: auto;
 }
 
+/* "Click a text block to zoom in" hit-area over one paragraph's real
+   bounding box — desktop only. See webapp's flipbook.client.ts for the
+   click/zoom behavior; this is just the hit-area's own box + affordance.
+
+   pointer-events:none by DEFAULT, only switched to auto under
+   #app:not(.mobile-mode) below — belt-and-suspenders alongside
+   flipbook.client.ts's own mobileMode check so these can never intercept
+   a mobile tap meant for page-navigation or another overlay underneath,
+   even during a mode-transition or if the JS check were ever bypassed.
+   (Harmless no-op on the standalone pageN.html previews too, which have
+   no #app ancestor at all and no click handler of their own for this.)
+
+   Every alpha below is 0 (fully transparent, no visible highlight) for
+   now — left in place, not deleted, specifically so a color can be
+   dropped back in later (just raise these alphas) without re-deriving the
+   rule shapes. */
+.zoom-block {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 4px;
+  background: rgba(98, 67, 147, 0);
+  outline: 1px solid rgba(98, 67, 147, 0);
+  transition: background-color 0.15s ease, outline-color 0.15s ease;
+  /* generate.py emits every .zoom-block AFTER the page's other interactive
+     overlays (pdf-link, readmore-trigger, photo-zoom, yt-trigger,
+     tooltip-hotspot) — a real paragraph can legitimately contain one of
+     those (a PDF hyperlink inline in running text, say), and with no
+     explicit z-index anywhere, later-in-the-DOM wins ties, so the zoom
+     hit-area was silently painting ON TOP of them wherever they overlap,
+     stealing the click a reader meant for the link/button underneath.
+     z-index:0 here + the explicit z-index:1 on that whole group below
+     fixes the stacking regardless of DOM order — those must always win;
+     zooming in on text is the fallback affordance, not the priority one. */
+  z-index: 0;
+}
+
+/* Always wins over an overlapping .zoom-block — see its own comment above
+   for why. Everything here is an existing, more specific affordance (open
+   a link, open an article/photo/video) that a reader clicking that exact
+   spot is far more likely to mean than "zoom in on the text near it". */
+.toc-jump,
+.toc-page-label,
+.readmore-trigger,
+.pdf-link,
+.yt-trigger,
+.photo-zoom,
+.tooltip-hotspot {
+  z-index: 1;
+}
+
+#app:not(.mobile-mode) .zoom-block {
+  pointer-events: auto;
+  cursor: zoom-in;
+}
+
+#app:not(.mobile-mode) .zoom-block:hover,
+#app:not(.mobile-mode) .zoom-block:focus-visible {
+  background: rgba(98, 67, 147, 0);
+  outline: 1px solid rgba(98, 67, 147, 0);
+  outline-offset: 2px;
+}
+
+/* The block currently zoomed into — was kept highlighted while zoomed so
+   it's clear what's being focused on and what a second click undoes;
+   alpha 0 for now too, same as above. */
+#app:not(.mobile-mode) .zoom-block.is-zoomed {
+  background: rgba(98, 67, 147, 0);
+  outline: 1.5px solid rgba(98, 67, 147, 0);
+  cursor: zoom-out;
+}
+
 /* Transparent hit-area over the "閱讀全文" button already visible in the
    background image — click opens the article modal. See webapp's
    readmore.client.ts. */

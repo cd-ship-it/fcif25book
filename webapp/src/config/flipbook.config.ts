@@ -75,6 +75,32 @@ export interface FlipbookConfig {
     hideOnDesktopUntilToggled: boolean;
   };
 
+  /**
+   * "Click a text block to zoom in" — desktop only (mobile has its own
+   * pinch-to-zoom already, see flipbook.client.ts's mobileMode checks; the
+   * .zoom-block hit-areas generate.py emits into every page's markup are
+   * simply never wired up there regardless of this flag). The blocks
+   * themselves (which paragraphs are eligible) come from generate.py's own
+   * heuristic, not from here — this only tunes/kills the interaction.
+   */
+  zoomToBlock: {
+    /** Master on/off switch for the whole feature. */
+    enabled: boolean;
+    /**
+     * Padding (CSS px, at the book's natural 1x scale — pageWidth/
+     * pageHeight above) added around a block's own bounding box before
+     * fitting it to the viewport.
+     */
+    padPx: number;
+    /**
+     * Hard ceiling on how far a single block can be zoomed in, regardless
+     * of how small it is. These are 2x-resolution raster page backgrounds
+     * (see assets/backgrounds/), so past this point you're just
+     * magnifying pixels, not revealing more detail.
+     */
+    maxZoom: number;
+  };
+
   labels: {
     tocButton: string;
     prev: string;
@@ -138,6 +164,12 @@ const config: FlipbookConfig = {
     showKeyboardNav: true,
     showSound: false,
     hideOnDesktopUntilToggled: true,
+  },
+
+  zoomToBlock: {
+    enabled: true,
+    padPx: 28,
+    maxZoom: 2.8,
   },
 
   labels: {
