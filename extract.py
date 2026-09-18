@@ -2,11 +2,38 @@ import pymupdf as fitz
 import difflib, hashlib, json, os, re, sys
 from PIL import Image, ImageOps
 
-DEFAULT_PDF = 'FiCF 25 Book-Stage1.5.pdf'
-PDF_PATH = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_PDF
+DEFAULT_PDF = 'FiCF 25 Book-Stage1.6.pdf'
+
+def parse_page_spec(spec):
+    """'63' / '60,63' / '60-65' / '60-65,70' -> {60,61,...,65,70}."""
+    pages = set()
+    for part in spec.split(','):
+        part = part.strip()
+        if not part:
+            continue
+        if '-' in part:
+            lo, hi = part.split('-', 1)
+            pages.update(range(int(lo), int(hi) + 1))
+        else:
+            pages.add(int(part))
+    return pages
+
+# --pages restricts the (slow — 93 full-resolution background renders)
+# per-page extraction loop to just the given book pages, reusing every
+# other page's entry as-is from the existing data/pages.json rather than
+# re-rendering it. For a PDF revision that only touched a couple of pages,
+# this turns a multi-minute full re-extract into a few seconds. Omit it
+# (the default) to re-extract every page, as before.
+_argv = sys.argv[1:]
+PAGE_FILTER = None
+if '--pages' in _argv:
+    idx = _argv.index('--pages')
+    PAGE_FILTER = parse_page_spec(_argv[idx + 1])
+    del _argv[idx:idx + 2]
+PDF_PATH = _argv[0] if _argv else DEFAULT_PDF
 
 doc = fitz.open(PDF_PATH)
-print(f'Reading {PDF_PATH} ({len(doc)} pages)')
+print(f'Reading {PDF_PATH} ({len(doc)} pages)' + (f' — pages filter: {sorted(PAGE_FILTER)}' if PAGE_FILTER else ''))
 
 PAGE_W_PT = 612.0
 PAGE_H_PT = 792.0
@@ -243,23 +270,32 @@ NUM_PAGES = len(doc)
 # Render the timeline artwork once, split into this book's two normal
 # per-page background images (same RENDER_SCALE, same CSS_W/CSS_H per half
 # as every other page) — done up front so the main per-page loop below can
-# just drop these in for pages 8/9 instead of rendering from `doc`.
-timeline_events_by_page = extract_timeline_events()
-print(f"Timeline: {sum(len(v) for v in timeline_events_by_page.values())} events across pages {sorted(TIMELINE_PAGES)}")
+# just drop these in for pages 8/9 instead of rendering from `doc`. Skipped
+# entirely under --pages when neither timeline page was requested (the
+# main loop will just reuse pages 8/9's existing data/pages.json entries).
+need_timeline = PAGE_FILTER is None or bool(TIMELINE_PAGES & PAGE_FILTER)
+need_photo_albums = PAGE_FILTER is None or bool(set(PHOTO_ALBUM_PAGES) & PAGE_FILTER)
 
-photo_albums_by_page = extract_photo_albums()
+if need_timeline:
+    timeline_events_by_page = extract_timeline_events()
+    print(f"Timeline: {sum(len(v) for v in timeline_events_by_page.values())} events across pages {sorted(TIMELINE_PAGES)}")
 
-_tdoc = fitz.open(TIMELINE_PDF_PATH)
-_tpage = _tdoc[0]
-_tmat = fitz.Matrix(sx * RENDER_SCALE, sy * RENDER_SCALE)
-_tpix = _tpage.get_pixmap(matrix=_tmat, alpha=False)
-_full_img = Image.frombuffer('RGB', (_tpix.width, _tpix.height), _tpix.samples, 'raw', 'RGB', 0, 1)
-_split_px = round(TIMELINE_SPLIT_PT * sx * RENDER_SCALE)
-timeline_bg_halves = {
-    8: _full_img.crop((0, 0, _split_px, _tpix.height)),
-    9: _full_img.crop((_split_px, 0, _tpix.width, _tpix.height)),
-}
-_tdoc.close()
+    _tdoc = fitz.open(TIMELINE_PDF_PATH)
+    _tpage = _tdoc[0]
+    _tmat = fitz.Matrix(sx * RENDER_SCALE, sy * RENDER_SCALE)
+    _tpix = _tpage.get_pixmap(matrix=_tmat, alpha=False)
+    _full_img = Image.frombuffer('RGB', (_tpix.width, _tpix.height), _tpix.samples, 'raw', 'RGB', 0, 1)
+    _split_px = round(TIMELINE_SPLIT_PT * sx * RENDER_SCALE)
+    timeline_bg_halves = {
+        8: _full_img.crop((0, 0, _split_px, _tpix.height)),
+        9: _full_img.crop((_split_px, 0, _tpix.width, _tpix.height)),
+    }
+    _tdoc.close()
+else:
+    timeline_events_by_page = {}
+    timeline_bg_halves = {}
+
+photo_albums_by_page = extract_photo_albums() if need_photo_albums else {}
 
 # Real content photos vs. decorative art (watercolor washes, leaf-motif
 # illustrations, stock "photo not available yet" placeholders): every page
@@ -294,9 +330,17 @@ for i in range(NUM_PAGES):
     page_image_entries[n] = entries
 
 # Pass 2: keep only hashes unique to one page, save each as its own file.
+# Uniqueness itself is always checked against the WHOLE document (image_
+# hash_count above already scanned every page — cheap, no rendering
+# involved), even under --pages — otherwise a photo's uniqueness verdict
+# could flip depending on which pages happen to be in the filter. Only the
+# actual file write is skipped for a page --pages excludes, since that
+# page's own data/pages.json entry (and its already-written photo files)
+# are being reused untouched anyway.
 photos_by_page = {}
 total_photos = 0
 for n, entries in page_image_entries.items():
+    write_files = PAGE_FILTER is None or n in PAGE_FILTER
     kept = []
     idx = 0
     for entry in entries:
@@ -304,16 +348,32 @@ for n, entries in page_image_entries.items():
             continue
         idx += 1
         fname = f'page{n}-photo{idx}.jpg'
-        with open(f'assets/photos/{fname}', 'wb') as f:
-            f.write(entry['bytes'])
+        if write_files:
+            with open(f'assets/photos/{fname}', 'wb') as f:
+                f.write(entry['bytes'])
         kept.append({'bbox': list(entry['bbox']), 'file': fname})
     photos_by_page[n] = kept
     total_photos += len(kept)
 print(f'Extracted {total_photos} unique photos across {sum(1 for v in photos_by_page.values() if v)} pages')
 
+existing_pages_by_num = {}
+if PAGE_FILTER is not None:
+    if not os.path.exists('data/pages.json'):
+        sys.exit('--pages given but data/pages.json does not exist yet — run a full extract() first, without --pages.')
+    with open('data/pages.json', encoding='utf-8') as f:
+        existing_pages_by_num = {p['page']: p for p in json.load(f)}
+    unchanged = sorted(set(existing_pages_by_num) - PAGE_FILTER)
+    print(f'--pages filter: recomputing {sorted(PAGE_FILTER)}, reusing existing data/pages.json entries for the other {len(unchanged)} pages')
+
 for i in range(NUM_PAGES):
     page = doc[i]
     n = i + 1
+
+    if PAGE_FILTER is not None and n not in PAGE_FILTER:
+        if n not in existing_pages_by_num:
+            sys.exit(f'--pages filter excludes page {n}, but it has no existing data/pages.json entry to reuse — run a full extract() first, without --pages.')
+        pages_data.append(existing_pages_by_num[n])
+        continue
 
     if n in TIMELINE_PAGES:
         bg_ext = 'png'

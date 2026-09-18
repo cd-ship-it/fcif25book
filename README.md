@@ -1,6 +1,6 @@
 # FiCF 25 週年紀念電子書
 
-A PDF-to-HTML/CSS conversion of "FiCF 25 Book-Stage1.5.pdf" (93 pages), rendered as a
+A PDF-to-HTML/CSS conversion of "FiCF 25 Book-Stage1.6.pdf" (93 pages), rendered as a
 two-page-spread flipbook.
 
 **Live site:** https://cd-ship-it.github.io/fcif25book/ (deployed automatically by
@@ -9,7 +9,7 @@ two-page-spread flipbook.
 ## Layout
 
 ```
-FiCF 25 Book-Stage1.5.pdf   — source document (93 pages)
+FiCF 25 Book-Stage1.6.pdf   — source document (93 pages)
 extract.py                 — PDF -> assets/backgrounds/*.png|jpg (text-redacted, 2x retina)
                                  + assets/backgrounds/*.webp (displayed copy, see below)
                                  + assets/photos/*.jpg (original-resolution real photos, see below)
@@ -50,6 +50,24 @@ cd webapp && node scripts/sync-from-source.mjs && npm run build
 
 `extract.py` takes the PDF path as an optional first argument (defaults to the
 constant at the top of the file) — no need to hand-edit the script for a new PDF.
+
+**Per-page update** — when a new PDF revision only touched a handful of
+pages, pass `--pages` to skip re-rendering the other ~90 (each a full-
+resolution background image, the slow part of `extract.py`) and reuse
+their existing `data/pages.json` entries untouched instead:
+
+```sh
+./.venv/bin/python3 extract.py "FiCF 25 Book-Stage1.6.pdf" --pages 63   # single page
+./.venv/bin/python3 extract.py "FiCF 25 Book-Stage1.6.pdf" --pages 63,88   # a few
+./.venv/bin/python3 extract.py "FiCF 25 Book-Stage1.6.pdf" --pages 60-65   # a range
+./.venv/bin/python3 generate.py           # still runs over all pages — fast, no images
+cd webapp && node scripts/sync-from-source.mjs && npm run build
+```
+
+`generate.py` has no `--pages` option (and doesn't need one — with no
+image rendering, running it over all 93 pages takes well under a second),
+so it always regenerates every `pageN.html`/`.generated.css` from
+whatever's now in `data/pages.json`.
 
 Only `webapp/` is what actually ships — the `pages/pageN.html` files and
 `index.html` gallery are a standalone preview/debugging aid, not part of the
