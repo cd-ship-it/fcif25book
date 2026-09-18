@@ -1,0 +1,230 @@
+/* FB-style scrolling feed — proof of concept.
+   Entirely separate from app.css/details.css (own element IDs throughout,
+   even though the two routes never load simultaneously — defensive
+   isolation per the POC's "must not interfere with the existing app"
+   requirement).
+
+   An earlier version of this card used a crop of the page's own rendered
+   PDF page (text baked in) as a top banner — removed per feedback (it
+   read as a plain "capture the whole page as a hero image" treatment
+   rather than anything more deliberate). The current version instead
+   washes .fb-post-body's own background with that page's extracted
+   decorative art ONLY — no text, just the watercolor/line-art PNG
+   (extract_fbstyle_decor.py) — blended under a translucent white layer
+   (inline `background-image: linear-gradient(white-ish, white-ish),
+   url(decor.png)` in index.astro) so the whole card carries a soft trace
+   of the page's own artwork instead of a hard banner block. Posts with no
+   extracted decoration (post.decor undefined) simply render on plain
+   white, same as before. */
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #f0f2f5; /* classic feed backdrop grey */
+  color: #050505;
+  font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+}
+
+#fb-feed {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 20px 12px 60px;
+}
+
+#fb-feed h1 {
+  font-size: 20px;
+  text-align: center;
+  color: #050505;
+  margin: 0 0 20px;
+}
+
+/* ---------------- Post card ---------------- */
+
+.fb-post {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.06);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.fb-post-body {
+  padding: 14px 16px 4px;
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+}
+
+.fb-post-badge {
+  display: block;
+  margin-bottom: 6px;
+  color: #65676b;
+  font-size: 12px;
+}
+
+/* ---------------- Categories, as hashtags ---------------- */
+
+.fb-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.fb-hashtag {
+  font-size: 13px;
+  font-weight: 700;
+  color: #624393;
+}
+
+/* ---------------- Title / subtitle / author ---------------- */
+
+.fb-title {
+  margin: 0 0 4px;
+  font-size: 20px;
+  line-height: 1.35;
+  color: #050505;
+}
+
+.fb-subtitle {
+  margin: 0 0 6px;
+  font-size: 15px;
+  color: #444;
+}
+
+.fb-author {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: #65676b;
+}
+
+/* ---------------- Hero media: horizontal-scroll carousel ----------------
+   Pure CSS, no JavaScript — native touch/mouse-wheel scroll-snapping in
+   every current browser. A single-item strip just renders as a plain
+   non-scrolling full-width image (nothing to scroll to), so the template
+   never needs to branch on "is this 1 photo, many, or an album." No
+   click-to-zoom anywhere here — explicit requirement for this version. */
+
+.fb-hero {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  gap: 8px;
+  margin: 4px -16px 12px;
+  padding: 0 16px;
+}
+
+.fb-hero::-webkit-scrollbar {
+  display: none;
+}
+
+.fb-hero-item {
+  flex: 0 0 85%;
+  scroll-snap-align: start;
+}
+
+.fb-hero-item img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+  border-radius: 8px;
+  background: #e4e6eb;
+}
+
+.fb-hero-caption {
+  margin: 4px 2px 0;
+  font-size: 12px;
+  color: #65676b;
+  line-height: 1.4;
+}
+
+/* ---------------- Body text: full-width, left-aligned, reflowed ---------- */
+
+.fb-text p {
+  margin: 0 0 12px;
+  text-align: left;
+  line-height: 1.6;
+  overflow-wrap: break-word;
+}
+
+.fb-text p:last-child {
+  margin-bottom: 0;
+}
+
+/* ---------------- Read-more trigger ---------------- */
+
+.fb-readmore-btn {
+  display: block;
+  width: 100%;
+  margin: 4px 0 16px;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(98, 67, 147, 0.08);
+  color: #624393;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: center;
+}
+
+.fb-readmore-btn:hover {
+  background: rgba(98, 67, 147, 0.16);
+}
+
+/* ---------------- Read-more: inline expand ----------------
+   Facebook-style "See more" — expands the article in place within the
+   same post card, not a modal/popup. No collapse control: once expanded,
+   the trigger button is removed entirely (see fbstyle-readmore.client.ts)
+   — Facebook doesn't offer a "retract" either, so neither does this. */
+
+.fb-detail-inline {
+  padding: 4px 0 16px;
+  border-top: 1px solid #e4e6eb;
+  margin-top: 8px;
+}
+
+.fb-detail-title {
+  margin: 16px 0 4px;
+  font-size: 20px;
+  color: #624393;
+}
+
+.fb-detail-subtitle {
+  margin: 0 0 20px;
+  font-size: 14px;
+  color: #6b6470;
+}
+
+.fb-detail-content {
+  font-size: 18px;
+  line-height: 1.9;
+}
+
+.fb-detail-content p {
+  margin: 0 0 1em;
+  text-align: justify;
+  text-align-last: left;
+}
+
+.fb-detail-content img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 12px 0;
+  border-radius: 6px;
+}
+
+.fb-detail-content blockquote {
+  margin: 0 0 1.4em;
+  padding: 10px 16px;
+  border-left: 3px solid #c9a227;
+  background: rgba(201, 162, 39, 0.08);
+  font-size: 13.5px;
+  color: #55504f;
+}

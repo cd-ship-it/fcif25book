@@ -1,6 +1,6 @@
 # FiCF 25 週年紀念電子書
 
-A PDF-to-HTML/CSS conversion of "FiCF 25 Book-Stage1.3.pdf" (93 pages), rendered as a
+A PDF-to-HTML/CSS conversion of "FiCF 25 Book-Stage1.5.pdf" (93 pages), rendered as a
 two-page-spread flipbook.
 
 **Live site:** https://cd-ship-it.github.io/fcif25book/ (deployed automatically by
@@ -9,7 +9,7 @@ two-page-spread flipbook.
 ## Layout
 
 ```
-FiCF 25 Book-Stage1.3.pdf   — source document (93 pages)
+FiCF 25 Book-Stage1.5.pdf   — source document (93 pages)
 extract.py                 — PDF -> assets/backgrounds/*.png|jpg (text-redacted, 2x retina)
                                  + assets/backgrounds/*.webp (displayed copy, see below)
                                  + assets/photos/*.jpg (original-resolution real photos, see below)

@@ -1,0 +1,150 @@
+---
+// FB-style scrolling feed — proof of concept. New, isolated route: does
+// not import or touch app.css/details.css/index.astro/flipbook.client.ts
+// or any other file the production route (../index.astro) uses.
+//
+// Data comes from generate_fbstyle_md.py's per-page fbstyle-src/md/*.md
+// (synced to posts.json by scripts/sync-fbstyle.mjs) — plain extracted
+// title/subtitle/author/categories/photos/body, no per-span font styling
+// the way the earlier posts.json-based version carried.
+import '../../styles/fbstyle.css';
+import posts from '../../generated-fbstyle/posts.json';
+import { readMoreLinks } from '../../config/readmore.config';
+
+interface Photo {
+  file: string;
+  caption: string;
+}
+interface Post {
+  page: number;
+  title?: string;
+  subtitle?: string;
+  author?: string;
+  categories: string[];
+  photos: Photo[];
+  readmore?: string;
+  body: string;
+  decor?: string;
+}
+interface DetailFrontmatter {
+  title: string;
+  subtitle?: string;
+  page: number;
+}
+
+const typedPosts = posts as Post[];
+
+// Same pattern as ../index.astro's detailModules/detailPanels, filtered
+// down to only the read-more entries this sample set actually needs.
+const detailModules = import.meta.glob('../../details/*.md', { eager: true }) as Record<
+  string,
+  { frontmatter: DetailFrontmatter; Content: any }
+>;
+
+const neededSlugs = new Set(typedPosts.map((p) => p.readmore).filter(Boolean));
+
+const detailPanels = readMoreLinks
+  .filter((link) => neededSlugs.has(link.detailsFile))
+  .map((link) => {
+    const key = Object.keys(detailModules).find((k) => k.endsWith(`/${link.detailsFile}.md`));
+    if (!key) {
+      console.warn(`[fbstyle] No src/details/${link.detailsFile}.md — skipping its read-more button.`);
+      return null;
+    }
+    const mod = detailModules[key];
+    return { detailsFile: link.detailsFile, frontmatter: mod.frontmatter, Content: mod.Content };
+  })
+  .filter((p): p is NonNullable<typeof p> => p !== null);
+
+const detailByDetailsFile = new Map(detailPanels.map((p) => [p.detailsFile, p]));
+
+function withBase(path: string): string {
+  return `${import.meta.env.BASE_URL.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
+}
+
+function bodyParagraphs(body: string): string[] {
+  return body.split(/\n{2,}/).map((s) => s.trim()).filter(Boolean);
+}
+---
+
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FB-style feed (POC) — 基督豐榮：同行25載</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div id="fb-feed">
+    <h1>基督豐榮．同行25載 — Feed 版 (proof of concept)</h1>
+
+    {typedPosts.map((post) => (
+      <article class="fb-post">
+        <div
+          class="fb-post-body"
+          style={post.decor
+            ? {
+                backgroundImage: `linear-gradient(rgba(255,255,255,0.86), rgba(255,255,255,0.86)), url(${withBase(`assets/fbstyle-decor/${post.decor}`)})`,
+              }
+            : undefined}
+        >
+          <span class="fb-post-badge">第 {post.page} 頁</span>
+
+          {post.categories.length > 0 && (
+            <div class="fb-categories">
+              {post.categories.map((c) => (
+                <span class="fb-hashtag">#{c}</span>
+              ))}
+            </div>
+          )}
+
+          {post.title && <h2 class="fb-title">{post.title}</h2>}
+          {post.subtitle && <p class="fb-subtitle">{post.subtitle}</p>}
+          {post.author && <p class="fb-author">{post.author}</p>}
+
+          {post.photos.length > 0 && (
+            <div class="fb-hero">
+              {post.photos.map((photo) => (
+                <div class="fb-hero-item">
+                  <img src={withBase(`assets/photos/${photo.file}`)} alt="" loading="lazy" />
+                  {photo.caption && <p class="fb-hero-caption">{photo.caption}</p>}
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div class="fb-text">
+            {bodyParagraphs(post.body).map((para) => (
+              <p>{para}</p>
+            ))}
+          </div>
+
+          {post.readmore && detailByDetailsFile.has(post.readmore) && (() => {
+            const d = detailByDetailsFile.get(post.readmore)!;
+            return (
+              <Fragment>
+                <button type="button" class="fb-readmore-btn" data-fb-readmore={d.detailsFile}>
+                  閱讀全文
+                </button>
+                <div class="fb-detail-inline" data-fb-detail-panel={d.detailsFile} hidden>
+                  <h2 class="fb-detail-title">{d.frontmatter.title}</h2>
+                  {d.frontmatter.subtitle && <p class="fb-detail-subtitle">{d.frontmatter.subtitle}</p>}
+                  <div class="fb-detail-content">
+                    <d.Content />
+                  </div>
+                </div>
+              </Fragment>
+            );
+          })()}
+        </div>
+      </article>
+    ))}
+  </div>
+
+  <script>
+    import '../../scripts/fbstyle-readmore.client.ts';
+  </script>
+</body>
+</html>

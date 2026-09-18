@@ -412,7 +412,7 @@ READMORE_TRIGGER_TEXT = '閱讀全文'
 # now that there's no per-line text-emission loop to assign one). Re-derive
 # this table with a quick dump of page 5's 'lines' (text + bbox) if a future
 # PDF revision changes page 5's content — verified once against
-# FiCF 25 Book-Stage1.3.pdf:
+# FiCF 25 Book-Stage1.3.pdf, re-confirmed unchanged as of Stage1.5.pdf:
 #   0  目錄 (page title, not a TOC entry)
 #   1  鳴謝                                          -> 3
 #   2  成長茁壯                                       -> 30

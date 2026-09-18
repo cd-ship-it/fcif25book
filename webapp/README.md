@@ -13,7 +13,7 @@ one directory up) and adapts them into a single-page flipbook.
 ## Pipeline
 
 ```
-../FiCF 25 Book-Stage1.3.pdf
+../FiCF 25 Book-Stage1.5.pdf
         │  extract.py   (PyMuPDF: renders text-free backgrounds, dumps text spans)
         ▼
 ../data/pages.json, ../assets/backgrounds/*.png|jpg, ../assets/fonts/*

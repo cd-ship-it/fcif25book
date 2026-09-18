@@ -2,7 +2,7 @@ import pymupdf as fitz
 import difflib, hashlib, json, os, re, sys
 from PIL import Image, ImageOps
 
-DEFAULT_PDF = 'FiCF 25 Book-Stage1.3.pdf'
+DEFAULT_PDF = 'FiCF 25 Book-Stage1.5.pdf'
 PDF_PATH = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_PDF
 
 doc = fitz.open(PDF_PATH)
