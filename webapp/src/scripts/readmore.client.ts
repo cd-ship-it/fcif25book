@@ -4,8 +4,35 @@ function init(): void {
   const overlay = document.getElementById('detail-overlay');
   const card = document.getElementById('detail-card');
   const closeBtn = document.getElementById('detail-close');
+  const fontDecBtn = document.getElementById('detail-font-dec') as HTMLButtonElement | null;
+  const fontIncBtn = document.getElementById('detail-font-inc') as HTMLButtonElement | null;
   const stage = document.getElementById('stage');
   if (!overlay || !stage) return; // no detail panels were rendered (no matching .md files)
+
+  // Article font size, adjustable via the 縮小字體/加大字體 buttons — applied
+  // as a CSS var on #detail-card (read by .detail-content in details.css)
+  // rather than per-article, so it stays put when switching between
+  // articles within the same session; resets to the default on reload.
+  const FONT_MIN = 14;
+  const FONT_MAX = 26;
+  const FONT_STEP = 2;
+  let fontSize = 18;
+
+  function applyFontSize(): void {
+    card?.style.setProperty('--detail-font-size', `${fontSize}px`);
+    if (fontDecBtn) fontDecBtn.disabled = fontSize <= FONT_MIN;
+    if (fontIncBtn) fontIncBtn.disabled = fontSize >= FONT_MAX;
+  }
+
+  fontDecBtn?.addEventListener('click', () => {
+    fontSize = Math.max(FONT_MIN, fontSize - FONT_STEP);
+    applyFontSize();
+  });
+  fontIncBtn?.addEventListener('click', () => {
+    fontSize = Math.min(FONT_MAX, fontSize + FONT_STEP);
+    applyFontSize();
+  });
+  applyFontSize();
 
   const panels = overlay.querySelectorAll<HTMLElement>('[data-detail-panel]');
   const idToSlug = new Map(readMoreLinks.map((l) => [l.elementId, l.detailsFile] as const));

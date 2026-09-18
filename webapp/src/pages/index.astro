@@ -201,7 +201,13 @@ const total = manifest.total as number;
   {detailPanels.length > 0 && (
     <div id="detail-overlay" aria-hidden="true">
       <div id="detail-card" role="dialog" aria-modal="true">
-        <button type="button" id="detail-close" aria-label="關閉">✕</button>
+        <div id="detail-toolbar">
+          <div class="detail-fontsize-group">
+            <button type="button" id="detail-font-dec" class="detail-pill-btn">縮小字體</button>
+            <button type="button" id="detail-font-inc" class="detail-pill-btn">加大字體</button>
+          </div>
+          <button type="button" id="detail-close" aria-label="關閉">✕</button>
+        </div>
         <div id="detail-body">
           {detailPanels.map((d) => (
             <article class="detail-panel" data-detail-panel={d.detailsFile} hidden>

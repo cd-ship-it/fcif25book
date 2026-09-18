@@ -33,7 +33,77 @@
   border-radius: 10px;
   border: 1px solid var(--fpToolbarBorder, #000000);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
-  padding: 36px 40px 40px;
+  /* No padding here — #detail-toolbar and #detail-body each carry their
+     own, so the sticky toolbar (below) can sit flush against the card's
+     top/side edges without fighting a parent padding via negative
+     margins, which position:sticky doesn't reliably honor (a negative
+     margin-top on a sticky element was observed NOT shifting it, unlike
+     the equivalent negative margin-left, which did — Chrome, Sep 2026). */
+}
+
+/* Sticky row at the top of the card: font-size controls + close button,
+   right-aligned together — same idea as the main top toolbar (a flex row
+   of pill buttons), scaled down to fit inside the modal. Opaque
+   background so scrolled article text doesn't show through underneath
+   it once #detail-card is scrolled. */
+#detail-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 16px 20px 12px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  background: #fdfcfa;
+  border-radius: 10px 10px 0 0;
+}
+
+.detail-fontsize-group {
+  display: flex;
+  gap: 8px;
+}
+
+/* The padding #detail-card itself used to carry, moved here now that the
+   card has none of its own (see #detail-card's comment) — no top padding,
+   since #detail-toolbar's own top/bottom padding already provides that. */
+#detail-body {
+  padding: 0 40px 40px;
+}
+
+/* Same liquid/pill look as the main toolbar's buttons (app.css's
+   `.toolbar button, .toolbar .btn`), duplicated at a smaller size rather
+   than shared — this modal isn't inside `.toolbar`, and these two rules
+   are small enough that keeping them independent is simpler than
+   generalizing a shared class across both. */
+.detail-pill-btn {
+  appearance: none;
+  border: none;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--fpPrimary, #624393);
+  padding: 8px 16px;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.detail-pill-btn:hover {
+  background: var(--fpPrimaryDark, #453168);
+  color: #ffffff;
+}
+
+.detail-pill-btn:active {
+  transform: scale(0.96);
+}
+
+.detail-pill-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+  transform: none;
 }
 
 /* Explicit equal width/height + flex-centered content, not padding-based
@@ -42,21 +112,19 @@
    alone (the old approach here) rendered as a visible oval there. Same
    fixed-box-plus-flex-center pattern already used for every other round
    button in this app (.dock-btn, #btn-toolbar-toggle, .hint-bubble-close,
-   .jump-form-go). */
+   .jump-form-go). Sized to match .detail-pill-btn's own rendered height
+   (~34px) now that they sit side by side in #detail-toolbar. */
 #detail-close {
-  position: sticky;
-  float: right;
-  top: 0;
-  margin: -20px -24px 0 0;
+  flex: none;
   appearance: none;
   border: none;
   background: var(--fpPrimary, #624393);
   color: #ffffff;
-  font-size: 19px;
+  font-size: 16px;
   line-height: 1;
   cursor: pointer;
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   padding: 0;
   display: flex;
   align-items: center;
@@ -91,7 +159,7 @@
 }
 
 .detail-content {
-  font-size: 18px;
+  font-size: var(--detail-font-size, 18px);
   line-height: 1.9;
 }
 
@@ -128,7 +196,16 @@
 }
 
 @media (max-width: 560px) {
-  #detail-card {
-    padding: 28px 20px 32px;
+  #detail-body {
+    padding: 0 20px 32px;
+  }
+
+  #detail-toolbar {
+    padding: 12px 16px 10px 20px;
+  }
+
+  .detail-pill-btn {
+    padding: 7px 12px;
+    font-size: 12px;
   }
 }
