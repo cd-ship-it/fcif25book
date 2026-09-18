@@ -165,9 +165,12 @@ the corresponding article from `details/`. One markdown file per button —
 `Page N.md` for a page with a single button, `Page N Left.md` / `Right.md`
 or `Page N Top.md` / `Bottom.md` for a page with two (a trailing
 parenthetical in the filename, e.g. `Page 57 (with in text photos).md`, is
-just a note-to-self, ignored when matching). Format: a `# Title` heading, an
-`*Author*` line, then the article body in plain Markdown — an inline image
-is `![](images/foo.jpg)` referencing a same-named file in `details/images/`.
+just a note-to-self, ignored when matching). Format: a `# Title` heading,
+one or more `*Author*` lines (consecutive, no blank line between — e.g. a
+subject line plus a separate "interviewed/written by" credit — joined with
+`<br>` into a single subtitle), then the article body in plain Markdown —
+an inline image is `![](images/foo.jpg)` referencing a same-named file in
+`details/images/`.
 `webapp/scripts/sync-details.mjs` turns this into the webapp's
 `readmore.config.ts` + `src/details/*.md` automatically (see
 `webapp/README.md`) — matching each file to its "閱讀全文" trigger element by

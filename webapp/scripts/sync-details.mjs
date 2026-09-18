@@ -98,9 +98,19 @@ for (const filename of readdirSync(SRC_DETAILS)) {
   const title = titleMatch ? titleMatch[1].trim() : parsed.page.toString();
   if (titleMatch) i++;
   while (i < lines.length && lines[i].trim() === '') i++;
-  const authorMatch = lines[i]?.match(/^\*(.+)\*$/);
-  const subtitle = authorMatch ? authorMatch[1].trim() : null;
-  if (authorMatch) i++;
+  // One or more consecutive "*Author*" lines (no blank line between them) —
+  // a page can credit multiple people (e.g. a subject + the writer who
+  // interviewed them). Joined with <br> into a single subtitle line rather
+  // than left as separate lines, which would otherwise fall through into
+  // the body as a stray extra paragraph.
+  const authorLines = [];
+  while (i < lines.length) {
+    const m = lines[i].match(/^\*(.+)\*$/);
+    if (!m) break;
+    authorLines.push(m[1].trim());
+    i++;
+  }
+  const subtitle = authorLines.length ? authorLines.join('<br>') : null;
   while (i < lines.length && lines[i].trim() === '') i++;
 
   // Image references (`![](images/foo.jpg)`) need no rewriting — images/
