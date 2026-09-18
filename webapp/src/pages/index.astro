@@ -206,7 +206,7 @@ const total = manifest.total as number;
           {detailPanels.map((d) => (
             <article class="detail-panel" data-detail-panel={d.detailsFile} hidden>
               <h2 class="detail-title">{d.frontmatter.title}</h2>
-              {d.frontmatter.subtitle && <p class="detail-subtitle">{d.frontmatter.subtitle}</p>}
+              {d.frontmatter.subtitle && <p class="detail-subtitle" set:html={d.frontmatter.subtitle} />}
               <div class="detail-content">
                 <d.Content />
               </div>
